@@ -3,7 +3,7 @@
 
 # FeedGram
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://gitlab.com/Territory91/2019_assignment1_meldon/blob/master/LICENSE)
+[![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://gitlab.com/meliurwen/feedgram/blob/master/LICENSE)
 
 </div>
 
@@ -23,20 +23,30 @@
 
 Acquire, through experimental activities, the skills necessary to independently develop a system using agile methodologies by practicing the knowledge acquired during the course of studies.
 
-In this project we'll use Trello and the Gitlab's CI/CD infrastructure.
+In this project we'll use **_Trello_** in combination with the _Gitlab's_ **_git_** and **_CI/CD_** infrastructure.
 
 ## App
 
 > **Note:** At the moment it's in pre-alpha state; a sensible part of our available resources has been invested on the study on learning agile practices.
 
-A simple Telegram bot app living in the cloud with bare bones functionalities!  ☁️🗒
+A simple to use, but yet powerful Telegram bot app living in the cloud with bare bones functionalities!  ☁️🗒
 
-This multi-user bot allows to receive news, RSS feeds, social networks and other platforms posts into a single and curated inbox!
+This **_multi-user bot_** allows to receive _news_, _RSS feeds_, _social networks and other platforms posts_ into a **_single and curated inbox_**!
 
-The first social networks supported will be the most popular ones: Youtube, Instagram ,Flickr, Artstation, Twitter, etc...
+The first platforms supported will be the most popular ones: _Instagram_, _Youtube_, _Flickr_, _Twitter_, _Artstation_, etc...
 
 ## Architecture
-> TODO
+
+The diagram below is the **_high level architecture_** of this project and describes the _interactions_ between the _internal components_ of the app and between the app and the _external ones_:
+
+![High Level Architecture](img/architecture_high_level.png)
+
+As described by the diagram **_the bot does not interact directly with the users_**, but it accomplish this _via the Telegram's stack_ using _APIs expressively provided for the bots_.
+
+The **_interactions with the socials/platforms_** will be done with various methods and techniques that depends on _how_ (and _at which conditions_) each social/platform we interact with exposes the data we need. In most cases _is better use the official APIs_ provided via _HTTP_ methods (GET or POST) or _OAuth_, but in few cases for various reasons the classic _scraping methods are more convenient_.
+
+The **_internal structure_** of the application is mainly composed by a multitude of _specialised python modules_, an _SQLite3_ database and a config file in `ini` format, most of them directly orchestrated by a main module.
+
 
 ## How to Install and Launch
 
