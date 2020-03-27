@@ -1,2 +1,7 @@
 # Virtual Environment
 venv/
+
+# setup.py
+build/
+dist/
+*.egg*

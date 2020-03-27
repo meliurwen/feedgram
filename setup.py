@@ -8,10 +8,10 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 #    description = f.read()
 
 with open(os.path.join(dir_path, 'version'),"r") as f:
-    version = f.readline()
+    version = f.readline().rstrip('\n')
 
 with open(os.path.join(dir_path, 'pjname'),"r") as f:
-    pjname = f.readline()
+    pjname = f.readline().rstrip('\n')
 
 description = "A Telegram bot that allows you to receive updates from multiple social networks, sites, RSS feeds and organizations in a single feed."
 
@@ -34,7 +34,7 @@ setup(
     url='https://gitlab.com/meliurwen/feedgram',
     license="GPLv3",
     install_requires=install_requires,
-    tests_requires=tests_require,
+    tests_require=tests_require,
     test_suite="nose.collector",
     include_package_data=True,
     keywords=['telegram', 'bot', 'feed', 'feeds', 'instagram'],
