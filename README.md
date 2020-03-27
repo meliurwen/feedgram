@@ -65,11 +65,11 @@ cd feedgram
 ```
 
 ```sh
-python3 -m venv .
+virtualenv -p python3 venv
 ```
 
 ```sh
-source bin/activate
+source venv/bin/activate
 ```
 
 ```sh
