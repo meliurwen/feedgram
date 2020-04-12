@@ -5,3 +5,10 @@ venv/
 build/
 dist/
 *.egg*
+
+# Tests
+.coverage
+coverage.xml
+
+# Python Trash
+__pycache__/
