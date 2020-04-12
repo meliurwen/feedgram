@@ -9,6 +9,10 @@ dist/
 # Tests
 .coverage
 coverage.xml
+junit_coverage.xml
 
 # Python Trash
 __pycache__/
+
+# vscode
+.vscode/
