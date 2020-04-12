@@ -8,8 +8,7 @@ dist/
 
 # Tests
 .coverage
-coverage.xml
-junit_coverage.xml
+coverage/
 
 # Python
 __pycache__/
