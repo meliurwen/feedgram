@@ -11,8 +11,12 @@ dist/
 coverage.xml
 junit_coverage.xml
 
-# Python Trash
+# Python
 __pycache__/
 
 # vscode
 .vscode/
+
+# App
+config.ini
+*.sqlite3
