@@ -1,0 +1,6 @@
+[flake8]
+exclude = .venv,venv/*,.tox/*,dist/*,doc/*,build/*,*.egg,docs/*,*/migrations/
+ignore = E302,E305,W391,W292,E231,F401,F841,E501,E226,W191,E241,E265,E101,E116,E117,W291,E722,W293,E303
+# E302 expected 2 blank lines, found 1
+# E305 expected 2 blank lines after class or function definition, found 1
+# W391 blank line at end of file

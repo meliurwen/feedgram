@@ -15,14 +15,9 @@ with open(os.path.join(dir_path, 'pjname'),"r") as f:
 
 description = "A Telegram bot that allows you to receive updates from multiple social networks, sites, RSS feeds and organizations in a single feed."
 
-install_requires = [
-    'requests',
-    ]
+install_requires = [line.rstrip('\n') for line in open('requirements.txt')]
 
-tests_require = [
-    'mock>=1.0.1',
-    'nose>=1.3.4',
-    ]
+tests_require = [line.rstrip('\n') for line in open('test-requirements.txt')]
 
 setup(
     name=pjname,
@@ -35,7 +30,7 @@ setup(
     license="GPLv3",
     install_requires=install_requires,
     tests_require=tests_require,
-    test_suite="nose.collector",
+    test_suite="pytest",
     include_package_data=True,
     keywords=['telegram', 'bot', 'feed', 'feeds', 'instagram'],
     packages=find_packages(),
