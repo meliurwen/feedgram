@@ -4,8 +4,6 @@ import logging
 import json
 from lib.utils import get_url
 
-LOGGER = logging.getLogger('social.instagram')
-
 
 class Instagram:
 
@@ -16,8 +14,7 @@ class Instagram:
     # The content retreived here comes from this URL -> "https://www.instagram.com/"+user+"/"
     # For `json.loads` exceptions see: https://docs.python.org/3/library/json.html#json.loads
 
-    @classmethod
-    def __get_json_from_url(cls, url):
+    def __get_json_from_url(self, url):
         before_json_exception = False
         while True:
             content = get_url(url)
@@ -27,14 +24,44 @@ class Instagram:
                 jsn = json.loads(content)
                 if before_json_exception:
                     before_json_exception = False
-                    LOGGER.warning("This time the the content retrived contains json! :D")
+                    self.__logger.warning("This time the the content retrived contains json! :D")
                 return jsn
             except json.JSONDecodeError:
                 before_json_exception = True
-                LOGGER.warning("The content of the url is not json, now i print the content...")
-                LOGGER.warning(content)
+                self.__logger.warning("The content of the url is not json, now i print the content...")
+                self.__logger.warning(content)
                 time.sleep(1)
-                LOGGER.warning("Trying to retreive again the content from the url...")
+                self.__logger.warning("Trying to retreive again the content from the url...")
+
+    def extract_data(self, sn_account):
+        if sn_account["username"]:
+            sn_payload = self.__get_json_from_url("https://www.instagram.com/" + sn_account["username"] + "/")
+            if sn_payload["entry_data"]:  # se non è vuoto (quindi esiste l'account social)
+                sn_account["internal_id"] = sn_payload["entry_data"]["ProfilePage"][0]["graphql"]["user"]["id"]
+                sn_account["title"] = sn_account["username"]
+                sn_account["subStatus"] = "subscribable"
+                if sn_payload["entry_data"]["ProfilePage"][0]["graphql"]["user"]["is_private"]:
+                    sn_account["status"] = "private"
+                else:
+                    sn_account["status"] = "public"
+            else:
+                sn_account["subStatus"] = "NotExists"
+                sn_account["status"] = "unknown"
+        elif "p" in sn_account["data"]:
+            sn_payload = self.__get_json_from_url("https://www.instagram.com/p/" + sn_account["data"]["p"] + "/")
+            try:  # se genera l'eccezione vuol dire che il link di instagram per il post (video od immagine che sia) non è valido od è privato
+                sn_account["username"] = sn_payload["entry_data"]["PostPage"][0]["graphql"]["shortcode_media"]["owner"]["username"]
+                sn_account["title"] = sn_payload["entry_data"]["PostPage"][0]["graphql"]["shortcode_media"]["owner"]["username"]
+                sn_account["internal_id"] = sn_payload["entry_data"]["PostPage"][0]["graphql"]["shortcode_media"]["owner"]["id"]
+                sn_account["subStatus"] = "subscribable"
+                sn_account["status"] = "public"
+            except KeyError:
+                sn_account["subStatus"] = "NotExistsOrPrivate"
+                sn_account["status"] = "unknown"
+        else:
+            sn_account["subStatus"] = "noSpecificMethodToExtractData"
+            sn_account["status"] = "unknown"
+        return sn_account
 
     def get_feed(self, social_accounts):
 
@@ -91,7 +118,7 @@ class Instagram:
 
             else:
                 # Se l'account non esiste più allora lo cancello
-                LOGGER.info("Il profilo %s non esiste più, ora lo cancello.", user)
+                self.__logger.info("Il profilo %s non esiste più, ora lo cancello.", user)
                 queries["delete"].append({'type': 'socialAccount', 'social': 'instagram', 'internal_id': '' + user_id + ''})
                 messages.append({"type": "deleted_account", "social": "instagram", "internal_id": user_id, "username": user, "title": title, "post_url": "https://www.instagram.com/" + user + "/", "post_date": int(time.time())})
 
