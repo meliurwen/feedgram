@@ -44,7 +44,7 @@ def test_database_creation():
     # creo il database che non esiste con le tabelle base
 
     # Nome del file per il test
-    database_path = "./test/database/databseTest.sqlite3"
+    database_path = "./test/databseTest.sqlite3"
 
     # Verifico se il file esiste. Nel caso eista lo elimino
     if path.exists(database_path):
@@ -73,7 +73,7 @@ def test_database_creation():
 def test_database_table_error():
 
     # Nome del file per il test
-    database_path = "./test/database/databse_table_error.sqlite3"
+    database_path = "./test/databse_table_error.sqlite3"
 
     # Verifico se il file esiste. Nel caso eista lo elimino
     if path.exists(database_path):
