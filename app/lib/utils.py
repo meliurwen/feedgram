@@ -20,14 +20,17 @@ def get_url(url):
                 before_get_url_exception = False
                 LOGGER.info("Connection restored! :D")
             return content
-        except requests.RequestException as err:
-            LOGGER.error(err)
-        except ValueError as err:
-            LOGGER.error(err)
-        finally:
+        except requests.RequestException:
             before_get_url_exception = True
-            LOGGER.waring("Connection lost, attempting to connect again in %s seconds... :(", 2**i)
+            LOGGER.warning("Connection error or lost, attempting to connect again in %s seconds... :(", 2**i)
             time.sleep(2**i)
-            LOGGER.waring("Re-rying to connect...")
+            LOGGER.warning("Re-rying to connect...")
+            if i < 6:
+                i = i + 1
+        except ValueError:
+            before_get_url_exception = True
+            LOGGER.warning("Decoding error, attempting to connect again in %s seconds... :(", 2**i)
+            time.sleep(2**i)
+            LOGGER.warning("Re-rying to connect...")
             if i < 6:
                 i = i + 1
