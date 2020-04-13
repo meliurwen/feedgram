@@ -1,6 +1,5 @@
 import os.path
 import sqlite3
-import time
 import logging
 
 
@@ -97,8 +96,8 @@ class MyDatabase:
                 con.commit()
         except sqlite3.Error as err:
             self.__logger.error("Database error: %s", err)
-        except Exception as err:
-            self.__logger.error("Exception in _query: %s", err)
+        except sqlite3.Warning as err:
+            self.__logger.error("Exception in query: %s", err)
         finally:
             if con:
                 con.close()
