@@ -33,5 +33,4 @@ def test_get_url_content_ok():
     with requests_mock.mock() as mock_get:
         mock_get.get('https://test.com', text=json.dumps(API_MESSAGE))
         response = get_url("https://test.com")
-    print(response)
     assert_equal(json.loads(response), API_MESSAGE)

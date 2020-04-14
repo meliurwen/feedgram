@@ -3,7 +3,7 @@ import time
 import json
 import logging
 from urllib.parse import quote_plus
-from lib.utils import get_url
+from ..lib.utils import get_url
 
 
 class Telegram:
