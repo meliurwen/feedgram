@@ -70,6 +70,25 @@ def test_database_creation():
     assert database.status == 1
 
 
+def test_database_alredy_exist():
+    
+    # Nome del file per il test
+    database_path = "./test/databseTest.sqlite3"
+
+    # Mi assicuro che il file non esista/ sia stato cancellato
+    assert path.exists(database_path)
+
+    # Eseguo la chiamata al costruttore della classe di configurazione
+    # che mi genererà il file di configurazione con i valori base
+    # e tenterà di caricarla
+    database = MyDatabase(database_path)
+
+    # state = database.status
+
+    # Verifico che lo stato della classe sia quello coretto
+    assert database.status == 1
+
+
 def test_database_table_error():
 
     # Nome del file per il test
