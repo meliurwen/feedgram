@@ -90,7 +90,8 @@ class Telegram:
     # al momento, per renderle comaptibili glielo inserisco lo stesso, ma è una soluzione abbastanza triste.
     # Tutto quello che so di ufficiale riguardo i rate limits è quì: https://core.telegram.org/bots/faq#my-bot-is-hitting-limits-how-do-i-avoid-this
     # Se fossero un po' più precisi nelle specifiche mi farebbero un gran favore. >:(
-    def send_messages(self, coda, condizione):
+    # def send_messages(self, coda, condizione):
+    def send_messages(self, coda):
 
         last_one_second = {}
         last_sixty_seconds = {}
@@ -119,8 +120,9 @@ class Telegram:
                 # print(len(last_one_second))
                 h_tmp = 0
             h_tmp += 1
-            with condizione:
-                condizione.wait(0.5)
+            # with condizione:
+            #     condizione.wait(0.5)
+            time.sleep(0.5)
 
         contatore_messaggi_inviati = 0
 
@@ -265,8 +267,9 @@ class Telegram:
                 # print("stop")
                 # print("Ci ho messo: "+str(one_second_time - tempo_sleep)+"s")
                 if tempo_sleep > 0:
-                    with condizione:
-                        condizione.wait(tempo_sleep)
+                    # with condizione:
+                    #     condizione.wait(tempo_sleep)
+                    time.sleep(tempo_sleep)
             i += 1
 
             # Ad intervalli regolari "pulisci" last_one_second e last_sixty_seconds
