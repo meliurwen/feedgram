@@ -1,6 +1,7 @@
 import os.path
 import sqlite3
 import logging
+import time
 
 
 class MyDatabase:
@@ -102,3 +103,16 @@ class MyDatabase:
             if con:
                 con.close()
         return data, rowcount
+
+    def check_utente(self, user_id):
+        query = ("SELECT 1 FROM users WHERE user_id = ?;")
+        res, _ = self.__query(query, user_id)
+        return bool(res)
+
+    def unsubscribe_user(self, user_id):
+        self.__query("DELETE FROM users WHERE user_id = ?;",
+                     user_id, foreign=True)
+
+    def subscribe_user(self, user_id, username, chat_id, notifications, max_registrations):
+        self.__query("INSERT INTO users (user_id, username, chat_id, notifications, max_registrations, subscription_time) VALUES (?, ?, ?, ?, ?, ?);",
+                     user_id, username, chat_id, notifications, max_registrations, int(time.time()))
