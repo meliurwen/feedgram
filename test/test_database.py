@@ -145,7 +145,7 @@ def test_database_subscribe():
 
     database.subscribe_user(6551474276, "username", 75692378, 1, 10)
 
-    us_exist, _= myquery(DATABASE_PATH, "SELECT 1 FROM users WHERE user_id = ?;", 6551474276)
+    us_exist, _ = myquery(DATABASE_PATH, "SELECT 1 FROM users WHERE user_id = ?;", 6551474276)
 
     assert bool(us_exist)
 
