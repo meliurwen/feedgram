@@ -23,14 +23,10 @@ def get_url(url):
         except requests.RequestException:
             before_get_url_exception = True
             LOGGER.warning("Connection error or lost, attempting to connect again in %s seconds... :(", 2**i)
-            time.sleep(2**i)
-            LOGGER.warning("Re-rying to connect...")
-            if i < 6:
-                i = i + 1
         except ValueError:
             before_get_url_exception = True
             LOGGER.warning("Decoding error, attempting to connect again in %s seconds... :(", 2**i)
-            time.sleep(2**i)
-            LOGGER.warning("Re-rying to connect...")
-            if i < 6:
-                i = i + 1
+        time.sleep(2**i)
+        LOGGER.warning("Re-rying to connect...")
+        if i < 6:
+            i = i + 1
