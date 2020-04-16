@@ -39,54 +39,7 @@ def myquery(db_path, query, *args, foreign=False, fetch=1):
     return data, rowcount
 
 
-def test_database_creation():
-
-    # creo il database che non esiste con le tabelle base
-
-    # Nome del file per il test
-    database_path = "./test/databseTest.sqlite3"
-
-    # Verifico se il file esiste. Nel caso eista lo elimino
-    if path.exists(database_path):
-        try:
-            remove(database_path)
-        except OSError as err:  # if failed, report it back to the user ##
-            print("Error: {} - {}.".format(err.filename, err.strerror))
-
-    # Mi assicuro che il file non esista/ sia stato cancellato
-    assert not path.exists(database_path)
-
-    # Eseguo la chiamata al costruttore della classe di configurazione
-    # che mi genererà il file di configurazione con i valori base
-    # e tenterà di caricarla
-    database = MyDatabase(database_path)
-
-    # state = database.status
-
-    # verifico che il file sia stato creato
-    assert path.exists(database_path)
-
-    # Verifico che lo stato della classe sia quello coretto
-    assert database.status == 1
-
-
-def test_database_alredy_exist():
-
-    # Nome del file per il test
-    database_path = "./test/databseTest.sqlite3"
-
-    # Mi assicuro che il file non esista/ sia stato cancellato
-    assert path.exists(database_path)
-
-    # Eseguo la chiamata al costruttore della classe di configurazione
-    # che mi genererà il file di configurazione con i valori base
-    # e tenterà di caricarla
-    database = MyDatabase(database_path)
-
-    # state = database.status
-
-    # Verifico che lo stato della classe sia quello coretto
-    assert database.status == 1
+DATABASE_PATH = "./test/databseTest.sqlite3"
 
 
 def test_database_table_error():
@@ -121,3 +74,109 @@ def test_database_table_error():
 
     # Verifico che lo stato della classe sia quello coretto
     assert database.status == -1
+
+
+def test_database_creation():
+
+    # creo il database che non esiste con le tabelle base
+
+    # Verifico se il file esiste. Nel caso eista lo elimino
+    if path.exists(DATABASE_PATH):
+        try:
+            remove(DATABASE_PATH)
+        except OSError as err:  # if failed, report it back to the user ##
+            print("Error: {} - {}.".format(err.filename, err.strerror))
+
+    # Mi assicuro che il file non esista/ sia stato cancellato
+    assert not path.exists(DATABASE_PATH)
+
+    # Eseguo la chiamata al costruttore della classe di configurazione
+    # che mi genererà il file di configurazione con i valori base
+    # e tenterà di caricarla
+    database = MyDatabase(DATABASE_PATH)
+
+    # state = database.status
+
+    # verifico che il file sia stato creato
+    assert path.exists(DATABASE_PATH)
+
+    # Verifico che lo stato della classe sia quello coretto
+    assert database.status == 1
+
+
+def test_database_alredy_exist():
+
+    # Mi assicuro che il file non esista/ sia stato cancellato
+    assert path.exists(DATABASE_PATH)
+
+    # Eseguo la chiamata al costruttore della classe di configurazione
+    # che mi genererà il file di configurazione con i valori base
+    # e tenterà di caricarla
+    database = MyDatabase(DATABASE_PATH)
+
+    # Verifico che lo stato della classe sia quello coretto
+    assert database.status == 1
+
+
+def test_database_user_id_not_exist():
+
+    # Mi assicuro che il file non esista/ sia stato cancellato
+    assert path.exists(DATABASE_PATH)
+
+    # Eseguo la chiamata al costruttore della classe di configurazione
+    # che mi genererà il file di configurazione con i valori base
+    # e tenterà di caricarla
+    database = MyDatabase(DATABASE_PATH)
+
+    us_exist = database.check_utente(6551474276)
+
+    assert not us_exist
+
+
+def test_database_subscribe():
+
+    # Mi assicuro che il file non esista/ sia stato cancellato
+    assert path.exists(DATABASE_PATH)
+
+    # Eseguo la chiamata al costruttore della classe di configurazione
+    # che mi genererà il file di configurazione con i valori base
+    # e tenterà di caricarla
+    database = MyDatabase(DATABASE_PATH)
+
+    database.subscribe_user(6551474276, "username", 75692378, 1, 10)
+
+    us_exist, _= myquery(DATABASE_PATH, "SELECT 1 FROM users WHERE user_id = ?;", 6551474276)
+
+    assert bool(us_exist)
+
+
+def test_database_user_id_exist():
+
+    # Mi assicuro che il file non esista/ sia stato cancellato
+    assert path.exists(DATABASE_PATH)
+
+    # Eseguo la chiamata al costruttore della classe di configurazione
+    # che mi genererà il file di configurazione con i valori base
+    # e tenterà di caricarla
+    database = MyDatabase(DATABASE_PATH)
+
+    us_exist = database.check_utente(6551474276)
+
+    assert us_exist
+
+
+def test_database_unsubscribe():
+
+    # Mi assicuro che il file non esista/ sia stato cancellato
+    assert path.exists(DATABASE_PATH)
+
+    # Eseguo la chiamata al costruttore della classe di configurazione
+    # che mi genererà il file di configurazione con i valori base
+    # e tenterà di caricarla
+    database = MyDatabase(DATABASE_PATH)
+
+    database.unsubscribe_user(6551474276)
+
+    us_exist, _ = myquery(DATABASE_PATH, "SELECT 1 FROM users WHERE user_id = ?;", 6551474276)
+
+    assert not bool(us_exist)
