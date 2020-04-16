@@ -2,7 +2,7 @@
 import time
 import logging
 import json
-from ..lib.utils import get_url
+from app.lib.utils import get_url
 
 
 class Instagram:
