@@ -108,6 +108,36 @@ NOT_COMMAND = {
     ],
 }
 
+WRONG_COMMAND = {
+    "ok": True,
+    "result": [
+        {
+            "update_id": 731419465,
+            "message": {
+                "message_id": 1257,
+                "from": {
+                    "id": 62517772,
+                    "is_bot": False,
+                    "first_name": "Ivan",
+                    "last_name": "Donati",
+                    "username": "Territory",
+                    "language_code": "it",
+                },
+                "chat": {
+                    "id": 62517772,
+                    "first_name": "Ivan",
+                    "last_name": "Donati",
+                    "username": "Territory",
+                    "type": "private",
+                },
+                "date": 1587049603,
+                "text": "/stops",
+                "entities": [{"offset": 0, "length": 6, "type": "bot_command"}],
+            },
+        }
+    ],
+}
+
 # Instanzio il database che utilizzarà il process input
 DATABASE_PATH = "./test/processinputTest.sqlite3"
 
@@ -173,6 +203,24 @@ def test_process_input_start_registred():
 
     # Verifico hc eil messaggio di risposta sia coretto
     assert result[0]["text"] == "You're alredy registred.\nType /help to learn the commands available!"
+
+
+def test_process_input_wrong_command():
+
+    database = MyDatabase(DATABASE_PATH)
+
+    myprocess_input = Processinput(database)  # da dare in input i social
+
+    result = myprocess_input.process(WRONG_COMMAND)
+
+    # verifico che il messaggio di risposta sia un messaggio normale
+    assert result[0]["type"] == "sendMessage"
+
+    # verifico che la risposta sia data sulla chat giusta
+    assert WRONG_COMMAND["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+
+    # Verifico hc eil messaggio di risposta sia coretto
+    assert result[0]["text"] == "Unrecognized command"
 
 
 def test_process_input_not_command_registred():
