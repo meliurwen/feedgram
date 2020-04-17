@@ -255,7 +255,7 @@ def test_process_input_wrong_command():
 
 
 def test_process_input_help_command():
-    
+
     msm_help = ("📖Help\n\nYou can follow up to <i>10 social accounts</i>.\n"
                 "Socials currently supported:\n"
                 " • <i>Instagram</i>\n"
