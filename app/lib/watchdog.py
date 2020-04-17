@@ -6,6 +6,7 @@ import logging
 from app.lib.process_input import Processinput
 from app.lib.database import MyDatabase
 from app.lib.telegram import Telegram
+from app.social.instagram import Instagram
 
 CODA = queue.Queue()
 CODA_TEMP = queue.Queue()
@@ -27,13 +28,14 @@ class Watchdog(threading.Thread):
 
         # Inizializazione dei social da fare solo ne caso del news_retreiver e del telegram_user_interface
         if self.mode == "telegram_user_interface" or self.mode == "news_retreiver":
+            self.__instagram_interface = Instagram()
             self.__db = MyDatabase(self.__conf_dict["BOT"]["databasefilepath"])
 
         if self.mode == "telegram_user_interface" or self.mode == "sender":
             self.__tel_interface = Telegram(self.__conf_dict["API"]["telegramkey"])  # <- cambiare config_dict
 
         if self.mode == "telegram_user_interface":
-            self.__process_input = Processinput(self.__db)  # da dare in input i social
+            self.__process_input = Processinput(self.__db, [self.__instagram_interface])  # da dare in input i social
 
     def run(self):
         global CODA
