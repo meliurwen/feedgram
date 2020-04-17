@@ -3,7 +3,7 @@
 
 # FeedGram
 
-[![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://gitlab.com/meliurwen/feedgram/blob/master/LICENSE)
+[![pipeline status](https://gitlab.com/meliurwen/feedgram/badges/master/pipeline.svg)](https://gitlab.com/meliurwen/feedgram/commits/master) [![coverage report](https://gitlab.com/meliurwen/feedgram/badges/master/coverage.svg)](https://gitlab.com/meliurwen/feedgram/commits/master) [![Pylint](https://gitlab.com/meliurwen/feedgram/-/jobs/artifacts/master/raw/pylint/pylint.svg?job=pylint)](https://gitlab.com/meliurwen/feedgram/-/jobs/artifacts/master/raw/pylint/pylint.log?job=pylint) [![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://gitlab.com/meliurwen/feedgram/blob/master/LICENSE)
 
 </div>
 
@@ -65,11 +65,11 @@ cd feedgram
 ```
 
 ```sh
-python3 -m venv .
+virtualenv -p python3 venv
 ```
 
 ```sh
-source bin/activate
+source venv/bin/activate
 ```
 
 ```sh

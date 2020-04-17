@@ -1,0 +1,21 @@
+# Virtual Environment
+venv/
+
+# setup.py
+build/
+dist/
+*.egg*
+
+# Tests
+.coverage
+coverage/
+
+# Python
+__pycache__/
+
+# vscode
+.vscode/
+
+# App
+config.ini
+*.sqlite3
