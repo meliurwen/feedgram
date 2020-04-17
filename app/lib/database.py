@@ -186,3 +186,45 @@ class MyDatabase:
                 "INSERT INTO registrations (user_id, social_id) VALUES (?, ?);", user_id, sub["social_id"])
 
         return sub
+
+    @property
+    def create_dict_of_user_ids_and_socials(self):
+        res, _ = self.__query("SELECT registrations.user_id, socials.social, socials.internal_id, socials.username, socials.title, socials.retreive_time, socials.status FROM registrations, socials WHERE registrations.social_id = socials.social_id;", fetch=0)
+        socials_accounts_dict = {"social_accounts": {}, "subscriptions": {}}
+        if res:
+            for row in res:
+                if row[1] not in socials_accounts_dict["subscriptions"]:
+                    socials_accounts_dict["subscriptions"][row[1]] = {}
+                    socials_accounts_dict["social_accounts"][row[1]] = []
+                if row[2] not in socials_accounts_dict["subscriptions"][row[1]]:
+                    socials_accounts_dict["subscriptions"][row[1]][row[2]] = []
+                    account_temp = {}
+                    account_temp["internal_id"] = str(row[2])
+                    account_temp["username"] = str(row[3])
+                    account_temp["title"] = str(row[4])
+                    account_temp["retreive_time"] = str(row[5])
+                    account_temp["status"] = str(row[6])
+                    socials_accounts_dict["social_accounts"][row[1]].append(account_temp)
+                socials_accounts_dict["subscriptions"][row[1]][row[2]].append(str(row[0]))
+        return socials_accounts_dict
+
+    def clean_dead_subscriptions(self):
+        _, rowcount = self.__query(
+            "DELETE FROM socials WHERE social_id IN (SELECT social_id FROM socials WHERE social_id NOT IN (SELECT social_id FROM registrations));")
+        self.__logger.info(
+            "Account senza iscrizioni rimossi: %s ", rowcount)
+
+    def process_messages_queries(self, messages_queries):
+        for query in messages_queries["update"]:
+            if query["type"] == "retreive_time":
+                self.__query("UPDATE socials SET retreive_time = ? WHERE social = ? AND internal_id = ?;",
+                             query["retreive_time"], query["social"], query["internal_id"], foreign=True)
+            elif query["type"] == "status":
+                self.__query("UPDATE socials SET status = ? WHERE social = ? AND internal_id = ?;",
+                             query["status"], query["social"], query["internal_id"], foreign=True)
+        for query in messages_queries["delete"]:
+            if query["type"] == "socialAccount":
+                self.__query("DELETE FROM registrations WHERE registrations.social_id = (SELECT socials.social_id FROM socials WHERE socials.social = ? AND socials.internal_id = ?);",
+                             query["social"], query["internal_id"], foreign=True)
+                self.__query("DELETE FROM socials WHERE socials.social = ? AND socials.internal_id = ?;",
+                             query["social"], query["internal_id"], foreign=True)
