@@ -54,7 +54,7 @@ class Processinput:
                                 if text == "/stop":
                                     self.__db.unsubscribe_user(user_id)
                                     if self.__db.check_utente(user_id):
-                                        messages.append(self.__ms_maker(chat_id, "Something bad happened, you're STILL registered!\nTry again later.", ))
+                                        messages.append(self.__ms_maker(chat_id, "Something bad happened, you're STILL registered!\nTry again later." ))
                                     else:
                                         messages.append(self.__ms_maker(chat_id, self.__msm_stop, "HTML"))
                                 elif text == "/help":
@@ -77,6 +77,8 @@ class Processinput:
                                 self.__db.subscribe_user(user_id, username, chat_id, 1, 10)
                                 if self.__db.check_utente(user_id):
                                     messages.append(self.__ms_maker(chat_id, "Congratulations, you're now registered!\nType /help to learn the commands available!"))
+                                    tets = self.__ms_maker(chat_id, self.__msm_help, "HTML")
+                                    messages.append(tets)
                                 else:
                                     messages.append(self.__ms_maker(chat_id, "Something bad happened, you're NOT registered!\nTry again later."))
                             else:
