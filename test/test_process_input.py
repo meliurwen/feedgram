@@ -138,6 +138,37 @@ WRONG_COMMAND = {
     ],
 }
 
+
+COMMAND_HELP = {
+    "ok": True,
+    "result": [
+        {
+            "update_id": 731419464,
+            "message": {
+                "message_id": 1256,
+                "from": {
+                    "id": 62517772,
+                    "is_bot": False,
+                    "first_name": "Ivan",
+                    "last_name": "Donati",
+                    "username": "Territory",
+                    "language_code": "it",
+                },
+                "chat": {
+                    "id": 62517772,
+                    "first_name": "Ivan",
+                    "last_name": "Donati",
+                    "username": "Territory",
+                    "type": "private",
+                },
+                "dte": 1587049598,
+                "text": "/help",
+                "entities": [{"offset": 0, "length": 5, "type": "bot_command"}],
+            },
+        }
+    ],
+}
+
 # Instanzio il database che utilizzarà il process input
 DATABASE_PATH = "./test/processinputTest.sqlite3"
 
@@ -221,6 +252,35 @@ def test_process_input_wrong_command():
 
     # Verifico hc eil messaggio di risposta sia coretto
     assert result[0]["text"] == "Unrecognized command"
+
+
+def test_process_input_help_command():
+    
+    msm_help = ("📖Help\n\nYou can follow up to <i>10 social accounts</i>.\n"
+                "Socials currently supported:\n"
+                " • <i>Instagram</i>\n"
+                "You can follow only <b>public</b> accounts.\n"
+                "\n"
+                "<b>Receive Feeds:</b>\n"
+                " • /sub <i>social</i> <i>username</i>\n"
+                " • /sub <i>link</i>\n"
+                "/stop to stop and unsubscribe from the bot.\n"
+                "That's all. :)")
+
+    database = MyDatabase(DATABASE_PATH)
+
+    myprocess_input = Processinput(database)  # da dare in input i social
+
+    result = myprocess_input.process(COMMAND_HELP)
+
+    # verifico che il messaggio di risposta sia un messaggio normale
+    assert result[0]["type"] == "sendMessage"
+
+    # verifico che la risposta sia data sulla chat giusta
+    assert COMMAND_HELP["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+
+    # Verifico hc eil messaggio di risposta sia coretto
+    assert result[0]["text"] == msm_help
 
 
 def test_process_input_not_command_registred():
