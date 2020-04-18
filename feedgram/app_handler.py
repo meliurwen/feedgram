@@ -4,9 +4,9 @@ import threading
 import logging
 import time
 # lib
-from app.lib.config import Config
-from app.lib.database import MyDatabase
-from app.lib.watchdog import Watchdog
+from feedgram.lib.config import Config
+from feedgram.lib.database import MyDatabase
+from feedgram.lib.watchdog import Watchdog
 
 
 FILE_CONFIG = "config.ini"

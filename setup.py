@@ -38,6 +38,6 @@ setup(
         'Programming Language :: Python :: 3.6',
     ],
     entry_points={
-        'console_scripts': ['app = app.app_handler:main']
+        'console_scripts': ['feedgram = feedgram.app_handler:main']
     },
 )

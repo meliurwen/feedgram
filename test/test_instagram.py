@@ -6,7 +6,7 @@ from unittest import mock
 import requests_mock
 from nose.tools import assert_equal
 
-from app.social.instagram import Instagram
+from feedgram.social.instagram import Instagram
 
 IG_API_SCRP_USERNAME_EXIST_PUB = {
     "query": {
@@ -356,7 +356,7 @@ SOCIAL_QUERY_PUBLIC_NOW_PRIVATE["result"]["queries"] = {
 }
 
 
-@mock.patch('app.social.instagram.time.time', mock.MagicMock(return_value=61300805))
+@mock.patch('feedgram.social.instagram.time.time', mock.MagicMock(return_value=61300805))
 def test_get_feed():
     igram = Instagram()
 

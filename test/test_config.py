@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from os import path, remove
-from app.lib.config import Config
+from feedgram.lib.config import Config
 
 # creo il file di configurazione che non esiste con la configurazione di default
 

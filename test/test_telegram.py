@@ -9,7 +9,7 @@ from time import time, sleep
 import requests_mock
 from nose.tools import assert_equal, assert_true
 
-from app.lib.telegram import Telegram
+from feedgram.lib.telegram import Telegram
 
 JSON_GENERIC = {
     "success": True,

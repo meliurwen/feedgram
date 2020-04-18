@@ -3,9 +3,9 @@ from os import path, remove
 import copy
 from unittest.mock import patch
 
-from app.lib.process_input import Processinput
-from app.lib.database import MyDatabase
-from app.social.instagram import Instagram
+from feedgram.lib.process_input import Processinput
+from feedgram.lib.database import MyDatabase
+from feedgram.social.instagram import Instagram
 
 COMMAND_START = {
     "ok": True,
@@ -457,7 +457,7 @@ def dummy_instagram_extract_data(_):
 
 def test_sub_command_social_username():
     global GLOBAL_EXTRCT_DATA_RETURN
-    with patch('app.social.instagram.Instagram.extract_data', side_effect=dummy_instagram_extract_data):
+    with patch('feedgram.social.instagram.Instagram.extract_data', side_effect=dummy_instagram_extract_data):
         database = MyDatabase(DATABASE_PATH)
         igram = Instagram()
         myprocess_input = Processinput(database, [igram])
@@ -485,7 +485,7 @@ def test_sub_command_social_username():
 # 4) Use a valid link pointing to an unrecognized service
 def test_sub_command_url():
     global GLOBAL_EXTRCT_DATA_RETURN
-    with patch('app.social.instagram.Instagram.extract_data', side_effect=dummy_instagram_extract_data):
+    with patch('feedgram.social.instagram.Instagram.extract_data', side_effect=dummy_instagram_extract_data):
         database = MyDatabase(DATABASE_PATH)
         igram = Instagram()
         myprocess_input = Processinput(database, [igram])

@@ -2,7 +2,7 @@
 
 from os import path, remove
 import sqlite3
-from app.lib.database import MyDatabase
+from feedgram.lib.database import MyDatabase
 
 
 def myquery(db_path, query, *args, foreign=False, fetch=1):

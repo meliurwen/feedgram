@@ -60,7 +60,7 @@ pylint:
     - tags
   script:
     - mkdir ./pylint
-    - pylint --output-format=text --rcfile=setup.cfg app/ test/ *.py | tee ./pylint/pylint.log || pylint-exit $?
+    - pylint --output-format=text --rcfile=setup.cfg feedgram/ test/ *.py | tee ./pylint/pylint.log || pylint-exit $?
     - PYLINT_SCORE=$(sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p' ./pylint/pylint.log)
     - anybadge --label=Pylint --file=pylint/pylint.svg --value=$PYLINT_SCORE 2=red 4=orange 8=yellow 10=green
     - echo "Pylint score is $PYLINT_SCORE"
@@ -75,7 +75,7 @@ Test:
   script:
     - echo "Start test"
     - pip install -r requirements.txt
-    - pytest
+    - pytest test/
     - echo "Finished test"
   artifacts:
     expire_in: 1 mos

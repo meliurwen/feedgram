@@ -6,7 +6,7 @@ import requests_mock
 import requests
 from nose.tools import assert_is_not_none, assert_equal
 
-from app.lib.utils import get_url
+from feedgram.lib.utils import get_url
 
 API_MESSAGE = {
     "success": True,
@@ -15,14 +15,14 @@ API_MESSAGE = {
 
 
 def test_get_url_connection_ok():
-    with patch('app.lib.utils.requests.get') as mock_get:
+    with patch('feedgram.lib.utils.requests.get') as mock_get:
         mock_get.return_value.ok = True
         response = get_url("https://test.com")
         assert_is_not_none(response)
 
 
 def test_get_url_connection_error():
-    with patch('app.lib.utils.requests.get') as mock_get:
+    with patch('feedgram.lib.utils.requests.get') as mock_get:
         mock_get.side_effect = iter([requests.exceptions.ConnectionError(), mock_get.return_value.ok])
         response = get_url("https://test.com")
     assert_is_not_none(response)

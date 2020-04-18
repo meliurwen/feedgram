@@ -3,10 +3,10 @@ import threading
 import queue
 import logging
 # Libs
-from app.lib.process_input import Processinput
-from app.lib.database import MyDatabase
-from app.lib.telegram import Telegram
-from app.social.instagram import Instagram
+from feedgram.lib.process_input import Processinput
+from feedgram.lib.database import MyDatabase
+from feedgram.lib.telegram import Telegram
+from feedgram.social.instagram import Instagram
 
 CODA = queue.Queue()
 CODA_TEMP = queue.Queue()

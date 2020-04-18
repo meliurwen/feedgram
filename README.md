@@ -12,7 +12,7 @@
 > **_Note:_** It's a private repo, use the `LabProgettazioneDISCo` Gitlab's user in order to access it!
 
 + **_Project's Link:_** https://gitlab.com/meliurwen/feedgram
-+ **_Demo Link:_** _TODO_
++ **_Demo Link:_** https://t.me/FeedGram_demo_bot
 
 ## Group Members
 
