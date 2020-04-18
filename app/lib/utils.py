@@ -23,7 +23,7 @@ def get_url(url):
         except requests.RequestException:
             before_get_url_exception = True
             LOGGER.warning("Connection error or lost, attempting to connect again in %s seconds... :(", 2**i)
-        except ValueError:
+        except TypeError:
             before_get_url_exception = True
             LOGGER.warning("Decoding error, attempting to connect again in %s seconds... :(", 2**i)
         time.sleep(2**i)

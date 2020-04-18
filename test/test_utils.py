@@ -34,3 +34,24 @@ def test_get_url_content_ok():
         mock_get.get('https://test.com', text=json.dumps(API_MESSAGE))
         response = get_url("https://test.com")
     assert_equal(json.loads(response), API_MESSAGE)
+
+
+GLOBAL_COUNTER = 0
+
+
+def custom_matcher_no_json(request):
+    global GLOBAL_COUNTER
+    # print(request.path_url)
+    if GLOBAL_COUNTER == 0:
+        GLOBAL_COUNTER += 1
+        return requests_mock.create_response(request, status_code=200, text=b'')
+    else:
+        GLOBAL_COUNTER = 0
+        return requests_mock.create_response(request, status_code=200, text="hello")
+
+
+def test_get_url_type_error():
+    with requests_mock.mock() as mock_get:
+        mock_get.add_matcher(custom_matcher_no_json)
+        response = get_url("https://test.com")
+    assert_equal(response, "hello")
