@@ -116,3 +116,115 @@ class MyDatabase:
     def subscribe_user(self, user_id, username, chat_id, notifications, max_registrations):
         self.__query("INSERT INTO users (user_id, username, chat_id, notifications, max_registrations, subscription_time) VALUES (?, ?, ?, ?, ?, ?);",
                      user_id, username, chat_id, notifications, max_registrations, int(time.time()))
+
+    def check_number_subscribtions(self, user_id):
+        res, _ = self.__query(
+            "SELECT users.user_id, (SELECT count(user_id) AS registrations FROM registrations WHERE user_id = ?) AS actual_registrations, users.max_registrations FROM users where users.user_id = ?;", user_id, user_id)
+        value = res
+        value = {
+            "user_id": value[0], "actual_registrations": value[1], "max_registrations": value[2]}
+        return value
+
+    def get_first_social_id_from_internal_user_social_and_if_present_subscribe(self, user_id, sub, exists):
+        tmp_list = []
+
+        if sub["internal_id"]:
+            tmp_list, _ = self.__query(
+                "SELECT social_id, username, title, status FROM socials WHERE social = ? AND internal_id = ?;", sub["social"], sub["internal_id"])
+        elif sub["username"]:
+            tmp_list, _ = self.__query(
+                "SELECT social_id, internal_id, title, status FROM socials WHERE social = ? AND username = ?;", sub["social"], sub["username"])
+        else:
+            sub["subStatus"] = "internalId_or_username_not_present"
+            return sub  # Errore, internal_id od username non presenti
+
+        if tmp_list:
+            # if tmp_list is not none
+            # Ottengo il social_id ed i restanti dati mancanti
+            sub["social_id"] = tmp_list[0]
+            if not exists:
+                sub["status"] = tmp_list[3]
+                sub["title"] = tmp_list[2]
+                if sub["internal_id"]:
+                    sub["username"] = tmp_list[1]
+                elif sub["username"]:
+                    sub["internal_id"] = tmp_list[1]
+                else:
+                    return -1  # Errore, è praticamente impossibile arrivare in questo else
+            else:
+                pass
+        else:
+            # if tmp_list is none
+            # La ricerca ha dato riscontro negativo, non si trova nel database
+            if exists:
+                self.__query("INSERT INTO socials (social, username, title, internal_id, retreive_time) VALUES (?, ?, ?, ?, ?);",
+                             sub["social"], sub["username"], sub["title"], sub["internal_id"], int(time.time()))
+                res, _ = self.__query(
+                    "SELECT social_id FROM socials WHERE social = ? AND internal_id = ?;", sub["social"], sub["internal_id"])
+                sub["social_id"] = res[0]
+
+                self.__query(
+                    "INSERT INTO registrations (user_id, social_id) VALUES (?, ?);", user_id, sub["social_id"])
+                sub["subStatus"] = "CreatedSocialAccAndSubscribed"
+                return sub
+            else:
+                sub["subStatus"] = "notInDatabase"
+                return sub
+
+        # Se si è arrivati a questo punto significa che è presente nel database, ora bisogna controllare se l'utente è iscritto
+        res, _ = self.__query(
+            "SELECT 1 FROM registrations WHERE user_id = ? AND social_id = ?;", user_id, sub["social_id"])
+        # None se non c'è la relazione quindi devi sottoscrivere
+        if res:
+            # utente già inscritto
+            sub["subStatus"] = "AlreadySubscribed"
+        else:
+            # utente non inscritto
+            # Utente non ancora iscritto, ora procedo ad iscriverlo
+            sub["subStatus"] = "JustSubscribed"
+            self.__query(
+                "INSERT INTO registrations (user_id, social_id) VALUES (?, ?);", user_id, sub["social_id"])
+
+        return sub
+
+    @property
+    def create_dict_of_user_ids_and_socials(self):
+        res, _ = self.__query("SELECT registrations.user_id, socials.social, socials.internal_id, socials.username, socials.title, socials.retreive_time, socials.status FROM registrations, socials WHERE registrations.social_id = socials.social_id;", fetch=0)
+        socials_accounts_dict = {"social_accounts": {}, "subscriptions": {}}
+        if res:
+            for row in res:
+                if row[1] not in socials_accounts_dict["subscriptions"]:
+                    socials_accounts_dict["subscriptions"][row[1]] = {}
+                    socials_accounts_dict["social_accounts"][row[1]] = []
+                if row[2] not in socials_accounts_dict["subscriptions"][row[1]]:
+                    socials_accounts_dict["subscriptions"][row[1]][row[2]] = []
+                    account_temp = {}
+                    account_temp["internal_id"] = str(row[2])
+                    account_temp["username"] = str(row[3])
+                    account_temp["title"] = str(row[4])
+                    account_temp["retreive_time"] = str(row[5])
+                    account_temp["status"] = str(row[6])
+                    socials_accounts_dict["social_accounts"][row[1]].append(account_temp)
+                socials_accounts_dict["subscriptions"][row[1]][row[2]].append(str(row[0]))
+        return socials_accounts_dict
+
+    def clean_dead_subscriptions(self):
+        _, rowcount = self.__query(
+            "DELETE FROM socials WHERE social_id IN (SELECT social_id FROM socials WHERE social_id NOT IN (SELECT social_id FROM registrations));")
+        self.__logger.info(
+            "Account senza iscrizioni rimossi: %s ", rowcount)
+
+    def process_messages_queries(self, messages_queries):
+        for query in messages_queries["update"]:
+            if query["type"] == "retreive_time":
+                self.__query("UPDATE socials SET retreive_time = ? WHERE social = ? AND internal_id = ?;",
+                             query["retreive_time"], query["social"], query["internal_id"], foreign=True)
+            elif query["type"] == "status":
+                self.__query("UPDATE socials SET status = ? WHERE social = ? AND internal_id = ?;",
+                             query["status"], query["social"], query["internal_id"], foreign=True)
+        for query in messages_queries["delete"]:
+            if query["type"] == "socialAccount":
+                self.__query("DELETE FROM registrations WHERE registrations.social_id = (SELECT socials.social_id FROM socials WHERE socials.social = ? AND socials.internal_id = ?);",
+                             query["social"], query["internal_id"], foreign=True)
+                self.__query("DELETE FROM socials WHERE socials.social = ? AND socials.internal_id = ?;",
+                             query["social"], query["internal_id"], foreign=True)
