@@ -62,7 +62,6 @@ class Watchdog(threading.Thread):
                     CODA_TEMP.put(self.__process_input.process(updates))
 
         if self.mode == "elaborazione_code":
-            self.__logger.info("Ciao sono elaborazione_code")
             delivering_list = []
             message_list = []
             # TODO: dare un'occhiata alla logica di questa roba qua sotto, c'è qualquadra che non cosa... :/
@@ -139,7 +138,7 @@ class Watchdog(threading.Thread):
 
                     # In caso nessuno sia iscritto al social aggiungo un array ed un dizionario vuoti
                     num_subs_threads = {"subscriptions": {"total": 0}, "threads": {"total": 0}}
-                    for element in ["instagram", "youtube", "flickr"]:  # TODO: Portare fuori questa lista, che indica i servizi che sono abilitati per il retrieving delle informazioni
+                    for element in ["instagram"]:  # TODO: Portare fuori questa lista, che indica i servizi che sono abilitati per il retrieving delle informazioni
                         if element not in SUBSCRIPTIONS_DICT["subscriptions"]:
                             SUBSCRIPTIONS_DICT["subscriptions"][element] = {}
                         if element not in SUBSCRIPTIONS_DICT["social_accounts"]:
