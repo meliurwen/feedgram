@@ -198,7 +198,7 @@ GitlabRelease:
     - echo ${URL_DEB_UBUNTU_1804}
     - echo extra ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases   
     - |
-      JSON_DATA=$(jq -n -c --arg name "Supa Dupa v${VERSION}" \
+      JSON_DATA=$(jq -n -c --arg name "FeedGram v${VERSION}" \
       --arg tag_name "release_${VERSION}" \
       --arg description "## Changelog ${CHANGELOG}" \
       --arg pip "${URL_WHEEL_PIP}" \
