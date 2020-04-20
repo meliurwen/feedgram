@@ -96,25 +96,17 @@ class Watchdog(threading.Thread):
                                 for chat_id in SUBSCRIPTIONS_DICT["subscriptions"][data_social["social"]][data_social["internal_id"]]:
                                     message_title = data_social["title"]
                                     if data_social["type"] == "new_post":
-                                        messages_socials.append({'type': 'sendMessage',
-                                                                 'text': "<b>[" + data_social["social"].upper() + "]</b>\nUser: <i>" + message_title + "</i>\nLink: " + data_social["post_url"],
-                                                                 'chat_id': str(chat_id),
-                                                                 'markdown': 'HTML'})
+                                        text = "<b>[" + data_social["social"].upper() + "]</b>\nUser: <i>" + message_title + "</i>\nLink: " + data_social["post_url"]
                                     elif data_social["type"] == "now_private":
-                                        messages_socials.append({'type': 'sendMessage',
-                                                                 'text': "<b>⚠️ALERT⚠️</b>\n<b>[" + data_social["social"].upper() + "]</b>\nThis account now is <b>private</b>, that means that you'll no longer receive updates until its owner decides to change it back to <i>public</i>.\nUser: <i>" + message_title + "</i>\nLink: " + data_social["post_url"],
-                                                                 'chat_id': str(chat_id),
-                                                                 'markdown': 'HTML'})
+                                        text = "<b>⚠️ALERT⚠️</b>\n<b>[" + data_social["social"].upper() + "]</b>\nThis account now is <b>private</b>, that means that you'll no longer receive updates until its owner decides to change it back to <i>public</i>.\nUser: <i>" + message_title + "</i>\nLink: " + data_social["post_url"]
                                     elif data_social["type"] == "deleted_account":
-                                        messages_socials.append({'type': 'sendMessage',
-                                                                 'text': "<b>⚠️ALERT⚠️</b>\n<b>[" + data_social["social"].upper() + "]</b>\nThis account has been <b>deleted</b> and also automatically removed from your <i>Follow List</i>.\nUser: <i>" + message_title + "</i>\nLink: " + data_social["post_url"],
-                                                                 'chat_id': str(chat_id),
-                                                                 'markdown': 'HTML'})
+                                        text = "<b>⚠️ALERT⚠️</b>\n<b>[" + data_social["social"].upper() + "]</b>\nThis account has been <b>deleted</b> and also automatically removed from your <i>Follow List</i>.\nUser: <i>" + message_title + "</i>\nLink: " + data_social["post_url"]
                                     else:
-                                        messages_socials.append({'type': 'sendMessage',
-                                                                 'text': "<b>⚠️UNKNOWN MESSAGE⚠️</b>\nPlease report it to the creator of this bot.",
-                                                                 'chat_id': str(chat_id),
-                                                                 'markdown': 'HTML'})
+                                        text = "<b>⚠️UNKNOWN MESSAGE⚠️</b>\nPlease report it to the creator of this bot."
+                                    messages_socials.append({'type': 'sendMessage',
+                                                             'text': text,
+                                                             'chat_id': str(chat_id),
+                                                             'markdown': 'HTML'})
                 self.__logger.info("Messaggi da inviare: %s ", len(messages_socials))
                 if len(messages_socials) > 0:
                     CODA_TEMP.put(messages_socials)

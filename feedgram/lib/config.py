@@ -101,6 +101,7 @@ class Config:
         except OSError:
             self.__logger.warning(
                 "Qualcosa è andato storto. Impossibile creare il file di configurazione.")
+            raise
 
     @property
     def __check_config(self):
@@ -141,13 +142,12 @@ class Config:
         sections_dict = {}
 
         # get all defaults
-        defaults = dicts.defaults()
-        if defaults:
-            temp_dict = {}
-            for key in defaults.iterkeys():
-                temp_dict[key] = defaults[key]
-
-            sections_dict['default'] = temp_dict
+        # defaults = dicts.defaults()
+        # if defaults:
+        #     temp_dict = {}
+        #     for key in defaults.iterkeys():
+        #         temp_dict[key] = defaults[key]
+        #     sections_dict['default'] = temp_dict
 
         # get sections and iterate over each
         sections = dicts.sections()

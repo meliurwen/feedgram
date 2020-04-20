@@ -372,3 +372,21 @@ def test_get_feed():
             mock_get.get(matcher, text=ig_html_src(api["response"]))
             response = igram.get_feed([api["query"]])
         assert_equal(response, api["result"])
+
+
+# This test is a quick patch.
+# TODO: Now that the feedgram.lib.utils.get_url function can also return the
+# `status_code` of the HTTP stack we should update these tests.
+
+def test_extract_data_username_no_exist():
+    igram = Instagram()
+
+    matcher = re.compile(r"^(?:https:\/\/www\.|www\.)?instagram\.com\/([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?)")
+
+    api_queries = [IG_API_SCRP_USERNAME_NO_EXIST]
+
+    for api in api_queries:
+        with requests_mock.mock() as mock_get:
+            mock_get.get(matcher, status_code=404, text="trash")
+            response = igram.extract_data(api["query"])
+        assert_equal(response, api["query"])

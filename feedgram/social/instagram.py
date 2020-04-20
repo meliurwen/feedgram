@@ -18,24 +18,29 @@ class Instagram:
         before_json_exception = False
         while True:
             content = get_url(url)
-            content = content[content.find("window._sharedData = ") + len("window._sharedData = "):]
-            content = content[:content.find(";</script>")]
+            content["content"] = content["content"][content["content"].find("window._sharedData = ") + len("window._sharedData = "):]
+            content["content"] = content["content"][:content["content"].find(";</script>")]
             try:
-                jsn = json.loads(content)
+                content["content"] = json.loads(content["content"])
                 if before_json_exception:
                     before_json_exception = False
                     self.__logger.warning("This time the the content retrived contains json! :D")
-                return jsn
+                return content
             except json.JSONDecodeError:
+                if content["status_code"] == 404:
+                    content["content"] = {"entry_data": {}}
+                    return content
                 before_json_exception = True
                 self.__logger.warning("The content of the url is not json, now i print the content...")
-                self.__logger.warning(content)
+                self.__logger.warning(content["content"])
                 time.sleep(1)
                 self.__logger.warning("Trying to retreive again the content from the url...")
 
     def extract_data(self, sn_account):
         if sn_account["username"]:
-            sn_payload = self.__get_json_from_url("https://www.instagram.com/" + sn_account["username"] + "/")
+            response = self.__get_json_from_url("https://www.instagram.com/" + sn_account["username"] + "/")
+            sn_payload = response["content"]
+
             if sn_payload["entry_data"]:  # se non è vuoto (quindi esiste l'account social)
                 sn_account["internal_id"] = sn_payload["entry_data"]["ProfilePage"][0]["graphql"]["user"]["id"]
                 sn_account["title"] = sn_account["username"]
@@ -48,7 +53,9 @@ class Instagram:
                 sn_account["subStatus"] = "NotExists"
                 sn_account["status"] = "unknown"
         elif "p" in sn_account["data"]:
-            sn_payload = self.__get_json_from_url("https://www.instagram.com/p/" + sn_account["data"]["p"] + "/")
+            response = self.__get_json_from_url("https://www.instagram.com/p/" + sn_account["data"]["p"] + "/")
+            sn_payload = response["content"]
+
             try:  # se genera l'eccezione vuol dire che il link di instagram per il post (video od immagine che sia) non è valido od è privato
                 sn_account["username"] = sn_payload["entry_data"]["PostPage"][0]["graphql"]["shortcode_media"]["owner"]["username"]
                 sn_account["title"] = sn_payload["entry_data"]["PostPage"][0]["graphql"]["shortcode_media"]["owner"]["username"]
@@ -79,7 +86,8 @@ class Instagram:
             status = value["status"]
 
             self.__logger.info("Getting JSON from Instagram of %s...", user)
-            sn_payload = self.__get_json_from_url("https://www.instagram.com/" + user + "/")
+            response = self.__get_json_from_url("https://www.instagram.com/" + user + "/")
+            sn_payload = response["content"]
 
             if sn_payload["entry_data"]:  # Controlla se l'account è ancora esistente o meno
                 if sn_payload["entry_data"]["ProfilePage"][0]["graphql"]["user"]["is_private"]:  # Controlla se il profilo è privato o meno
