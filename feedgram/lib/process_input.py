@@ -63,7 +63,7 @@ class Processinput:
                                 elif text == "/help":
                                     tets = self.__ms_maker(chat_id, self.__msm_help, "HTML")
                                     messages.append(tets)
-                                elif text[:5] == "/sub ":
+                                elif text[:4] == "/sub":
                                     match = re.search(r"^([a-zA-Z]{1,16}) (\S{1,128})$", text[5:])
                                     if match:
                                         msg_subs = self.__iscrizione({"social": match.group(1), "username": match.group(2), "internal_id": None, "social_id": None, "link": None, "data": {}}, user_id)
@@ -74,8 +74,8 @@ class Processinput:
                                         else:
                                             msg_subs = None
                                     if not msg_subs:
-                                        msg_subs = "/sub command badly compiled"
-                                    messages.append(self.__ms_maker(chat_id, msg_subs))
+                                        msg_subs = "<b>⚠️Warning</b>\n<code>/sub</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/sub &lt;link&gt;</code>\n<i>or</i>\n<code>/sub &lt;social&gt; &lt;username&gt;</code>"
+                                    messages.append(self.__ms_maker(chat_id, msg_subs, "HTML"))
 
                                 elif text == "/start":
                                     messages.append(self.__ms_maker(chat_id, "You're alredy registred.\nType /help to learn the commands available!"))
