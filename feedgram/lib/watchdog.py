@@ -197,7 +197,7 @@ class Watchdog(threading.Thread):
                 self.condizione.acquire()
                 self.condizione.notify_all()
                 self.condizione.release()
-                self.__logger.info("Controllerò di nuovo tra 10 minuti.")
+                self.__logger.info("Controllerò di nuovo tra %s minuti.", self.delay // 60)
 
                 with self.condizione:
                     self.condizione.wait(self.delay)

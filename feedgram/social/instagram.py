@@ -2,7 +2,18 @@
 import time
 import logging
 import json
+from random import randrange
 from feedgram.lib.utils import get_url
+
+# User Defined exceptions
+
+
+class Error(Exception):
+    pass
+
+
+class RateLimitError(Error):
+    pass
 
 
 class Instagram:
@@ -22,6 +33,9 @@ class Instagram:
             content["content"] = content["content"][:content["content"].find(";</script>")]
             try:
                 content["content"] = json.loads(content["content"])
+                if "entry_data" in content["content"]:
+                    if "LoginAndSignupPage" in content["content"]["entry_data"]:
+                        raise RateLimitError
                 if before_json_exception:
                     before_json_exception = False
                     self.__logger.warning("This time the the content retrived contains json! :D")
@@ -31,10 +45,17 @@ class Instagram:
                     content["content"] = {"entry_data": {}}
                     return content
                 before_json_exception = True
+                wait_time = randrange(10, 20)
                 self.__logger.warning("The content of the url is not json, now i print the content...")
                 self.__logger.warning(content["content"])
-                time.sleep(1)
-                self.__logger.warning("Trying to retreive again the content from the url...")
+                self.__logger.warning("Trying again in %s seconds...", wait_time)
+            except RateLimitError:
+                before_json_exception = True
+                wait_time = randrange(60, 240)
+                self.__logger.warning("Rate Limited...")
+                self.__logger.warning("Trying again in %s seconds...", wait_time)
+            time.sleep(wait_time)
+            self.__logger.warning("Trying to retreive again the content from the url...")
 
     def extract_data(self, sn_account):
         if sn_account["username"]:

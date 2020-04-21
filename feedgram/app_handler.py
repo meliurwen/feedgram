@@ -10,6 +10,7 @@ from feedgram.lib.watchdog import Watchdog
 
 
 FILE_CONFIG = "config.ini"
+RETR_INTERVAL = 3600
 
 
 def setup_loger():
@@ -66,7 +67,7 @@ def main():
     thread1 = Watchdog(1, "TelegramUserInterface", "telegram_user_interface", 0, None, config.dictionary, still_run)  # T.U.I. aka Telegram User Interface (I hope to be the first to have invented this **original** name 8-) )
     thread2 = Watchdog(1, "Sender", "sender", 0, condizione_sender, config.dictionary, still_run)
     thread3 = Watchdog(1, "ElaborazioneCode", "elaborazione_code", 0, None, None, still_run)
-    thread4 = Watchdog(1, "NewsRetreiver", "news_retreiver", 600, condizione_compiler, config.dictionary, still_run)
+    thread4 = Watchdog(1, "NewsRetreiver", "news_retreiver", RETR_INTERVAL, condizione_compiler, config.dictionary, still_run)
     thread5 = Watchdog(1, "NewsCompiler", "news_compiler", 0, condizione_compiler, None, still_run)
 
     thread1.daemon = True

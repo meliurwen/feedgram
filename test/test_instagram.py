@@ -2,6 +2,7 @@
 import json
 import re
 import copy
+from unittest.mock import patch
 from unittest import mock
 import requests_mock
 from nose.tools import assert_equal
@@ -185,15 +186,20 @@ GLOBAL_COUNTER = 0
 def custom_matcher_no_json(request):
     global GLOBAL_COUNTER
     # print(request.path_url)
-    if GLOBAL_COUNTER == 0:
+    if GLOBAL_COUNTER == 0:  # Not a json
         GLOBAL_COUNTER += 1
         return requests_mock.create_response(request, status_code=200, text="THIS IS A TEST")
+    elif GLOBAL_COUNTER == 1:  # A json, but it's the rate limited case, in which a login page is presented
+        GLOBAL_COUNTER += 1
+        return requests_mock.create_response(request, status_code=200, text=ig_html_src({"entry_data": {"LoginAndSignupPage": None}}))
     else:
-        GLOBAL_COUNTER = 0
+        GLOBAL_COUNTER = 0  # A json
         return requests_mock.create_response(request, status_code=200, text=ig_html_src(IG_API_SCRP_USERNAME_EXIST_PUB["response"]))
 
 
-def test_extract_data_no_json_error():
+# tme.sleep patched so regardless the value issue it is now istant
+@patch('feedgram.social.instagram.time.sleep', return_value=None)
+def test_extract_data_no_json_error(_):
     igram = Instagram()
 
     api = IG_API_SCRP_USERNAME_EXIST_PUB
