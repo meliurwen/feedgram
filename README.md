@@ -58,7 +58,7 @@ At the moment platforms officially supported are:
 + Ubuntu 18.04
 + Python Wheels
 
-Go to the [release's section](https://gitlab.com/meliurwen/feedgram/-/releases) to download the latest installer:
+Go to the [releases section](https://gitlab.com/meliurwen/feedgram/-/releases) to download the latest installer:
 
 ### From Source
 
