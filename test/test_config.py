@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from os import path, remove
+from unittest.mock import patch
 from feedgram.lib.config import Config
 
 # creo il file di configurazione che non esiste con la configurazione di default
@@ -134,3 +135,13 @@ def test_config_work():
     assert config.dictionary["API"]["telegramkey"] == "5616486161:aslihfawlhrki2u4hbvlWAYgv"
 
     assert config.dictionary["API"]["youtubev3key"] == "ka3iorq237byfrva4wiymhvtlih4awyhnal"
+
+
+def test_oserror():
+    with patch('feedgram.lib.config.open') as mock_oserror:
+        mock_oserror.side_effect = OSError
+        config_path = "./some/path/config_file_test.ini"
+        try:
+            Config(config_path)
+        except OSError:
+            print('test passed, sys.exit() called')

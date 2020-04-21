@@ -11,6 +11,8 @@ from nose.tools import assert_equal, assert_true
 
 from feedgram.lib.telegram import Telegram
 
+TELEGRAM_API_KEY = "258484394:QKPEDbZx8AZcfi6yhHqh2eNCGBNHb3fubQa"
+
 JSON_GENERIC = {
     "success": True,
     "description": "This is a test"
@@ -51,7 +53,7 @@ API_ONE_MESSAGE = {
 
 
 def test_get_updates():
-    tel_interface = Telegram("258484394:QKPEDbZx8AZcfi6yhHqh2eNCGBNHb3fubQa")
+    tel_interface = Telegram(TELEGRAM_API_KEY)
 
     matcher = re.compile(r"^https:\/\/api\.telegram\.org\/bot\d{9}:[A-Za-z0-9-_]{35}\/getUpdates\?timeout=\d{1,4}(&offset=-?\d{1,4})?$")
 
@@ -87,7 +89,7 @@ def custom_matcher_no_json(request):
 
 
 def test_get_updates_no_json_error():
-    tel_interface = Telegram("258484394:QKPEDbZx8AZcfi6yhHqh2eNCGBNHb3fubQa")
+    tel_interface = Telegram(TELEGRAM_API_KEY)
 
     with requests_mock.mock() as mock_get:
         mock_get.add_matcher(custom_matcher_no_json)
@@ -240,7 +242,7 @@ def custom_matcher(request):
 
 
 def test_send_message():
-    tel_interface = Telegram("258484394:QKPEDbZx8AZcfi6yhHqh2eNCGBNHb3fubQa")
+    tel_interface = Telegram(TELEGRAM_API_KEY)
 
     api_queries = [ONE_MESSAGE_STANDARD,
                    ONE_MESSAGE_STANDARD_INLN_KYBD,
@@ -269,7 +271,7 @@ def test_send_message():
 
 
 def test_send_messages_max_one_sec_different_chat_ids():
-    tel_interface = Telegram("258484394:QKPEDbZx8AZcfi6yhHqh2eNCGBNHb3fubQa")
+    tel_interface = Telegram(TELEGRAM_API_KEY)
     coda = queue.Queue()
 
     # For the sake of the duration of the tests the time windows of one second
@@ -313,7 +315,7 @@ def test_send_messages_max_one_sec_different_chat_ids():
 # Note: the number 20 in the equation above is the rate limit per minute.
 # For example to send 21 messages the delay is 60 seconds.
 def test_send_messages_max_one_min_same_chat_ids():
-    tel_interface = Telegram("258484394:QKPEDbZx8AZcfi6yhHqh2eNCGBNHb3fubQa")
+    tel_interface = Telegram(TELEGRAM_API_KEY)
     coda = queue.Queue()
 
     # For the sake of the duration of the tests the time windows of one second
@@ -353,7 +355,7 @@ def test_send_messages_max_one_min_same_chat_ids():
 
 # 90 unique chat_id sends 20 messages at minute = 1800 messages at minute
 def test_send_messages_max_one_sec_max_one_min_same_chat_ids():
-    tel_interface = Telegram("258484394:QKPEDbZx8AZcfi6yhHqh2eNCGBNHb3fubQa")
+    tel_interface = Telegram(TELEGRAM_API_KEY)
     coda = queue.Queue()
 
     # For the sake of the duration of the tests the time windows of one second
@@ -387,7 +389,7 @@ def test_send_messages_max_one_sec_max_one_min_same_chat_ids():
 
 
 def test_send_messages_random():
-    tel_interface = Telegram("258484394:QKPEDbZx8AZcfi6yhHqh2eNCGBNHb3fubQa")
+    tel_interface = Telegram(TELEGRAM_API_KEY)
     coda = queue.Queue()
 
     # For the sake of the duration of the tests the time windows of one second
@@ -424,7 +426,7 @@ def dummy_send_messages():
 
 
 def test_send_messages_while():
-    tel_interface = Telegram("258484394:QKPEDbZx8AZcfi6yhHqh2eNCGBNHb3fubQa")
+    tel_interface = Telegram(TELEGRAM_API_KEY)
 
     # For the sake of the duration of the tests the time windows of one second
     # and one minute has been reduced at 1/10

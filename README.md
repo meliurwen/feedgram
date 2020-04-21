@@ -89,7 +89,7 @@ pip3 uninstall <package_name>
 At the _root_ of the project's folder launch:
 
 ```sh
-pip3 install --upgrade
+pip3 install --upgrade .
 ```
 
 ## Develop
@@ -121,6 +121,8 @@ _Prepare_ the development environment:
 ```
 
 That's all! ☕️
+
+> **Tip:** To deactivate the **_virtual environment_** simply issue the `deactivate` command.
 
 ## Testing & Linting
 

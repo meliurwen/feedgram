@@ -218,6 +218,7 @@ MSG_CMD_SUB_STANDARD = {
         {
             "type": "sendMessage",
             "chat_id": 123456789,
+            "markdown": "HTML",
             "text": "Social: instagram\nUser: testProfile\nYou've been successfully subscribed!\nFrom now on, you'll start to receive feeds from this account!"
         }
     ]
@@ -227,7 +228,7 @@ MSG_CMD_SUB_BAD_FORMAT = copy.deepcopy(MSG_CMD_SUB_STANDARD)
 MSG_CMD_SUB_BAD_FORMAT["query"]["result"][0]["message"]["text"] = "/sub potato"
 MSG_CMD_SUB_BAD_FORMAT["response"] = {}
 
-MSG_CMD_SUB_BAD_FORMAT["result"][0]["text"] = "/sub command badly compiled"
+MSG_CMD_SUB_BAD_FORMAT["result"][0]["text"] = "<b>⚠️Warning</b>\n<code>/sub</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/sub &lt;link&gt;</code>\n<i>or</i>\n<code>/sub &lt;social&gt; &lt;username&gt;</code>"
 
 
 MSG_CMD_SUB_AGAIN = copy.deepcopy(MSG_CMD_SUB_STANDARD)
@@ -335,7 +336,7 @@ MSG_CMD_SUB_IG_P_NO_SPEC_MTHD["result"][0]["text"] = "Social: instagram\nMmmh, t
 MSG_CMD_SUB_INVALID_URL = copy.deepcopy(MSG_CMD_SUB_STANDARD)
 MSG_CMD_SUB_INVALID_URL["query"]["result"][0]["message"]["text"] = "/sub https://www.potato.banana"
 MSG_CMD_SUB_INVALID_URL["response"] = {}
-MSG_CMD_SUB_INVALID_URL["result"][0]["text"] = "/sub command badly compiled"
+MSG_CMD_SUB_INVALID_URL["result"][0]["text"] = "<b>⚠️Warning</b>\n<code>/sub</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/sub &lt;link&gt;</code>\n<i>or</i>\n<code>/sub &lt;social&gt; &lt;username&gt;</code>"
 
 MSG_CMD_SUB_INVALID_SOCIAL = copy.deepcopy(MSG_CMD_SUB_STANDARD)
 MSG_CMD_SUB_INVALID_SOCIAL["query"]["result"][0]["message"]["text"] = "/sub banana potato"
@@ -404,7 +405,7 @@ def test_wrong_command():
 
 def test_help_command():
 
-    msm_help = ("📖Help\n\nYou can follow up to <i>10 social accounts</i>.\n"
+    msm_help = ("📖 Help\n\nYou can follow up to <i>10 social accounts</i>.\n"
                 "Socials currently supported:\n"
                 " • <i>Instagram</i>\n"
                 "You can follow only <b>public</b> accounts.\n"
@@ -412,8 +413,7 @@ def test_help_command():
                 "<b>Receive Feeds:</b>\n"
                 " • /sub <i>social</i> <i>username</i>\n"
                 " • /sub <i>link</i>\n"
-                "/stop to stop and unsubscribe from the bot.\n"
-                "That's all. :)")
+                " • /stop to stop and unsubscribe from the bot.")
 
     database = MyDatabase(DATABASE_PATH)
     myprocess_input = Processinput(database, [])

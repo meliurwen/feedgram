@@ -5,6 +5,10 @@ import requests
 
 LOGGER = logging.getLogger('telegram_bot.utils')
 
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:75.0) Gecko/20100101 Firefox/75.0",
+    "Accept-Language": "en-US;q=0.9,en;q=0.8,en-GB;q=0.7"
+}
 
 # For `requests` module exceptions handling see: https://2.python-requests.org/en/latest/api/
 # For `decode` classs handling see: https://docs.python.org/3/library/codecs.html#codecs.decode
@@ -15,7 +19,11 @@ def get_url(url):
     before_get_url_exception = False
     while True:
         try:
-            content = requests.get(url, timeout=(3, 300)).content.decode("utf8")
+            content = requests.get(url, headers=HEADERS, timeout=(3, 300))
+            content = {
+                "status_code": content.status_code,
+                "content": content.content.decode("utf8")
+            }
             if before_get_url_exception:
                 before_get_url_exception = False
                 LOGGER.info("Connection restored! :D")
