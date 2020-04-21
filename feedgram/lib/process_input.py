@@ -16,7 +16,7 @@ class Processinput:
                   "We already <i>miss</i> you, please come back soon! 😢\n"
                   "Tip: In order to re-joyn type /start *wink* *wink*")
 
-    __msm_help = ("📖Help\n\nYou can follow up to <i>10 social accounts</i>.\n"
+    __msm_help = ("📖 Help\n\nYou can follow up to <i>10 social accounts</i>.\n"
                   "Socials currently supported:\n"
                   " • <i>Instagram</i>\n"
                   "You can follow only <b>public</b> accounts.\n"
@@ -24,8 +24,7 @@ class Processinput:
                   "<b>Receive Feeds:</b>\n"
                   " • /sub <i>social</i> <i>username</i>\n"
                   " • /sub <i>link</i>\n"
-                  "/stop to stop and unsubscribe from the bot.\n"
-                  "That's all. :)")
+                  " • /stop to stop and unsubscribe from the bot.")
 
     def process(self, updates):
         messages = []

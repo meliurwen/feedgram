@@ -405,7 +405,7 @@ def test_wrong_command():
 
 def test_help_command():
 
-    msm_help = ("📖Help\n\nYou can follow up to <i>10 social accounts</i>.\n"
+    msm_help = ("📖 Help\n\nYou can follow up to <i>10 social accounts</i>.\n"
                 "Socials currently supported:\n"
                 " • <i>Instagram</i>\n"
                 "You can follow only <b>public</b> accounts.\n"
@@ -413,8 +413,7 @@ def test_help_command():
                 "<b>Receive Feeds:</b>\n"
                 " • /sub <i>social</i> <i>username</i>\n"
                 " • /sub <i>link</i>\n"
-                "/stop to stop and unsubscribe from the bot.\n"
-                "That's all. :)")
+                " • /stop to stop and unsubscribe from the bot.")
 
     database = MyDatabase(DATABASE_PATH)
     myprocess_input = Processinput(database, [])
