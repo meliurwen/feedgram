@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import test.constants as cnst
+
 from os import path, remove
 import sqlite3
 from feedgram.lib.database import MyDatabase
@@ -72,13 +74,10 @@ def test_database_table_error():
     # creato ma senza una tabella
     database = MyDatabase(database_path)
 
-    # Verifico che lo stato della classe sia quello coretto
     assert database.status == -1
 
 
 def test_database_creation():
-
-    # creo il database che non esiste con le tabelle base
 
     # Verifico se il file esiste. Nel caso eista lo elimino
     if path.exists(DATABASE_PATH):
@@ -86,48 +85,28 @@ def test_database_creation():
             remove(DATABASE_PATH)
         except OSError as err:  # if failed, report it back to the user ##
             print("Error: {} - {}.".format(err.filename, err.strerror))
-
-    # Mi assicuro che il file non esista/ sia stato cancellato
     assert not path.exists(DATABASE_PATH)
 
-    # Eseguo la chiamata al costruttore della classe di configurazione
-    # che mi genererà il file di configurazione con i valori base
-    # e tenterà di caricarla
     database = MyDatabase(DATABASE_PATH)
-
     # state = database.status
 
-    # verifico che il file sia stato creato
     assert path.exists(DATABASE_PATH)
-
-    # Verifico che lo stato della classe sia quello coretto
     assert database.status == 1
 
 
 def test_database_alredy_exist():
 
-    # Mi assicuro che il file non esista/ sia stato cancellato
     assert path.exists(DATABASE_PATH)
 
-    # Eseguo la chiamata al costruttore della classe di configurazione
-    # che mi genererà il file di configurazione con i valori base
-    # e tenterà di caricarla
     database = MyDatabase(DATABASE_PATH)
 
-    # Verifico che lo stato della classe sia quello coretto
     assert database.status == 1
 
 
 def test_database_user_id_not_exist():
 
-    # Mi assicuro che il file non esista/ sia stato cancellato
     assert path.exists(DATABASE_PATH)
-
-    # Eseguo la chiamata al costruttore della classe di configurazione
-    # che mi genererà il file di configurazione con i valori base
-    # e tenterà di caricarla
     database = MyDatabase(DATABASE_PATH)
-
     us_exist = database.check_utente(6551474276)
 
     assert not us_exist
@@ -135,16 +114,10 @@ def test_database_user_id_not_exist():
 
 def test_database_subscribe():
 
-    # Mi assicuro che il file non esista/ sia stato cancellato
     assert path.exists(DATABASE_PATH)
 
-    # Eseguo la chiamata al costruttore della classe di configurazione
-    # che mi genererà il file di configurazione con i valori base
-    # e tenterà di caricarla
     database = MyDatabase(DATABASE_PATH)
-
     database.subscribe_user(6551474276, "username", 75692378, 1, 10)
-
     us_exist, _ = myquery(DATABASE_PATH, "SELECT 1 FROM users WHERE user_id = ?;", 6551474276)
 
     assert bool(us_exist)
@@ -152,14 +125,9 @@ def test_database_subscribe():
 
 def test_database_user_id_exist():
 
-    # Mi assicuro che il file non esista/ sia stato cancellato
     assert path.exists(DATABASE_PATH)
 
-    # Eseguo la chiamata al costruttore della classe di configurazione
-    # che mi genererà il file di configurazione con i valori base
-    # e tenterà di caricarla
     database = MyDatabase(DATABASE_PATH)
-
     us_exist = database.check_utente(6551474276)
 
     assert us_exist
@@ -168,34 +136,12 @@ def test_database_user_id_exist():
 def test_database_check_number_subscribtions():
 
     assert path.exists(DATABASE_PATH)
-    database = MyDatabase(DATABASE_PATH)
 
+    database = MyDatabase(DATABASE_PATH)
     num_sub = database.check_number_subscribtions(6551474276)
 
     assert num_sub["user_id"] == 6551474276
-
     assert num_sub["actual_registrations"] == 0
-
-
-SUB_BY_POST_LINK = {"social": "instagram",
-                    "username": "il_post",
-                    "internal_id": None,
-                    "social_id": None,
-                    "link": "www.instagram.com/il_post",
-                    "data": {},
-                    "subStatus": "social_id_not_present"
-                    }
-
-SUB_BY_POST_LINK2 = {"social": "instagram",
-                     "username": "il_post",
-                     "internal_id": "1769583068",
-                     "social_id": None,
-                     "link": "www.instagram.com/il_post",
-                     "data": {},
-                     "subStatus": "subscribable",
-                     "title": "il_post",
-                     "status": "public"
-                     }
 
 
 def test_database_get_first_social_id_from_internal_user_social_and_if_present_subscribe1():
@@ -209,7 +155,7 @@ def test_database_get_first_social_id_from_internal_user_social_and_if_present_s
     assert path.exists(DATABASE_PATH)
     database = MyDatabase(DATABASE_PATH)
 
-    mresult = database.get_first_social_id_from_internal_user_social_and_if_present_subscribe(6551474276, SUB_BY_POST_LINK, False)
+    mresult = database.get_first_social_id_from_internal_user_social_and_if_present_subscribe(6551474276, cnst.SUB_BY_POST_LINK, False)
 
     assert mresult['subStatus'] == 'notInDatabase'
 
@@ -224,7 +170,7 @@ def test_database_get_first_social_id_from_internal_user_social_and_if_present_s
     assert path.exists(DATABASE_PATH)
     database = MyDatabase(DATABASE_PATH)
 
-    mresult = database.get_first_social_id_from_internal_user_social_and_if_present_subscribe(6551474276, SUB_BY_POST_LINK2, True)
+    mresult = database.get_first_social_id_from_internal_user_social_and_if_present_subscribe(6551474276, cnst.SUB_BY_POST_LINK2, True)
     assert mresult['social_id'] == 1
     assert mresult['subStatus'] == 'CreatedSocialAccAndSubscribed'
 
@@ -240,7 +186,7 @@ def test_database_get_first_social_id_from_internal_user_social_and_if_present_s
     assert path.exists(DATABASE_PATH)
     database = MyDatabase(DATABASE_PATH)
 
-    mresult = database.get_first_social_id_from_internal_user_social_and_if_present_subscribe(57356765765, SUB_BY_POST_LINK, False)
+    mresult = database.get_first_social_id_from_internal_user_social_and_if_present_subscribe(57356765765, cnst.SUB_BY_POST_LINK, False)
     assert mresult['internal_id'] == '1769583068'
     assert mresult['social_id'] == 1
     assert mresult['subStatus'] == 'JustSubscribed'
@@ -252,8 +198,7 @@ def test_database_get_first_social_id_from_internal_user_social_and_if_present_s
     '''
     assert path.exists(DATABASE_PATH)
     database = MyDatabase(DATABASE_PATH)
-
-    mresult = database.get_first_social_id_from_internal_user_social_and_if_present_subscribe(6551474276, SUB_BY_POST_LINK, False)
+    mresult = database.get_first_social_id_from_internal_user_social_and_if_present_subscribe(6551474276, cnst.SUB_BY_POST_LINK, False)
 
     assert mresult['subStatus'] == 'AlreadySubscribed'
 
@@ -283,28 +228,11 @@ def test_database_create_dict_of_user_ids_and_socials():
     assert res['subscriptions']['instagram'][il_post['internal_id']] == ['6551474276', '57356765765']
 
 
-QUERY_TODO_UPDATE = {"update": [{"type": "retreive_time",
-                                 "social": "instagram",
-                                 "internal_id": "1769583068",
-                                 "retreive_time": "999999999"
-                                 },
-                                {"type": "status",
-                                 "social": "instagram",
-                                 "internal_id": "1769583068",
-                                 "status": "private"
-                                 }
-                                ],
-                     "delete": []
-                     }
-
-
 def test_database_process_messages_queries1():
 
     assert path.exists(DATABASE_PATH)
     database = MyDatabase(DATABASE_PATH)
-
-    database.process_messages_queries(QUERY_TODO_UPDATE)
-
+    database.process_messages_queries(cnst.QUERY_TODO_UPDATE)
     res, _ = myquery(DATABASE_PATH,
                      "SELECT retreive_time, status FROM socials WHERE social = ? AND internal_id = ?",
                      'instagram', 1769583068)
@@ -328,7 +256,6 @@ def test_database_process_messages_queries2():
     database = MyDatabase(DATABASE_PATH)
 
     database.process_messages_queries(QUERY_TODO_DELETE)
-
     res, _ = myquery(DATABASE_PATH, "SELECT count() FROM registrations")
 
     assert res[0] == 0
@@ -344,7 +271,7 @@ def test_database_clean_dead_subscriptions():
     database = MyDatabase(DATABASE_PATH)
 
     # creo una sottoscrizione ad un social di un utente fintizzio
-    _ = database.get_first_social_id_from_internal_user_social_and_if_present_subscribe(1234567890, SUB_BY_POST_LINK2, True)
+    _ = database.get_first_social_id_from_internal_user_social_and_if_present_subscribe(1234567890, cnst.SUB_BY_POST_LINK2, True)
 
     # rimuovo la relazione tra l'utente e il social
     myquery(DATABASE_PATH, "DELETE FROM registrations WHERE user_id = ?", 1234567890)
@@ -365,16 +292,10 @@ def test_database_clean_dead_subscriptions():
 
 def test_database_unsubscribe():
 
-    # Mi assicuro che il file non esista/ sia stato cancellato
     assert path.exists(DATABASE_PATH)
 
-    # Eseguo la chiamata al costruttore della classe di configurazione
-    # che mi genererà il file di configurazione con i valori base
-    # e tenterà di caricarla
     database = MyDatabase(DATABASE_PATH)
-
     database.unsubscribe_user(6551474276)
-
     us_exist, _ = myquery(DATABASE_PATH, "SELECT 1 FROM users WHERE user_id = ?;", 6551474276)
 
     assert not bool(us_exist)

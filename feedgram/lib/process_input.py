@@ -24,6 +24,7 @@ class Processinput:
                   "<b>Receive Feeds:</b>\n"
                   " • /sub <i>social</i> <i>username</i>\n"
                   " • /sub <i>link</i>\n"
+                  "<b>Bot:</b>\n"
                   " • /stop to stop and unsubscribe from the bot.")
 
     def process(self, updates):
