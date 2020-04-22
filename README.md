@@ -3,7 +3,7 @@
 
 # FeedGram
 
-[![pipeline status](https://gitlab.com/meliurwen/feedgram/badges/master/pipeline.svg)](https://gitlab.com/meliurwen/feedgram/commits/master) [![coverage report](https://gitlab.com/meliurwen/feedgram/badges/master/coverage.svg)](https://gitlab.com/meliurwen/feedgram/commits/master) [![Pylint](https://gitlab.com/meliurwen/feedgram/-/jobs/artifacts/master/raw/pylint/pylint.svg?job=pylint)](https://gitlab.com/meliurwen/feedgram/-/jobs/artifacts/master/raw/pylint/pylint.log?job=pylint) [![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://gitlab.com/meliurwen/feedgram/blob/master/LICENSE)
+[![pipeline status](https://gitlab.com/meliurwen/feedgram/badges/master/pipeline.svg)](https://gitlab.com/meliurwen/feedgram/commits/master) [![coverage report](https://gitlab.com/meliurwen/feedgram/badges/master/coverage.svg)](https://gitlab.com/meliurwen/feedgram/commits/master) [![Pylint](https://gitlab.com/meliurwen/feedgram/-/jobs/artifacts/master/raw/pylint/pylint.svg?job=pylint)](https://gitlab.com/meliurwen/feedgram/-/jobs/artifacts/master/raw/pylint/pylint.log?job=pylint) [![FeedGram](https://gitlab.com/meliurwen/feedgram/-/jobs/artifacts/master/raw/pylint/app_version.svg?job=pylint)](https://gitlab.com/meliurwen/feedgram/-/jobs/artifacts/master/raw/pylint/app_version.svg?job=pylint) [![License: GPLv3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://gitlab.com/meliurwen/feedgram/blob/master/LICENSE)
 
 </div>
 
@@ -48,38 +48,102 @@ The **_interactions with the socials/platforms_** will be done with various meth
 The **_internal structure_** of the application is mainly composed by a multitude of _specialised python modules_, an _SQLite3_ database and a config file in `ini` format, most of them directly orchestrated by a main module.
 
 
-## How to Install and Launch
+## Install
 
-### Debian and derivatives
+### From Compiled Packages
 
-Install the dependencies:
+At the moment platforms officially supported are:
+
++ Debian 10
++ Ubuntu 18.04
++ Python Wheels
+
+Go to the [releases section](https://gitlab.com/meliurwen/feedgram/-/releases) to download the latest installer:
+
+### From Source
+
+**Prerequisites:**
+
++ `python3` (_>=3.6_)
++ `python3-setuptools`
++ `python3-pip`
+
+**Install:**
+
+At the _root_ of the project's folder launch:
 
 ```sh
-apt-get -y install python3 python3-venv python3-pip
+pip3 install .
 ```
 
-Enter the project's folder, _create_ the **_virtual environment_** and then _activate_ it:
+**Uninstall:**
+
+Anywhere in the system launch:
 
 ```sh
-cd feedgram
+pip3 uninstall <package_name>
 ```
 
+**Upgrade:**
+
+At the _root_ of the project's folder launch:
+
+```sh
+pip3 install --upgrade .
+```
+
+## Develop
+
+**Prerequisites:**
+
++ `python3` (_>=3.6_)
++ `python3-setuptools`
++ `python3-pip`
++ `python3-venv` (_optional_)
+
+_Create_ the **_virtual environment_** in the project's folder:
+```sh
+python3 -m venv venv
+```
+Or if oyu wanna use the `virtualenv` package:
 ```sh
 virtualenv -p python3 venv
 ```
 
+_Activate_ the virtual environment:
 ```sh
 source venv/bin/activate
 ```
 
+_Prepare_ the development environment:
 ```sh
-pip3 install requests
+./setup.py develop
 ```
 
-Now launch the bot:
+That's all! ☕️
 
+> **Tip:** To deactivate the **_virtual environment_** simply issue the `deactivate` command.
+
+## Testing & Linting
+
+_Activate_ the **virtual environment** as described in [Develop](##Develop). (optional)
+
+Install the dependencies:
 ```sh
-python3 main.py
+pip3 install -i test-requirements.txt
 ```
 
+To launch **Pytest**:
+```sh
+pytest
+```
 
+To launch **Pylint**:
+```sh
+pylint --output-format=text --rcfile=setup.cfg app/ test/ *.py
+```
+
+To launch **Flake8**:
+```sh
+flake8
+```

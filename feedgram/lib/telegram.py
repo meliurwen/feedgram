@@ -296,7 +296,7 @@ class Telegram:
     def __get_json_from_url(self, url):
         before_json_exception = False
         while True:
-            content = get_url(url)
+            content = get_url(url)["content"]
             try:
                 jsn = json.loads(content)
                 if before_json_exception:
