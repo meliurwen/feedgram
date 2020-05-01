@@ -394,7 +394,7 @@ NOT_COMMAND = {
                 "sticker": {
                     "width": 512,
                     "height": 444,
-                    "emoji": "\ud83d\ude4f",
+                    "emoji": "🙏",
                     "set_name": "Animushit",
                     "is_animated": False,
                     "thumb": {
@@ -411,6 +411,116 @@ NOT_COMMAND = {
             },
         }
     ],
+}
+
+CALLBACK_HELP = {
+    "ok": True,
+    "result": [
+        {
+            "update_id": 731420180,
+            "callback_query": {
+                "id": "268511788082888011",
+                "from": {
+                    "id": 123456789,
+                    "is_bot": False,
+                    "first_name": "John",
+                    "last_name": "Doe",
+                    "username": "TestUsername",
+                    "language_code": "en"
+                },
+                "message": {
+                    "message_id": 2120,
+                    "from": {
+                        "id": 987654321,
+                        "is_bot": True,
+                        "first_name": "TestbotID",
+                        "username": "Territory_ID_Bot"
+                    },
+                    "chat": {
+                        "id": 123456789,
+                        "first_name": "John",
+                        "last_name": "Doe",
+                        "username": "TestUsername",
+                        "type": "private"
+                    },
+                    "date": 1588349911,
+                    "text": "📖 Help\n\nYou can follow up to <i>10 social accounts</i>.\nSocials currently supported:\n • <i>Instagram</i>\nYou can follow only <b>public</b> accounts.\n\n<b>Receive Feeds:</b>\n • /sub <i>social</i> <i>username</i>\n • /sub <i>link</i>\n<b>Bot:</b>\n • /stop to stop and unsubscribe from the bot.",
+                    "entities": [
+                        {
+                            "offset": 30,
+                            "length": 18,
+                            "type": "italic"
+                        },
+                        {
+                            "offset": 82,
+                            "length": 9,
+                            "type": "italic"
+                        },
+                        {
+                            "offset": 112,
+                            "length": 6,
+                            "type": "bold"
+                        },
+                        {
+                            "offset": 130,
+                            "length": 14,
+                            "type": "bold"
+                        },
+                        {
+                            "offset": 148,
+                            "length": 4,
+                            "type": "bot_command"
+                        },
+                        {
+                            "offset": 153,
+                            "length": 6,
+                            "type": "italic"
+                        },
+                        {
+                            "offset": 160,
+                            "length": 8,
+                            "type": "italic"
+                        },
+                        {
+                            "offset": 172,
+                            "length": 4,
+                            "type": "bot_command"
+                        },
+                        {
+                            "offset": 177,
+                            "length": 4,
+                            "type": "italic"
+                        },
+                        {
+                            "offset": 182,
+                            "length": 4,
+                            "type": "bold"
+                        },
+                        {
+                            "offset": 190,
+                            "length": 5,
+                            "type": "bot_command"
+                        }
+                    ],
+                    "reply_markup": {
+                        "inline_keyboard": [
+                            [
+                                {
+                                    "text": "📋",
+                                    "callback_data": "list_mode"
+                                },
+                                {
+                                    "text": "🏷",
+                                    "callback_data": "category_mode"
+                                }
+                            ]
+                        ]
+                    }
+                },
+                "chat_instance": "4557971575337840976",
+                "data": "help_mode"
+            }
+        }],
 }
 
 WRONG_COMMAND = {

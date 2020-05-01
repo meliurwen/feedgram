@@ -44,8 +44,6 @@ class Processinput:
             mss_type = None
             if 'message' in update:
                 mss_type = "message"
-            elif 'edited_message' in update:
-                mss_type = "edited_message"
             elif 'callback_query' in update:
                 mss_type = "callback_query"
 
