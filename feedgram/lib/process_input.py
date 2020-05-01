@@ -27,12 +27,26 @@ class Processinput:
                   "<b>Bot:</b>\n"
                   " • /stop to stop and unsubscribe from the bot.")
 
+    # inline keyboard
+    __ilk_help = {"text": "📖", "callback_data": "help_mode"}
+
+    __ilk_pause = {"text": "⏯️", "callback_data": "pause_mode"}
+    __ilk_notoff = {"text": "🔕", "callback_data": "notifications_mode_off"}
+    __ilk_stop = {"text": "⏹", "callback_data": "stop_mode"}
+    __ilk_rem = {"text": "🗑", "callback_data": "remove"}
+
+    __ilk_list = {"text": "📋", "callback_data": "list_mode"}
+    __ilk_category = {"text": "🏷", "callback_data": "category_mode"}
+
     def process(self, updates):
         messages = []
         for update in updates["result"]:
             mss_type = None
             if 'message' in update:
                 mss_type = "message"
+            elif 'callback_query' in update:
+                mss_type = "callback_query"
+
             else:
                 # mss_type = "WTF" #trovare un modo per gestire questo caso
                 self.__logger.warning("Messaggio ricevuto non coretto %s ", update)
@@ -46,6 +60,8 @@ class Processinput:
                     username = ""
                 if "chat" in update[mss_type]:  # di solito arrivano quando ci sono i messaggi "normali"
                     chat_id = update[mss_type]["chat"]["id"]
+                elif "message" in update[mss_type]:  # di solito arrivando quando ci sono le callback_query
+                    chat_id = update[mss_type]["message"]["chat"]["id"]
                 else:
                     # chat_id = update[mss_type]["WTF"] #trovare un modo per gestire questo caso
                     self.__logger.warning("Il messaggio ricevuto non contiene in numero della chat %s ", update)
@@ -61,7 +77,7 @@ class Processinput:
                                     else:
                                         messages.append(self.__ms_maker(chat_id, self.__msm_stop, "HTML"))
                                 elif text == "/help":
-                                    tets = self.__ms_maker(chat_id, self.__msm_help, "HTML")
+                                    tets = self.__ms_maker(chat_id, self.__msm_help, "HTML", None, None, {"inline_keyboard": [[self.__ilk_list, self.__ilk_category]]})
                                     messages.append(tets)
                                 elif text[:4] == "/sub":
                                     match = re.search(r"^([a-zA-Z]{1,16}) (\S{1,128})$", text[5:])
@@ -85,6 +101,14 @@ class Processinput:
                         # che si basa sul parametro "chat_id" per schedualare i messaggi da inviare
                         # TODO: Togliere i chat_id inutili non appena è stato risolto il problema nel send_messages perché questa è una soluzione triste (ma non troppo)
                         # NOTA: Mi sa che questa "soluzione triste" rimarrà così per sempre, od almeno finchè Telegram non rilascerà specifiche più dettagliate.
+                        elif 'callback_query' in update:
+                            callback_query_id = update[mss_type]["id"]
+                            message_id = update[mss_type]["message"]["message_id"]
+                            callback_data = update[mss_type]["data"]
+
+                            if callback_data == "help_mode":
+                                messages.append(self.__callback_maker(chat_id, callback_query_id, "Help", False))
+                                messages.append(self.__ms_edit(chat_id, message_id, self.__msm_help, "HTML", {"inline_keyboard": [[self.__ilk_list, self.__ilk_category]]}))
                         else:
                             messages.append(self.__ms_maker(chat_id, "[AUTHORIZED] You can send text only!"))
                     else:
@@ -120,6 +144,40 @@ class Processinput:
 
         if notification:
             temp_dict["disable_notification"] = not notification
+
+        if markup:
+            temp_dict["reply_markup"] = markup
+
+        return temp_dict
+
+    @classmethod
+    def __callback_maker(cls, chatid, queryid, text=None, alert=None):
+        temp_dict = {}
+
+        temp_dict["type"] = "answerCallbackQuery"
+        temp_dict["chat_id"] = chatid
+        temp_dict["callback_query_id"] = queryid
+        if text:
+            temp_dict["text"] = text
+
+        # markdown <==> parser_mode di telegram
+        if alert:
+            temp_dict["show_alert"] = alert
+
+        return temp_dict
+
+    @classmethod
+    def __ms_edit(cls, chat_id, message_id, text, markdown=None, markup=None):
+        temp_dict = {}
+
+        temp_dict["type"] = "editMessageText"
+        temp_dict["chat_id"] = chat_id
+        temp_dict["message_id"] = message_id
+        temp_dict["text"] = text
+
+        # markdown <==> parser_mode di telegram
+        if markdown:
+            temp_dict["markdown"] = markdown
 
         if markup:
             temp_dict["reply_markup"] = markup

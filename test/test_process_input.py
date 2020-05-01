@@ -102,6 +102,22 @@ def test_not_command_registred():
     assert result[0]["text"] == "[AUTHORIZED] You can send text only!"
 
 
+def test_callback_help():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_HELP)
+
+    assert result[0]["type"] == "answerCallbackQuery"
+    assert result[0]["text"] == "Help"
+
+    assert result[1]["type"] == "editMessageText"
+    assert cnst.CALLBACK_HELP["result"][0]["callback_query"]["message"]["chat"]["id"] == result[1]["chat_id"]
+    assert cnst.CALLBACK_HELP["result"][0]["callback_query"]["message"]["message_id"] == result[1]["message_id"]
+    assert cnst.CALLBACK_HELP["result"][0]["callback_query"]["message"]["text"] == result[1]["text"]
+    assert cnst.CALLBACK_HELP["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
+
+
 GLOBAL_EXTRCT_DATA_RETURN = None
 
 
