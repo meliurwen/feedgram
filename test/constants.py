@@ -291,6 +291,7 @@ SOCIAL_QUERY_PUBLIC_NOW_PRIVATE["result"]["messages"] = [
         "social": "instagram",
         "internal_id": "123456789",
         "username": "alice",
+        "title": "alice",
         "post_url": "https://www.instagram.com/alice/",
         "post_date": 61300805
     }

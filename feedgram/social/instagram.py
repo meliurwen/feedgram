@@ -114,12 +114,12 @@ class Instagram:
                 if sn_payload["entry_data"]["ProfilePage"][0]["graphql"]["user"]["is_private"]:  # Controlla se il profilo è privato o meno
                     if status != "private":  # Se prima non era privato allora cambia il suo status, altrimenti non fare nulla
                         self.__logger.info("Il profilo %s è diventato privato", user)
-                        queries["update"].append({'type': 'status', 'status': 'private', 'social': 'instagram', 'internal_id': '' + user_id + ''})
-                        messages.append({"type": "now_private", "social": "instagram", "internal_id": user_id, "username": user, "post_url": "https://www.instagram.com/" + user + "/", "post_date": int(time.time())})
+                        queries["update"].append({'type': 'status', 'status': 'private', 'social': 'instagram', 'internal_id': str(user_id)})
+                        messages.append({"type": "now_private", "social": "instagram", "internal_id": user_id, "username": user, "title": title, "post_url": "https://www.instagram.com/" + user + "/", "post_date": int(time.time())})
                 else:
                     if status == "private":  # Se prima era privato allora cambia il suo status, altrimenti non fare nulla
                         self.__logger.info("Il profilo %s da privato è ritornato pubblico", user)
-                        queries["update"].append({'type': 'status', 'status': 'public', 'social': 'instagram', 'internal_id': '' + user_id + ''})
+                        queries["update"].append({'type': 'status', 'status': 'public', 'social': 'instagram', 'internal_id': str(user_id)})
 
                     last_post_date = int(value["retreive_time"])  # -1728000  # Decomment this number for debug only!
 
@@ -143,12 +143,12 @@ class Instagram:
                                 last_post_date_temp = int(taken_at_timestamp)
 
                     last_post_date = last_post_date_temp
-                    queries["update"].append({'type': 'retreive_time', 'social': 'instagram', 'internal_id': '' + user_id + '', 'retreive_time': '' + str(last_post_date) + ''})
+                    queries["update"].append({'type': 'retreive_time', 'social': 'instagram', 'internal_id': str(user_id), 'retreive_time': '' + str(last_post_date) + ''})
 
             else:
                 # Se l'account non esiste più allora lo cancello
                 self.__logger.info("Il profilo %s non esiste più, ora lo cancello.", user)
-                queries["delete"].append({'type': 'socialAccount', 'social': 'instagram', 'internal_id': '' + user_id + ''})
+                queries["delete"].append({'type': 'socialAccount', 'social': 'instagram', 'internal_id': str(user_id)})
                 messages.append({"type": "deleted_account", "social": "instagram", "internal_id": user_id, "username": user, "title": title, "post_url": "https://www.instagram.com/" + user + "/", "post_date": int(time.time())})
 
         # Messaggi ordinati cronologicamente
