@@ -64,8 +64,12 @@ pylint:
     - PYLINT_SCORE=$(sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p' ./pylint/pylint.log)
     - anybadge --label="Pylint score" --file=pylint/pylint.svg --value=$PYLINT_SCORE 2=red 4=orange 8=yellow 10=green
     - FEEDGRAM_V=$(cat version)
-    - anybadge --label="FeedGram" --file=pylint/app_version.svg --value=v$FEEDGRAM_V --color=#0088cc
     - echo "Pylint score is $PYLINT_SCORE"
+    - anybadge --label="FeedGram" --file=pylint/app_version.svg --value=v$FEEDGRAM_V --color=#0088cc
+    - anybadge --label="platform" --file=pylint/plaform.svg --value="Debian | Ubuntu | Wheel" --color=#007ec6
+    - anybadge --label="python" --file=pylint/python_ver.svg --value="3.6 | 3.7 | 3.8" --color=#007ec6
+    - anybadge --label="wheel" --file=pylint/wheel.svg --value="yes" --color=#4c1
+    - anybadge --label="pip install" --file=pylint/pip_install.svg --value="feedgram" --color=#007ec6
   artifacts:
     paths:
       - ./pylint/
