@@ -79,6 +79,8 @@ class Processinput:
                                 elif text == "/help":
                                     tets = self.__ms_maker(chat_id, self.__msm_help, "HTML", None, None, {"inline_keyboard": [[self.__ilk_list, self.__ilk_category]]})
                                     messages.append(tets)
+                                elif text == "/list":
+                                    message, button = self.__list_mss(user_id, 0)
                                 elif text[:4] == "/sub":
                                     match = re.search(r"^([a-zA-Z]{1,16}) (\S{1,128})$", text[5:])
                                     if match:
@@ -109,6 +111,20 @@ class Processinput:
                             if callback_data == "help_mode":
                                 messages.append(self.__callback_maker(chat_id, callback_query_id, "Help", False))
                                 messages.append(self.__ms_edit(chat_id, message_id, self.__msm_help, "HTML", {"inline_keyboard": [[self.__ilk_list, self.__ilk_category]]}))
+
+                            # Lo spazio con il numero possono non esserci
+                            # Es.
+                            # list_mode     <- chiamata normale del list mode
+                            # list_mode 66  <- chiamata durante lo spostamento di pagina
+                            elif bool(re.findall(r"^(list_mode)( \d+)?", callback_data)):
+                                match = re.findall(r"^(list_mode) ?(\d+)?", callback_data)[0]
+                                if match[1]:
+                                    message, button = self.__list_mss(user_id, int(match[1]))
+                                else:
+                                    messages.append(self.__callback_maker(chat_id, callback_query_id, "Following list", False))
+                                    message, button = self.__list_mss(user_id, 0)
+                                messages.append(self.__ms_edit(chat_id, message_id, message, "HTML", {"inline_keyboard": button}))
+
                         else:
                             messages.append(self.__ms_maker(chat_id, "[AUTHORIZED] You can send text only!"))
                     else:
@@ -183,6 +199,77 @@ class Processinput:
             temp_dict["reply_markup"] = markup
 
         return temp_dict
+
+    SUB_X_PAGE = 6
+    BUTN_X_ROW = 3
+    NUMBER_DICT = {"0": "⓪", "1": "①", "2": "②", "3": "③", "4": "④", "5": "⑤", "6": "⑥", "7": "⑦", "8": "⑧", "9": "⑨"}
+    LINE_LIMIT = 29
+
+    def __list_mss(self, user_id, index):
+        user_subscriptions = self.__db.user_subscriptions(user_id)
+        # u_s[0] -> social
+        # u_s[1] -> title
+        # u_s[2] -> internal_id
+
+        tmp_message_size = ' ' * 50
+        result = "👥Follow List\n" + tmp_message_size + "\nYou are following: \n"
+        i = 0  # indice di partenza degli elementi nella pagina
+        temporary_buttons_list = []
+
+        # verifico che il nuovo index non superi la lunghezza massima della lista
+        # se il nuovo indice supera viene resettato
+        if index > len(user_subscriptions) - 1:
+            i = ((len(user_subscriptions) - 1) // self.SUB_X_PAGE) * 6
+        else:
+            i = index
+
+        result += self.indent_array_table(user_subscriptions, i, self.SUB_X_PAGE, [0])
+
+        result += "\nPage {} of {}".format(
+            i // self.SUB_X_PAGE + 1,
+            (len(user_subscriptions) - 1) // self.SUB_X_PAGE + 1
+        )
+        # Funzionamento per non visualizzare il tasto se si è arrivato
+        # al limite superiore o inferiore della lista
+        temp_motion_button = []
+        if index - self.SUB_X_PAGE >= 0:
+            temp_motion_button.append({"text": "«", "callback_data": "list_mode {}".format(index - self.SUB_X_PAGE)})
+        if index + self.SUB_X_PAGE < len(user_subscriptions):
+            temp_motion_button.append({"text": "»", "callback_data": "list_mode {}".format(index + self.SUB_X_PAGE)})
+        temporary_buttons_list.append(temp_motion_button)
+
+        temporary_buttons_list.append([self.__ilk_pause, self.__ilk_notoff, self.__ilk_stop, self.__ilk_rem])
+        temporary_buttons_list.append([self.__ilk_help])
+
+        return result, temporary_buttons_list
+
+    @classmethod
+    def indent_array_table(cls, array, start, lent, key_index):
+        result = ""
+        key_value = [None] * len(key_index)
+        counter = 1
+        for subscri in array[start: start + lent]:
+            indent = 0
+            test = False
+            for i, item in enumerate(key_index):
+                if subscri[item] != key_value[i] or test:
+                    indents = ' ' * indent
+                    result += "<b>{}• {}</b>\n".format(indents, cls.__truncate(subscri[item]))
+                    key_value[i] = subscri[item]
+                    test = True
+                indent += 2
+            indents = ' ' * indent
+
+            result += "{}• {}\n".format(indents, cls.__truncate(subscri[1]))
+            counter += 1
+
+        return result
+
+    @classmethod
+    def __truncate(cls, text):
+        if len(text) > cls.LINE_LIMIT:
+            text = "{}...".format(text[:cls.LINE_LIMIT - 3])
+        return text
 
     def __iscrizione(self, sub, user_id):
         # Spostare fuori quessto dizionario
