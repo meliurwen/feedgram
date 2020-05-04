@@ -232,3 +232,9 @@ class MyDatabase:
                              query["social"], query["internal_id"], foreign=True)
                 self.__query("DELETE FROM socials WHERE socials.social = ? AND socials.internal_id = ?;",
                              query["social"], query["internal_id"], foreign=True)
+
+    def unfollow_social_account(self, user_id, social, internal_id):
+        self.__query("DELETE FROM registrations \
+            WHERE registrations.user_id = ? AND \
+            registrations.social_id = (\
+                SELECT socials.social_id FROM socials WHERE socials.social = ? AND socials.internal_id = ?);", user_id, social, internal_id)
