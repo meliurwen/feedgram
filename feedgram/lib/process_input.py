@@ -94,7 +94,13 @@ class Processinput:
                                     if not msg_subs:
                                         msg_subs = "<b>⚠️Warning</b>\n<code>/sub</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/sub &lt;link&gt;</code>\n<i>or</i>\n<code>/sub &lt;social&gt; &lt;username&gt;</code>"
                                     messages.append(self.__ms_maker(chat_id, msg_subs, "HTML"))
-
+                                elif text[:6] == "/unsub":
+                                    match = re.search(r"^([a-zA-Z]{1,16}) (\S{1,128})$", text[7:])
+                                    if match:
+                                        msg_subs = "Dummy Command"
+                                    else:
+                                        msg_subs = "<b>⚠️Warning</b>\n<code>/sub</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/unsub &lt;social&gt; &lt;username&gt;</code>"
+                                    messages.append(self.__ms_maker(chat_id, msg_subs, "HTML"))
                                 elif text == "/start":
                                     messages.append(self.__ms_maker(chat_id, "You're alredy registred.\nType /help to learn the commands available!"))
                                 else:
