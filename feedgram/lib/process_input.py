@@ -351,20 +351,20 @@ class Processinput:
         for subscri in array[start: start + lent]:
             indent = 0
             test = False
-            len_key_index = len(key_index)
-            for i in range(len_key_index):
-                if subscri[key_index[i]] != key_value[i] or test:
+            for i, item in enumerate(key_index):
+                if subscri[item] != key_value[i] or test:
                     indents = ' ' * indent
-                    result += "<b>" + indents + "• " + subscri[key_index[i]] + "</b>\n"
-                    key_value[i] = subscri[key_index[i]]
+                    result += "<b>{}• {}</b>\n".format(indents, cls.__truncate(subscri[item]))
+                    key_value[i] = subscri[item]
                     test = True
                 indent += 2
             indents = ' ' * indent
             if by_enum:
-                str_number = cls.__replace_all(str(counter), cls.NUMBER_DICT) + ' '
-                result += indents + str_number + subscri[1] + "\n"
+                # str_number = cls.__replace_all(str(counter), cls.NUMBER_DICT) + ' '
+                # result += indents + str_number + subscri[1] + "\n"
+                result += "{}{} {}\n".format(indents, cls.__replace_all(str(counter), cls.NUMBER_DICT), cls.__truncate(subscri[1]))
             else:
-                result += indents + "• " + subscri[1] + "\n"
+                result += "{}• {}\n".format(indents, cls.__truncate(subscri[1]))
             counter += 1
 
         return result
