@@ -228,6 +228,17 @@ def test_database_create_dict_of_user_ids_and_socials():
     assert res['subscriptions']['instagram'][il_post['internal_id']] == ['6551474276', '57356765765']
 
 
+def test_database_user_subscriptions():
+    assert path.exists(DATABASE_PATH)
+    database = MyDatabase(DATABASE_PATH)
+
+    res = database.user_subscriptions(6551474276)
+
+    assert res[0][0] == "instagram"
+    assert res[0][1] == "il_post"
+    assert res[0][2] == "1769583068"
+
+
 def test_database_process_messages_queries1():
 
     assert path.exists(DATABASE_PATH)

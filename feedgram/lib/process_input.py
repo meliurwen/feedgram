@@ -79,6 +79,9 @@ class Processinput:
                                 elif text == "/help":
                                     tets = self.__ms_maker(chat_id, self.__msm_help, "HTML", None, None, {"inline_keyboard": [[self.__ilk_list, self.__ilk_category]]})
                                     messages.append(tets)
+                                elif text == "/list":
+                                    message, button = self.__list_mss(user_id, 0)
+                                    messages.append(self.__ms_maker(chat_id, message, "HTML", None, None, {"inline_keyboard": button}))
                                 elif text[:4] == "/sub":
                                     match = re.search(r"^([a-zA-Z]{1,16}) (\S{1,128})$", text[5:])
                                     if match:
@@ -92,7 +95,13 @@ class Processinput:
                                     if not msg_subs:
                                         msg_subs = "<b>⚠️Warning</b>\n<code>/sub</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/sub &lt;link&gt;</code>\n<i>or</i>\n<code>/sub &lt;social&gt; &lt;username&gt;</code>"
                                     messages.append(self.__ms_maker(chat_id, msg_subs, "HTML"))
-
+                                elif text[:6] == "/unsub":
+                                    match = re.search(r"^([a-zA-Z]{1,16}) (\S{1,128})$", text[7:])
+                                    if match:
+                                        msg_subs = "Dummy Command"
+                                    else:
+                                        msg_subs = "<b>⚠️Warning</b>\n<code>/sub</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/unsub &lt;social&gt; &lt;username&gt;</code>"
+                                    messages.append(self.__ms_maker(chat_id, msg_subs, "HTML"))
                                 elif text == "/start":
                                     messages.append(self.__ms_maker(chat_id, "You're alredy registred.\nType /help to learn the commands available!"))
                                 else:
@@ -109,6 +118,54 @@ class Processinput:
                             if callback_data == "help_mode":
                                 messages.append(self.__callback_maker(chat_id, callback_query_id, "Help", False))
                                 messages.append(self.__ms_edit(chat_id, message_id, self.__msm_help, "HTML", {"inline_keyboard": [[self.__ilk_list, self.__ilk_category]]}))
+
+                            # Lo spazio con il numero possono non esserci
+                            # Es.
+                            # list_mode     <- chiamata normale del list mode
+                            # list_mode 66  <- chiamata durante lo spostamento di pagina
+                            elif bool(re.findall(r"^(list_mode)( \d+)?", callback_data)):
+                                match = re.findall(r"^(list_mode) ?(\d+)?", callback_data)[0]
+                                if match[1]:
+                                    message, button = self.__list_mss(user_id, int(match[1]))
+                                else:
+                                    messages.append(self.__callback_maker(chat_id, callback_query_id, "Following list", False))
+                                    message, button = self.__list_mss(user_id, 0)
+                                messages.append(self.__ms_edit(chat_id, message_id, message, "HTML", {"inline_keyboard": button}))
+
+                            # remove                            <- chiamata normale al remove
+                            # remove 66                         <- stò solo scorrendo le pagine
+                            # remove 66 <social> <internal_id>  <- stò facendo una rimozzone e sono ad una data pagina
+                            # ^(remove)     <- inizia con remove
+                            # ( \d+)?       <- Può avere un numero
+                            # ( \S+ \S+)?   <- Può esserci una sequenza di due str
+                            elif bool(re.findall(r"^(remove)( \d+)?( \S+ \S+)?", callback_data)):
+                                # avremo 4 match:
+                                # 0: remove
+                                # 1: <numero>
+                                # 2: <social>
+                                # 3: <internal_id>
+                                # Per evitare che nelle group 2 e 3 (\S+) ci sia lo spazio
+                                # si è messo fuori dalla parentesi con un ? per
+                                # indicare la possibilità che ci sia
+                                match = re.findall(r"^(remove)( \d+)? ?(\S+)? ?(\S+)?", callback_data)[0]
+                                if match[1]:
+                                    # il numero è presente siamo in una pagina
+                                    if match[2] and match[3]:
+                                        # Se gli elementi 2 e 3 sono presenti siamo nella rimozione di un elemento
+                                        # Lo rimuoviamo dal database e mettiamo il messaggio Unfollowed
+                                        self.__db.unfollow_social_account(user_id, match[2], match[3])
+                                        messages.append(self.__callback_maker(chat_id, callback_query_id, "Unfollowed", False))
+
+                                    # In ogni caso genereremo il messaggio nella pagina
+                                    message, button = self.__list_remove_mss(user_id, int(match[1]))
+
+                                else:
+                                    # Se il numero non è presente siamo nel caso base della remvoe a pagina 0
+                                    messages.append(self.__callback_maker(chat_id, callback_query_id, "Be careful, you'll not receive confirmation alert upon removing!", True))
+                                    message, button = self.__list_remove_mss(user_id, 0)
+
+                                messages.append(self.__ms_edit(chat_id, message_id, message, "HTML", {"inline_keyboard": button}))
+
                         else:
                             messages.append(self.__ms_maker(chat_id, "[AUTHORIZED] You can send text only!"))
                     else:
@@ -183,6 +240,147 @@ class Processinput:
             temp_dict["reply_markup"] = markup
 
         return temp_dict
+
+    SUB_X_PAGE = 6
+    BUTN_X_ROW = 3
+    NUMBER_DICT = {"0": "⓪", "1": "①", "2": "②", "3": "③", "4": "④", "5": "⑤", "6": "⑥", "7": "⑦", "8": "⑧", "9": "⑨"}
+    LINE_LIMIT = 29
+
+    def __list_mss(self, user_id, index):
+        user_subscriptions = self.__db.user_subscriptions(user_id)
+        # u_s[0] -> social
+        # u_s[1] -> title
+        # u_s[2] -> internal_id
+
+        tmp_message_size = ' ' * 50
+        result = "👥Follow List\n" + tmp_message_size + "\nYou are following: \n"
+        i = 0  # indice di partenza degli elementi nella pagina
+        temporary_buttons_list = []
+
+        # verifico che il nuovo index non superi la lunghezza massima della lista
+        # se il nuovo indice supera viene resettato
+        if index > len(user_subscriptions) - 1:
+            i = ((len(user_subscriptions) - 1) // self.SUB_X_PAGE) * 6
+        else:
+            i = index
+
+        result += self.indent_array_table(user_subscriptions, i, self.SUB_X_PAGE, [0])
+
+        result += "\nPage {} of {}".format(
+            i // self.SUB_X_PAGE + 1,
+            (len(user_subscriptions) - 1) // self.SUB_X_PAGE + 1
+        )
+        # Funzionamento per non visualizzare il tasto se si è arrivato
+        # al limite superiore o inferiore della lista
+        temp_motion_button = []
+        if i - self.SUB_X_PAGE >= 0:
+            temp_motion_button.append({"text": "«", "callback_data": "list_mode {}".format(i - self.SUB_X_PAGE)})
+        if i + self.SUB_X_PAGE < len(user_subscriptions):
+            temp_motion_button.append({"text": "»", "callback_data": "list_mode {}".format(i + self.SUB_X_PAGE)})
+        temporary_buttons_list.append(temp_motion_button)
+
+        temporary_buttons_list.append([self.__ilk_pause, self.__ilk_notoff, self.__ilk_stop, self.__ilk_rem])
+        temporary_buttons_list.append([self.__ilk_help])
+
+        return result, temporary_buttons_list
+
+    def __list_remove_mss(self, user_id, index):
+        user_subscriptions = self.__db.user_subscriptions(user_id)
+        # u_s[0] -> social
+        # u_s[1] -> title
+        # u_s[2] -> internal_id
+        # u_s[3] -> category (opzional)
+
+        tmp_message_size = ' ' * 50
+        result = "♻️Remove\n" + tmp_message_size + "\nYou are following: \n"
+        i = 0  # indice di partenza degli elementi nella pagina
+        temporary_buttons_list = []
+
+        # verifico che il nuovo index non superi la lunghezza massima della lista
+        # se il nuovo indice supera viene resettato
+        if index > len(user_subscriptions) - 1:
+            i = ((len(user_subscriptions) - 1) // self.SUB_X_PAGE) * 6
+        else:
+            i = index
+
+        result += self.indent_array_table(user_subscriptions, i, self.SUB_X_PAGE, [0], True)
+
+        result += "\nPage {} of {}".format(
+            i // self.SUB_X_PAGE + 1,
+            (len(user_subscriptions) - 1) // self.SUB_X_PAGE + 1
+        )
+
+        # Bottoni per rimuovere elementi
+        temporary_buttons_list = self.make_button_list(user_subscriptions, i, self.SUB_X_PAGE, i, self.BUTN_X_ROW)
+
+        # Funzionamento per non visualizzare il tasto se si è arrivato
+        # al limite superiore o inferiore della lista
+        temp_motion_button = []
+        if i - self.SUB_X_PAGE >= 0:
+            temp_motion_button.append({"text": "«", "callback_data": "remove {}".format(i - self.SUB_X_PAGE)})
+        if i + self.SUB_X_PAGE < len(user_subscriptions):
+            temp_motion_button.append({"text": "»", "callback_data": "remove {}".format(i + self.SUB_X_PAGE)})
+        temporary_buttons_list.append(temp_motion_button)
+
+        temporary_buttons_list.append([self.__ilk_pause, self.__ilk_notoff, self.__ilk_stop, self.__ilk_list])
+        temporary_buttons_list.append([self.__ilk_help])
+
+        return result, temporary_buttons_list
+
+    @classmethod
+    def make_button_list(cls, array, start, lent, page, row_len):
+        i = 1
+        result = []
+        tmp = []
+        for subscri in array[start: start + lent]:
+            tmp.append({"text": str(i), "callback_data": "remove {} {} {}".format(page, subscri[0], subscri[2])})
+            # tmp.append({"text": str(i), "callback_data": "remove " + subscri[0] + " " + subscri[2]})
+            if len(tmp) == row_len:
+                result.append(tmp)
+                tmp = []
+            i += 1
+        if tmp:
+            result.append(tmp)
+
+        return result
+
+    @classmethod
+    def indent_array_table(cls, array, start, lent, key_index, by_enum=False):
+        result = ""
+        key_value = [None] * len(key_index)
+        counter = 1
+        for subscri in array[start: start + lent]:
+            indent = 0
+            test = False
+            for i, item in enumerate(key_index):
+                if subscri[item] != key_value[i] or test:
+                    indents = ' ' * indent
+                    result += "<b>{}• {}</b>\n".format(indents, cls.__truncate(subscri[item]))
+                    key_value[i] = subscri[item]
+                    test = True
+                indent += 2
+            indents = ' ' * indent
+            if by_enum:
+                # str_number = cls.__replace_all(str(counter), cls.NUMBER_DICT) + ' '
+                # result += indents + str_number + subscri[1] + "\n"
+                result += "{}{} {}\n".format(indents, cls.__replace_all(str(counter), cls.NUMBER_DICT), cls.__truncate(subscri[1]))
+            else:
+                result += "{}• {}\n".format(indents, cls.__truncate(subscri[1]))
+            counter += 1
+
+        return result
+
+    @classmethod
+    def __replace_all(cls, text, dic):
+        for i, j in dic.items():
+            text = text.replace(i, j)
+        return text
+
+    @classmethod
+    def __truncate(cls, text):
+        if len(text) > cls.LINE_LIMIT:
+            text = "{}...".format(text[:cls.LINE_LIMIT - 3])
+        return text
 
     def __iscrizione(self, sub, user_id):
         # Spostare fuori quessto dizionario

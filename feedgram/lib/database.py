@@ -208,6 +208,10 @@ class MyDatabase:
                 socials_accounts_dict["subscriptions"][row[1]][row[2]].append(str(row[0]))
         return socials_accounts_dict
 
+    def user_subscriptions(self, user_id):
+        res, _ = self.__query("SELECT socials.social, socials.title, socials.internal_id FROM registrations, socials WHERE  registrations.user_id = ? AND registrations.social_id = socials.social_id ORDER BY socials.social;", user_id, fetch=0)
+        return res
+
     def clean_dead_subscriptions(self):
         _, rowcount = self.__query(
             "DELETE FROM socials WHERE social_id IN (SELECT social_id FROM socials WHERE social_id NOT IN (SELECT social_id FROM registrations));")
@@ -228,3 +232,9 @@ class MyDatabase:
                              query["social"], query["internal_id"], foreign=True)
                 self.__query("DELETE FROM socials WHERE socials.social = ? AND socials.internal_id = ?;",
                              query["social"], query["internal_id"], foreign=True)
+
+    def unfollow_social_account(self, user_id, social, internal_id):
+        self.__query("DELETE FROM registrations \
+            WHERE registrations.user_id = ? AND \
+            registrations.social_id = (\
+                SELECT socials.social_id FROM socials WHERE socials.social = ? AND socials.internal_id = ?);", user_id, social, internal_id)
