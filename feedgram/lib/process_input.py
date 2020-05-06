@@ -81,6 +81,7 @@ class Processinput:
                                     messages.append(tets)
                                 elif text == "/list":
                                     message, button = self.__list_mss(user_id, 0)
+                                    messages.append(self.__ms_maker(chat_id, message, "HTML", None, None, {"inline_keyboard": button}))
                                 elif text[:4] == "/sub":
                                     match = re.search(r"^([a-zA-Z]{1,16}) (\S{1,128})$", text[5:])
                                     if match:
@@ -272,10 +273,10 @@ class Processinput:
         # Funzionamento per non visualizzare il tasto se si è arrivato
         # al limite superiore o inferiore della lista
         temp_motion_button = []
-        if index - self.SUB_X_PAGE >= 0:
-            temp_motion_button.append({"text": "«", "callback_data": "list_mode {}".format(index - self.SUB_X_PAGE)})
-        if index + self.SUB_X_PAGE < len(user_subscriptions):
-            temp_motion_button.append({"text": "»", "callback_data": "list_mode {}".format(index + self.SUB_X_PAGE)})
+        if i - self.SUB_X_PAGE >= 0:
+            temp_motion_button.append({"text": "«", "callback_data": "list_mode {}".format(i - self.SUB_X_PAGE)})
+        if i + self.SUB_X_PAGE < len(user_subscriptions):
+            temp_motion_button.append({"text": "»", "callback_data": "list_mode {}".format(i + self.SUB_X_PAGE)})
         temporary_buttons_list.append(temp_motion_button)
 
         temporary_buttons_list.append([self.__ilk_pause, self.__ilk_notoff, self.__ilk_stop, self.__ilk_rem])
