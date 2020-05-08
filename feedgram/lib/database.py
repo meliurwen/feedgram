@@ -234,7 +234,32 @@ class MyDatabase:
                              query["social"], query["internal_id"], foreign=True)
 
     def unfollow_social_account(self, user_id, social, internal_id):
-        self.__query("DELETE FROM registrations \
+        _, rowcount = self.__query("DELETE FROM registrations \
             WHERE registrations.user_id = ? AND \
             registrations.social_id = (\
                 SELECT socials.social_id FROM socials WHERE socials.social = ? AND socials.internal_id = ?);", user_id, social, internal_id)
+
+        # If deletes something return True
+        return bool(rowcount)
+
+    def check_if_subscribed(self, user_id, social, username=None, internal_id=None):
+
+        # Check if there's enough data
+        if not (username or internal_id):
+            return None, None
+
+        # Check if user_id is subscribed to the SN profile issued
+        if internal_id:
+            res, _ = self.__query(
+                "SELECT socials.internal_id FROM socials, registrations WHERE registrations.user_id = ? AND registrations.social_id = (\
+                    SELECT socials.social_id FROM socials WHERE socials.social = ? AND socials.internal_id = ?);", user_id, social, internal_id)
+        else:
+            res, _ = self.__query(
+                "SELECT socials.internal_id FROM socials, registrations WHERE registrations.user_id = ? AND registrations.social_id = (\
+                    SELECT socials.social_id FROM socials WHERE socials.social = ? AND socials.username = ?);", user_id, social, username)
+
+        # If exists return True with the internal_id
+        if res:
+            return True, res[0]
+        else:
+            return False, None
