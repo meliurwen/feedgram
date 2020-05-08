@@ -98,7 +98,11 @@ class Processinput:
                                 elif text[:6] == "/unsub":
                                     match = re.search(r"^([a-zA-Z]{1,16}) (\S{1,128})$", text[7:])
                                     if match:
-                                        msg_subs = "Dummy Command"
+                                        unsub_status = self.__unsubscription({"social": match.group(1), "username": match.group(2), "internal_id": None}, user_id)
+                                        if unsub_status["ok"]:
+                                            msg_subs = "<b>✅🗑 Unsubscribed successfully!</b>\n\nSocial: <i>{}</i>\nUser: <i>{}</i>!".format(match.group(1), match.group(2))
+                                        else:
+                                            msg_subs = "<b>⚠️Warning</b>\nError: <code>{}</code>".format(unsub_status["description"])
                                     else:
                                         msg_subs = "<b>⚠️Warning</b>\n<code>/sub</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/unsub &lt;social&gt; &lt;username&gt;</code>"
                                     messages.append(self.__ms_maker(chat_id, msg_subs, "HTML"))
@@ -153,8 +157,12 @@ class Processinput:
                                     if match[2] and match[3]:
                                         # Se gli elementi 2 e 3 sono presenti siamo nella rimozione di un elemento
                                         # Lo rimuoviamo dal database e mettiamo il messaggio Unfollowed
-                                        self.__db.unfollow_social_account(user_id, match[2], match[3])
-                                        messages.append(self.__callback_maker(chat_id, callback_query_id, "Unfollowed", False))
+                                        unsub_status = self.__unsubscription({"social": match[2], "username": None, "internal_id": match[3]}, user_id)
+                                        if unsub_status["ok"]:
+                                            messages.append(self.__callback_maker(chat_id, callback_query_id, "Unfollowed", False))
+                                        else:
+                                            alert_msg = "Alert: {}".format(unsub_status["description"])
+                                            messages.append(self.__callback_maker(chat_id, callback_query_id, alert_msg, True))
 
                                     # In ogni caso genereremo il messaggio nella pagina
                                     message, button = self.__list_remove_mss(user_id, int(match[1]))
@@ -382,8 +390,38 @@ class Processinput:
             text = "{}...".format(text[:cls.LINE_LIMIT - 3])
         return text
 
+    def __unsubscription(self, sub, user_id):
+        # Spostare fuori questo dizionario
+        social_abilited = {"instagram": "instagram", "ig": "instagram"}
+
+        # Check if there's enough data
+        if not ((sub["social"] and sub["username"]) or (sub["social"] and sub["internal_id"])):
+            return {"ok": False, "description": "notEnoughData"}
+
+        # Check if social is abilited
+        if sub["social"] in social_abilited:
+            sub["social"] = social_abilited[sub["social"]]  # Uniforma tutti gli alias dei social ad un unico nome
+        else:
+            return {"ok": False, "description": "socialNotAbilitedOrMisstyped"}
+
+        # Check if user is subscribed to the issued sn profile
+        # if it is subscribed it returns the internal_id otherwise None
+        if sub["internal_id"] is None:
+            is_subscribed, sub["internal_id"] = self.__db.check_if_subscribed(user_id, sub["social"], username=sub["username"])
+        else:
+            is_subscribed, _ = self.__db.check_if_subscribed(user_id, sub["social"], internal_id=sub["internal_id"])
+
+        # If subscribed then unsubscribe, otherwise return error
+        if is_subscribed:
+            if self.__db.unfollow_social_account(user_id, sub["social"], sub["internal_id"]):
+                return {"ok": True, "description": "unsubscribed"}
+            else:
+                return {"ok": False, "description": "userNotSubscribed"}  # It happens only if between the check and the deleted the subscription is deleted by an nother istance/thread (it basically never happens)
+        else:
+            return {"ok": False, "description": "userNotSubscribed"}
+
     def __iscrizione(self, sub, user_id):
-        # Spostare fuori quessto dizionario
+        # Spostare fuori questo dizionario
         social_abilited = {"instagram": "instagram", "ig": "instagram"}
 
         # Check if there's enough data
