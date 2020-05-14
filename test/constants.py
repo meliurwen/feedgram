@@ -446,63 +446,6 @@ CALLBACK_HELP = {
                     },
                     "date": 1588349911,
                     "text": "📖 Help\n\nYou can follow up to <i>10 social accounts</i>.\nSocials currently supported:\n • <i>Instagram</i>\nYou can follow only <b>public</b> accounts.\n\n<b>Receive Feeds:</b>\n • /sub <i>social</i> <i>username</i>\n • /sub <i>link</i>\n<b>Bot:</b>\n • /stop to stop and unsubscribe from the bot.",
-                    "entities": [
-                        {
-                            "offset": 30,
-                            "length": 18,
-                            "type": "italic"
-                        },
-                        {
-                            "offset": 82,
-                            "length": 9,
-                            "type": "italic"
-                        },
-                        {
-                            "offset": 112,
-                            "length": 6,
-                            "type": "bold"
-                        },
-                        {
-                            "offset": 130,
-                            "length": 14,
-                            "type": "bold"
-                        },
-                        {
-                            "offset": 148,
-                            "length": 4,
-                            "type": "bot_command"
-                        },
-                        {
-                            "offset": 153,
-                            "length": 6,
-                            "type": "italic"
-                        },
-                        {
-                            "offset": 160,
-                            "length": 8,
-                            "type": "italic"
-                        },
-                        {
-                            "offset": 172,
-                            "length": 4,
-                            "type": "bot_command"
-                        },
-                        {
-                            "offset": 177,
-                            "length": 4,
-                            "type": "italic"
-                        },
-                        {
-                            "offset": 182,
-                            "length": 4,
-                            "type": "bold"
-                        },
-                        {
-                            "offset": 190,
-                            "length": 5,
-                            "type": "bot_command"
-                        }
-                    ],
                     "reply_markup": {
                         "inline_keyboard": [
                             [
@@ -923,3 +866,135 @@ NON_EXISTENT_TYPE = {
     "text": "Hello",
     "markdown": "HTML",
 }
+
+COMMAND_LIST = {
+    "ok": True,
+    "result": [
+        {
+            "update_id": 731419465,
+            "message": {
+                "message_id": 1257,
+                "from": {
+                    "id": 123456789,
+                    "is_bot": False,
+                    "first_name": "John",
+                    "last_name": "Doe",
+                    "username": "TestUsername",
+                    "language_code": "en",
+                },
+                "chat": {
+                    "id": 123456789,
+                    "first_name": "John",
+                    "last_name": "Doe",
+                    "username": "TestUsername",
+                    "type": "private",
+                },
+                "date": 1587049603,
+                "text": "/list",
+                "entities": [{"offset": 0, "length": 5, "type": "bot_command"}],
+            },
+        }
+    ],
+}
+
+CALLBACK_LIST_PAGE_1 = copy.deepcopy(CALLBACK_HELP)
+CALLBACK_LIST_PAGE_1["result"][0]["callback_query"]["message"]["text"] = "👥Follow List\n                                                  \nYou are following: \n<b>• instagram</b>\n  • testProfile\n  • testProfilePrivate\n  • testProfileStrangeStatus\n  • testIgProfileLinkHome\n  • testProfile2\n  • testProfile3\n\nPage 1 of 2"
+CALLBACK_LIST_PAGE_1["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'list_mode 6', 'text': '»'}],
+        [
+            {
+                "text": "⏯️",
+                "callback_data": "pause_mode"
+            },
+            {
+                "text": "🔕",
+                "callback_data": "notifications_mode_off"
+            },
+            {
+                "text": "⏹",
+                "callback_data": "stop_mode"
+            },
+            {
+                "text": "🗑",
+                "callback_data": "remove"
+            }
+        ],
+        [{"text": "📖", "callback_data": "help_mode"}]
+    ]
+}
+CALLBACK_LIST_PAGE_1["result"][0]["callback_query"]["data"] = "list_mode"
+
+CALLBACK_LIST_PAGE_2 = copy.deepcopy(CALLBACK_HELP)
+CALLBACK_LIST_PAGE_2["result"][0]["callback_query"]["message"]["text"] = "👥Follow List\n                                                  \nYou are following: \n<b>• instagram</b>\n  • testProfile4\n\nPage 2 of 2"
+CALLBACK_LIST_PAGE_2["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'list_mode 0', 'text': '«'}],
+        [
+            {
+                "text": "⏯️",
+                "callback_data": "pause_mode"
+            },
+            {
+                "text": "🔕",
+                "callback_data": "notifications_mode_off"
+            },
+            {
+                "text": "⏹",
+                "callback_data": "stop_mode"
+            },
+            {
+                "text": "🗑",
+                "callback_data": "remove"
+            }
+        ],
+        [{"text": "📖", "callback_data": "help_mode"}]
+    ]
+}
+CALLBACK_LIST_PAGE_2["result"][0]["callback_query"]["data"] = "list_mode 6"
+
+CALLBACK_LIST_PAGE_3 = copy.deepcopy(CALLBACK_HELP)
+CALLBACK_LIST_PAGE_3["result"][0]["callback_query"]["message"]["text"] = "👥Follow List\n                                                  \nYou are following: \n<b>• instagram</b>\n  • testProfile4\n\nPage 2 of 2"
+CALLBACK_LIST_PAGE_3["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'list_mode 0', 'text': '«'}],
+        [
+            {
+                "text": "⏯️",
+                "callback_data": "pause_mode"
+            },
+            {
+                "text": "🔕",
+                "callback_data": "notifications_mode_off"
+            },
+            {
+                "text": "⏹",
+                "callback_data": "stop_mode"
+            },
+            {
+                "text": "🗑",
+                "callback_data": "remove"
+            }
+        ],
+        [{"text": "📖", "callback_data": "help_mode"}]
+    ]
+}
+CALLBACK_LIST_PAGE_3["result"][0]["callback_query"]["data"] = "list_mode 24"
+
+MSG_CMD_SUB_STANDARD_2 = copy.deepcopy(MSG_CMD_SUB_STANDARD)
+MSG_CMD_SUB_STANDARD_2["query"]["result"][0]["message"]["text"] = "/sub instagram testProfile2"
+MSG_CMD_SUB_STANDARD_2["response"]["username"] = "testProfile2"
+MSG_CMD_SUB_STANDARD_2["response"]["internal_id"] = 4345345
+MSG_CMD_SUB_STANDARD_2["response"]["title"] = "testProfile2"
+
+MSG_CMD_SUB_STANDARD_3 = copy.deepcopy(MSG_CMD_SUB_STANDARD)
+MSG_CMD_SUB_STANDARD_3["query"]["result"][0]["message"]["text"] = "/sub instagram testProfile3"
+MSG_CMD_SUB_STANDARD_3["response"]["username"] = "testProfile3"
+MSG_CMD_SUB_STANDARD_3["response"]["internal_id"] = 782782767
+MSG_CMD_SUB_STANDARD_3["response"]["title"] = "testProfile3"
+
+MSG_CMD_SUB_STANDARD_4 = copy.deepcopy(MSG_CMD_SUB_STANDARD)
+MSG_CMD_SUB_STANDARD_4["query"]["result"][0]["message"]["text"] = "/sub instagram testProfile4"
+MSG_CMD_SUB_STANDARD_4["response"]["username"] = "testProfile4"
+MSG_CMD_SUB_STANDARD_4["response"]["internal_id"] = 456765579
+MSG_CMD_SUB_STANDARD_4["response"]["title"] = "testProfile4"

@@ -4,7 +4,6 @@ import test.constants as cnst
 
 from os import path, remove
 from unittest.mock import patch
-import copy
 
 from feedgram.lib.process_input import Processinput
 from feedgram.lib.database import MyDatabase
@@ -185,486 +184,6 @@ def test_sub_command_url():
             assert result[0] == query["result"][0]
 
 
-COMMAND_LIST = {
-    "ok": True,
-    "result": [
-        {
-            "update_id": 731419465,
-            "message": {
-                "message_id": 1257,
-                "from": {
-                    "id": 123456789,
-                    "is_bot": False,
-                    "first_name": "John",
-                    "last_name": "Doe",
-                    "username": "TestUsername",
-                    "language_code": "en",
-                },
-                "chat": {
-                    "id": 123456789,
-                    "first_name": "John",
-                    "last_name": "Doe",
-                    "username": "TestUsername",
-                    "type": "private",
-                },
-                "date": 1587049603,
-                "text": "/list",
-                "entities": [{"offset": 0, "length": 5, "type": "bot_command"}],
-            },
-        }
-    ],
-}
-CALLBACK_LIST_PAGE_1 = {
-    "ok": True,
-    "result": [
-        {
-            "update_id": 731420180,
-            "callback_query": {
-                "id": "268511788082888011",
-                "from": {
-                    "id": 123456789,
-                    "is_bot": False,
-                    "first_name": "John",
-                    "last_name": "Doe",
-                    "username": "TestUsername",
-                    "language_code": "en"
-                },
-                "message": {
-                    "message_id": 2120,
-                    "from": {
-                        "id": 987654321,
-                        "is_bot": True,
-                        "first_name": "TestbotID",
-                        "username": "Territory_ID_Bot"
-                    },
-                    "chat": {
-                        "id": 123456789,
-                        "first_name": "John",
-                        "last_name": "Doe",
-                        "username": "TestUsername",
-                        "type": "private"
-                    },
-                    "date": 1588349911,
-                    "text": "👥Follow List\n                                                  \nYou are following: \n<b>• instagram</b>\n  • testProfile\n  • testProfilePrivate\n  • testProfileStrangeStatus\n  • testIgProfileLinkHome\n  • testProfile2\n  • testProfile3\n\nPage 1 of 2",
-                    "entities": [
-                        {
-                            "offset": 30,
-                            "length": 18,
-                            "type": "italic"
-                        },
-                        {
-                            "offset": 82,
-                            "length": 9,
-                            "type": "italic"
-                        },
-                        {
-                            "offset": 112,
-                            "length": 6,
-                            "type": "bold"
-                        },
-                        {
-                            "offset": 130,
-                            "length": 14,
-                            "type": "bold"
-                        },
-                        {
-                            "offset": 148,
-                            "length": 4,
-                            "type": "bot_command"
-                        },
-                        {
-                            "offset": 153,
-                            "length": 6,
-                            "type": "italic"
-                        },
-                        {
-                            "offset": 160,
-                            "length": 8,
-                            "type": "italic"
-                        },
-                        {
-                            "offset": 172,
-                            "length": 4,
-                            "type": "bot_command"
-                        },
-                        {
-                            "offset": 177,
-                            "length": 4,
-                            "type": "italic"
-                        },
-                        {
-                            "offset": 182,
-                            "length": 4,
-                            "type": "bold"
-                        },
-                        {
-                            "offset": 190,
-                            "length": 5,
-                            "type": "bot_command"
-                        }
-                    ],
-                    "reply_markup": {
-                        "inline_keyboard": [
-                            [{'callback_data': 'list_mode 6', 'text': '»'}],
-                            [
-                                {
-                                    "text": "⏯️",
-                                    "callback_data": "pause_mode"
-                                },
-                                {
-                                    "text": "🔕",
-                                    "callback_data": "notifications_mode_off"
-                                },
-                                {
-                                    "text": "⏹",
-                                    "callback_data": "stop_mode"
-                                },
-                                {
-                                    "text": "🗑",
-                                    "callback_data": "remove"
-                                }
-                            ],
-                            [{"text": "📖", "callback_data": "help_mode"}]
-                        ]
-                    }
-                },
-                "chat_instance": "4557971575337840976",
-                "data": "list_mode"
-            }
-        }],
-}
-CALLBACK_LIST_PAGE_2 = {
-    "ok": True,
-    "result": [
-        {
-            "update_id": 731420180,
-            "callback_query": {
-                "id": "268511788082888011",
-                "from": {
-                    "id": 123456789,
-                    "is_bot": False,
-                    "first_name": "John",
-                    "last_name": "Doe",
-                    "username": "TestUsername",
-                    "language_code": "en"
-                },
-                "message": {
-                    "message_id": 2120,
-                    "from": {
-                        "id": 987654321,
-                        "is_bot": True,
-                        "first_name": "TestbotID",
-                        "username": "Territory_ID_Bot"
-                    },
-                    "chat": {
-                        "id": 123456789,
-                        "first_name": "John",
-                        "last_name": "Doe",
-                        "username": "TestUsername",
-                        "type": "private"
-                    },
-                    "date": 1588349911,
-                    "text": "👥Follow List\n                                                  \nYou are following: \n<b>• instagram</b>\n  • testProfile4\n\nPage 2 of 2",
-                    "entities": [
-                        {
-                            "offset": 30,
-                            "length": 18,
-                            "type": "italic"
-                        },
-                        {
-                            "offset": 82,
-                            "length": 9,
-                            "type": "italic"
-                        },
-                        {
-                            "offset": 112,
-                            "length": 6,
-                            "type": "bold"
-                        },
-                        {
-                            "offset": 130,
-                            "length": 14,
-                            "type": "bold"
-                        },
-                        {
-                            "offset": 148,
-                            "length": 4,
-                            "type": "bot_command"
-                        },
-                        {
-                            "offset": 153,
-                            "length": 6,
-                            "type": "italic"
-                        },
-                        {
-                            "offset": 160,
-                            "length": 8,
-                            "type": "italic"
-                        },
-                        {
-                            "offset": 172,
-                            "length": 4,
-                            "type": "bot_command"
-                        },
-                        {
-                            "offset": 177,
-                            "length": 4,
-                            "type": "italic"
-                        },
-                        {
-                            "offset": 182,
-                            "length": 4,
-                            "type": "bold"
-                        },
-                        {
-                            "offset": 190,
-                            "length": 5,
-                            "type": "bot_command"
-                        }
-                    ],
-                    "reply_markup": {
-                        "inline_keyboard": [
-                            [{'callback_data': 'list_mode 0', 'text': '«'}],
-                            [
-                                {
-                                    "text": "⏯️",
-                                    "callback_data": "pause_mode"
-                                },
-                                {
-                                    "text": "🔕",
-                                    "callback_data": "notifications_mode_off"
-                                },
-                                {
-                                    "text": "⏹",
-                                    "callback_data": "stop_mode"
-                                },
-                                {
-                                    "text": "🗑",
-                                    "callback_data": "remove"
-                                }
-                            ],
-                            [{"text": "📖", "callback_data": "help_mode"}]
-                        ]
-                    }
-                },
-                "chat_instance": "4557971575337840976",
-                "data": "list_mode 6"
-            }
-        }],
-}
-CALLBACK_LIST_PAGE_3 = {
-    "ok": True,
-    "result": [
-        {
-            "update_id": 731420180,
-            "callback_query": {
-                "id": "268511788082888011",
-                "from": {
-                    "id": 123456789,
-                    "is_bot": False,
-                    "first_name": "John",
-                    "last_name": "Doe",
-                    "username": "TestUsername",
-                    "language_code": "en"
-                },
-                "message": {
-                    "message_id": 2120,
-                    "from": {
-                        "id": 987654321,
-                        "is_bot": True,
-                        "first_name": "TestbotID",
-                        "username": "Territory_ID_Bot"
-                    },
-                    "chat": {
-                        "id": 123456789,
-                        "first_name": "John",
-                        "last_name": "Doe",
-                        "username": "TestUsername",
-                        "type": "private"
-                    },
-                    "date": 1588349911,
-                    "text": "👥Follow List\n                                                  \nYou are following: \n<b>• instagram</b>\n  • testProfile4\n\nPage 2 of 2",
-                    "entities": [
-                        {
-                            "offset": 30,
-                            "length": 18,
-                            "type": "italic"
-                        },
-                        {
-                            "offset": 82,
-                            "length": 9,
-                            "type": "italic"
-                        },
-                        {
-                            "offset": 112,
-                            "length": 6,
-                            "type": "bold"
-                        },
-                        {
-                            "offset": 130,
-                            "length": 14,
-                            "type": "bold"
-                        },
-                        {
-                            "offset": 148,
-                            "length": 4,
-                            "type": "bot_command"
-                        },
-                        {
-                            "offset": 153,
-                            "length": 6,
-                            "type": "italic"
-                        },
-                        {
-                            "offset": 160,
-                            "length": 8,
-                            "type": "italic"
-                        },
-                        {
-                            "offset": 172,
-                            "length": 4,
-                            "type": "bot_command"
-                        },
-                        {
-                            "offset": 177,
-                            "length": 4,
-                            "type": "italic"
-                        },
-                        {
-                            "offset": 182,
-                            "length": 4,
-                            "type": "bold"
-                        },
-                        {
-                            "offset": 190,
-                            "length": 5,
-                            "type": "bot_command"
-                        }
-                    ],
-                    "reply_markup": {
-                        "inline_keyboard": [
-                            [{'callback_data': 'list_mode 0', 'text': '«'}],
-                            [
-                                {
-                                    "text": "⏯️",
-                                    "callback_data": "pause_mode"
-                                },
-                                {
-                                    "text": "🔕",
-                                    "callback_data": "notifications_mode_off"
-                                },
-                                {
-                                    "text": "⏹",
-                                    "callback_data": "stop_mode"
-                                },
-                                {
-                                    "text": "🗑",
-                                    "callback_data": "remove"
-                                }
-                            ],
-                            [{"text": "📖", "callback_data": "help_mode"}]
-                        ]
-                    }
-                },
-                "chat_instance": "4557971575337840976",
-                "data": "list_mode 24"
-            }
-        }],
-}
-
-MSG_CMD_SUB_STANDARD = {
-    "query": {
-        "ok": True,
-        "result": [
-            {
-                "update_id": 12345,
-                "message": {
-                    "message_id": 1256,
-                    "from": {
-                        "id": 123456789,
-                        "is_bot": False,
-                        "first_name": "John",
-                        "last_name": "Doe",
-                        "username": "TestUsername",
-                        "language_code": "en",
-                    },
-                    "chat": {
-                        "id": 123456789,
-                        "first_name": "John",
-                        "last_name": "Doe",
-                        "username": "TestUsername",
-                        "type": "private",
-                    },
-                    "dte": 159753,
-                    "text": "/sub instagram testProfile",
-                    "entities": [{"offset": 0, "length": 1, "type": "bot_command"}],
-                },
-            }
-        ],
-    },
-    "response": {
-        "social": "instagram",
-        "username": "testProfile",
-        "internal_id": 546545337,
-        "title": "testProfile",
-        "subStatus": "subscribable",
-        "status": "public",
-        "link": None,
-        "data": {
-        }
-    },
-    "result": [
-        {
-            "type": "sendMessage",
-            "chat_id": 123456789,
-            "markdown": "HTML",
-            "text": "Social: instagram\nUser: testProfile\nYou've been successfully subscribed!\nFrom now on, you'll start to receive feeds from this account!"
-        }
-    ]
-}
-
-MSG_CMD_SUB_STANDARD_2 = copy.deepcopy(MSG_CMD_SUB_STANDARD)
-MSG_CMD_SUB_STANDARD_2["query"]["result"][0]["message"]["text"] = "/sub instagram testProfile2"
-MSG_CMD_SUB_STANDARD_2["response"] = {
-    "social": "instagram",
-    "username": "testProfile2",
-    "internal_id": 4345345,
-    "title": "testProfile2",
-    "subStatus": "subscribable",
-    "status": "public",
-    "link": None,
-    "data": {}
-}
-
-MSG_CMD_SUB_STANDARD_3 = copy.deepcopy(MSG_CMD_SUB_STANDARD)
-MSG_CMD_SUB_STANDARD_3["query"]["result"][0]["message"]["text"] = "/sub instagram testProfile3"
-MSG_CMD_SUB_STANDARD_3["response"] = {
-    "social": "instagram",
-    "username": "testProfile3",
-    "internal_id": 782782767,
-    "title": "testProfile3",
-    "subStatus": "subscribable",
-    "status": "public",
-    "link": None,
-    "data": {
-    }
-}
-
-MSG_CMD_SUB_STANDARD_4 = copy.deepcopy(MSG_CMD_SUB_STANDARD)
-MSG_CMD_SUB_STANDARD_4["query"]["result"][0]["message"]["text"] = "/sub instagram testProfile4"
-MSG_CMD_SUB_STANDARD_4["response"] = {
-    "social": "instagram",
-    "username": "testProfile4",
-    "internal_id": 456765579,
-    "title": "testProfile4",
-    "subStatus": "subscribable",
-    "status": "public",
-    "link": None,
-    "data": {
-    }
-}
-
-
 def test_list_comand():
 
     # Aggungo ulteriori sottoscrizioni in modo da poter testare le pagine
@@ -674,9 +193,9 @@ def test_list_comand():
         igram = Instagram()
         myprocess_input = Processinput(database, [igram])
 
-        queries = [MSG_CMD_SUB_STANDARD_2,
-                   MSG_CMD_SUB_STANDARD_3,
-                   MSG_CMD_SUB_STANDARD_4]
+        queries = [cnst.MSG_CMD_SUB_STANDARD_2,
+                   cnst.MSG_CMD_SUB_STANDARD_3,
+                   cnst.MSG_CMD_SUB_STANDARD_4]
 
         for query in queries:
             GLOBAL_EXTRCT_DATA_RETURN = query["response"]
@@ -685,7 +204,7 @@ def test_list_comand():
     database = MyDatabase(DATABASE_PATH)
     myprocess_input = Processinput(database, [])
 
-    result = myprocess_input.process(COMMAND_LIST)
+    result = myprocess_input.process(cnst.COMMAND_LIST)
 
     msm_list = ("👥Follow List\n"
                 "                                                  "
@@ -700,47 +219,47 @@ def test_list_comand():
                 "Page 1 of 2")
 
     assert result[0]["type"] == "sendMessage"
-    assert COMMAND_LIST["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert cnst.COMMAND_LIST["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
     assert result[0]["text"] == msm_list
 
 
 def test_callback_list_base():
     database = MyDatabase(DATABASE_PATH)
     myprocess_input = Processinput(database, [])
-    result = myprocess_input.process(CALLBACK_LIST_PAGE_1)
+    result = myprocess_input.process(cnst.CALLBACK_LIST_PAGE_1)
 
     assert result[0]["type"] == "answerCallbackQuery"
     assert result[0]["text"] == "Following list"
 
     assert result[1]["type"] == "editMessageText"
-    assert CALLBACK_LIST_PAGE_1["result"][0]["callback_query"]["message"]["chat"]["id"] == result[1]["chat_id"]
-    assert CALLBACK_LIST_PAGE_1["result"][0]["callback_query"]["message"]["message_id"] == result[1]["message_id"]
-    assert CALLBACK_LIST_PAGE_1["result"][0]["callback_query"]["message"]["text"] == result[1]["text"]
-    assert CALLBACK_LIST_PAGE_1["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
+    assert cnst.CALLBACK_LIST_PAGE_1["result"][0]["callback_query"]["message"]["chat"]["id"] == result[1]["chat_id"]
+    assert cnst.CALLBACK_LIST_PAGE_1["result"][0]["callback_query"]["message"]["message_id"] == result[1]["message_id"]
+    assert cnst.CALLBACK_LIST_PAGE_1["result"][0]["callback_query"]["message"]["text"] == result[1]["text"]
+    assert cnst.CALLBACK_LIST_PAGE_1["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
 
 
 def test_callback_list_page():
     database = MyDatabase(DATABASE_PATH)
     myprocess_input = Processinput(database, [])
-    result = myprocess_input.process(CALLBACK_LIST_PAGE_2)
+    result = myprocess_input.process(cnst.CALLBACK_LIST_PAGE_2)
 
     assert result[0]["type"] == "editMessageText"
-    assert CALLBACK_LIST_PAGE_2["result"][0]["callback_query"]["message"]["chat"]["id"] == result[0]["chat_id"]
-    assert CALLBACK_LIST_PAGE_2["result"][0]["callback_query"]["message"]["message_id"] == result[0]["message_id"]
-    assert CALLBACK_LIST_PAGE_2["result"][0]["callback_query"]["message"]["text"] == result[0]["text"]
-    assert CALLBACK_LIST_PAGE_2["result"][0]["callback_query"]["message"]["reply_markup"] == result[0]["reply_markup"]
+    assert cnst.CALLBACK_LIST_PAGE_2["result"][0]["callback_query"]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert cnst.CALLBACK_LIST_PAGE_2["result"][0]["callback_query"]["message"]["message_id"] == result[0]["message_id"]
+    assert cnst.CALLBACK_LIST_PAGE_2["result"][0]["callback_query"]["message"]["text"] == result[0]["text"]
+    assert cnst.CALLBACK_LIST_PAGE_2["result"][0]["callback_query"]["message"]["reply_markup"] == result[0]["reply_markup"]
 
 
 def test_callback_list_old_page():
     database = MyDatabase(DATABASE_PATH)
     myprocess_input = Processinput(database, [])
-    result = myprocess_input.process(CALLBACK_LIST_PAGE_3)
+    result = myprocess_input.process(cnst.CALLBACK_LIST_PAGE_3)
 
     assert result[0]["type"] == "editMessageText"
-    assert CALLBACK_LIST_PAGE_3["result"][0]["callback_query"]["message"]["chat"]["id"] == result[0]["chat_id"]
-    assert CALLBACK_LIST_PAGE_3["result"][0]["callback_query"]["message"]["message_id"] == result[0]["message_id"]
-    assert CALLBACK_LIST_PAGE_3["result"][0]["callback_query"]["message"]["text"] == result[0]["text"]
-    assert CALLBACK_LIST_PAGE_3["result"][0]["callback_query"]["message"]["reply_markup"] == result[0]["reply_markup"]
+    assert cnst.CALLBACK_LIST_PAGE_3["result"][0]["callback_query"]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert cnst.CALLBACK_LIST_PAGE_3["result"][0]["callback_query"]["message"]["message_id"] == result[0]["message_id"]
+    assert cnst.CALLBACK_LIST_PAGE_3["result"][0]["callback_query"]["message"]["text"] == result[0]["text"]
+    assert cnst.CALLBACK_LIST_PAGE_3["result"][0]["callback_query"]["message"]["reply_markup"] == result[0]["reply_markup"]
 
 
 def test_stop_registred():
