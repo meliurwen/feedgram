@@ -174,6 +174,11 @@ class Processinput:
 
                                 messages.append(self.__ms_edit(chat_id, message_id, message, "HTML", {"inline_keyboard": button}))
 
+                            # pause
+                            # pause <page> <day> <socail> <internal_id>
+                            elif callback_data[:4] == "pause":
+                                print("ciao")
+
                         else:
                             messages.append(self.__ms_maker(chat_id, "[AUTHORIZED] You can send text only!"))
                     else:
@@ -334,6 +339,26 @@ class Processinput:
         temporary_buttons_list.append([self.__ilk_help])
 
         return result, temporary_buttons_list
+
+    def __list_pause_mss(self, user_id, index):
+        user_subscriptions = self.__db.user_subscriptions(user_id)
+        # u_s[0] -> social
+        # u_s[1] -> title
+        # u_s[2] -> internal_id
+        # u_s[3] -> status
+        # u_s[4] -> expire_date
+        # u_s[5] -> category (opzional)
+
+        tmp_message_size = ' ' * 50
+        result = "👥Pause List\n" + tmp_message_size + "\nYou are following: \n"
+        i = 0  # indice di partenza degli elementi nella pagina
+        temporary_buttons_list = []
+
+        # verifico se la posizione della pagina è coretta
+        if index > len(user_subscriptions) - 1:
+            i = ((len(user_subscriptions) - 1) // self.SUB_X_PAGE) * 6
+        else:
+            i = index
 
     @classmethod
     def make_button_list(cls, array, start, lent, page, row_len):
