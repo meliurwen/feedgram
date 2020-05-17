@@ -188,8 +188,8 @@ class Processinput:
                                 messages.append(self.__ms_edit(chat_id, message_id, message, "HTML", {"inline_keyboard": button}))
 
                             # mute
-                            # mute <day> <page>
-                            # mute <day> <page> <socail> <internal_id>
+                            # mute <page> <day>
+                            # mute <page> <day> <socail> <internal_id>
                             elif bool(re.findall(r"^(mute)( \d+)?( \d+)?( \S+ \S+)?", callback_data)):
 
                                 match = re.findall(r"^(mute)( \d+)?( \d+)? ?(\S+)? ?(\S+)?", callback_data)[0]
@@ -198,10 +198,14 @@ class Processinput:
                                     if match[3] and match[4]:
                                         # Se gli elementi 3 e 4 sono presenti siamo nella pausa di un elemento
 
-                                        unsub_status = self.__set_sub_state({"social": match[3], "username": None, "internal_id": match[4]}, user_id, 1, "{}d".format(match[1]))
+                                        unsub_status = self.__set_sub_state({"social": match[3], "username": None, "internal_id": match[4]}, user_id, 1, "{}d".format(match[2]))
 
                                         if unsub_status["ok"]:
-                                            messages.append(self.__callback_maker(chat_id, callback_query_id, "Muted", False))
+                                            if int(match[2]) != 0:
+                                                messages.append(self.__callback_maker(chat_id, callback_query_id, "Muted", False))
+                                            else:
+                                                messages.append(self.__callback_maker(chat_id, callback_query_id, "Un-Muted", False))
+                                            
                                         else:
                                             alert_msg = "Alert: {}".format(unsub_status["description"])
                                             messages.append(self.__callback_maker(chat_id, callback_query_id, alert_msg, True))
@@ -212,7 +216,7 @@ class Processinput:
                                 else:
                                     # Se non  abbiamo ne day ne pagina siamo nel caso base
                                     messages.append(self.__callback_maker(chat_id, callback_query_id, "Muted list", False))
-                                    message, button = self.__list_mute_mss(user_id, 3, 0)
+                                    message, button = self.__list_mute_mss(user_id, 0, 3)
 
                                 messages.append(self.__ms_edit(chat_id, message_id, message, "HTML", {"inline_keyboard": button}))
 
@@ -367,7 +371,7 @@ class Processinput:
         )
 
         # Bottoni per rimuovere elementi
-        temporary_buttons_list = self.make_button_list('remove', user_subscriptions, i, self.SUB_X_PAGE, i, self.BUTN_X_ROW)
+        temporary_buttons_list = self.make_button_list('remove {}'.format(i), user_subscriptions, i, self.SUB_X_PAGE, self.BUTN_X_ROW)
 
         # Funzionamento per non visualizzare il tasto se si è arrivato
         # al limite superiore o inferiore della lista
@@ -383,7 +387,7 @@ class Processinput:
 
         return result, temporary_buttons_list
 
-    def __list_mute_mss(self, user_id, day, index):
+    def __list_mute_mss(self, user_id, index, day):
         user_subscriptions = self.__db.user_subscriptions(user_id)
         # u_s[0] -> social
         # u_s[1] -> title
@@ -411,26 +415,26 @@ class Processinput:
         )
 
         # Bottoni numerici per le azzioni
-        temporary_buttons_list = self.make_button_list('mute {}'.format(day), user_subscriptions, i, self.SUB_X_PAGE, i, self.BUTN_X_ROW)
+        temporary_buttons_list = self.make_button_list('mute {} {}'.format(i, day), user_subscriptions, i, self.SUB_X_PAGE, self.BUTN_X_ROW)
 
         # Funzionamento per non visualizzare il tasto se si è arrivato
         # al limite superiore o inferiore della lista
         temp_motion_button = []
         if i - self.SUB_X_PAGE >= 0:
-            temp_motion_button.append({"text": "«", "callback_data": "mute {} {}".format(day, i - self.SUB_X_PAGE)})
+            temp_motion_button.append({"text": "«", "callback_data": "mute {} {}".format(i - self.SUB_X_PAGE, day)})
         if i + self.SUB_X_PAGE < len(user_subscriptions):
-            temp_motion_button.append({"text": "»", "callback_data": "mute {} {}".format(day, i + self.SUB_X_PAGE)})
+            temp_motion_button.append({"text": "»", "callback_data": "mute {} {}".format(i + self.SUB_X_PAGE, day)})
         temporary_buttons_list.append(temp_motion_button)
 
         # prima fila di bottoni per i giorni
         temp_motion_button = []
-        temp_motion_button.append({"text": "{}1 Day".format("✔ " if day == 1 else ""), "callback_data": "mute {} {}".format(1, i)})
-        temp_motion_button.append({"text": "{}3 Day".format("✔ " if day == 3 else ""), "callback_data": "mute {} {}".format(3, i)})
+        temp_motion_button.append({"text": "{}1 Day".format("✔ " if day == 1 else ""), "callback_data": "mute {} {}".format(i, 1)})
+        temp_motion_button.append({"text": "{}3 Days".format("✔ " if day == 3 else ""), "callback_data": "mute {} {}".format(i, 3)})
         temporary_buttons_list.append(temp_motion_button)
         # seconda fila dei bottoni per i giorni
         temp_motion_button = []
-        temp_motion_button.append({"text": "{}7 Day".format("✔ " if day == 7 else ""), "callback_data": "mute {} {}".format(7, i)})
-        temp_motion_button.append({"text": "{}Un-mute".format("✔ " if day == 0 else ""), "callback_data": "mute {} {}".format(0, i)})
+        temp_motion_button.append({"text": "{}7 Days".format("✔ " if day == 7 else ""), "callback_data": "mute {} {}".format(i, 7)})
+        temp_motion_button.append({"text": "{}Un-mute".format("✔ " if day == 0 else ""), "callback_data": "mute {} {}".format(i, 0)})
         temporary_buttons_list.append(temp_motion_button)
 
         # Bottoni di navigazione
@@ -439,12 +443,12 @@ class Processinput:
         return result, temporary_buttons_list
 
     @classmethod
-    def make_button_list(cls, callbk_data, array, start, lent, page, row_len):
+    def make_button_list(cls, callbk_data, array, start, lent, row_len):
         i = 1
         result = []
         tmp = []
         for subscri in array[start: start + lent]:
-            tmp.append({"text": str(i), "callback_data": "{} {} {} {}".format(callbk_data, page, subscri[0], subscri[2])})
+            tmp.append({"text": str(i), "callback_data": "{} {} {}".format(callbk_data, subscri[0], subscri[2])})
             # tmp.append({"text": str(i), "callback_data": "remove " + subscri[0] + " " + subscri[2]})
             if len(tmp) == row_len:
                 result.append(tmp)

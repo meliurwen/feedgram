@@ -189,7 +189,7 @@ class MyDatabase:
 
     @property
     def create_dict_of_user_ids_and_socials(self):
-        res, _ = self.__query("SELECT registrations.user_id, socials.social, socials.internal_id, socials.username, socials.title, socials.retreive_time, socials.status FROM registrations, socials WHERE registrations.social_id = socials.social_id;", fetch=0)
+        res, _ = self.__query("SELECT registrations.user_id, socials.social, socials.internal_id, socials.username, socials.title, socials.retreive_time, socials.status, registrations.status, registrations.expire_date FROM registrations, socials WHERE registrations.social_id = socials.social_id;", fetch=0)
         socials_accounts_dict = {"social_accounts": {}, "subscriptions": {}}
         if res:
             for row in res:
@@ -205,7 +205,7 @@ class MyDatabase:
                     account_temp["retreive_time"] = str(row[5])
                     account_temp["status"] = str(row[6])
                     socials_accounts_dict["social_accounts"][row[1]].append(account_temp)
-                socials_accounts_dict["subscriptions"][row[1]][row[2]].append(str(row[0]))
+                socials_accounts_dict["subscriptions"][row[1]][row[2]].append({'id': row[0], 'state': row[7], 'expire': row[8]})
         return socials_accounts_dict
 
     def user_subscriptions(self, user_id):
