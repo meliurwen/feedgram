@@ -205,7 +205,6 @@ class Processinput:
                                                 messages.append(self.__callback_maker(chat_id, callback_query_id, "Muted", False))
                                             else:
                                                 messages.append(self.__callback_maker(chat_id, callback_query_id, "Un-Muted", False))
-                                            
                                         else:
                                             alert_msg = "Alert: {}".format(unsub_status["description"])
                                             messages.append(self.__callback_maker(chat_id, callback_query_id, alert_msg, True))
