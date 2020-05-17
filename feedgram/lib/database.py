@@ -209,7 +209,10 @@ class MyDatabase:
         return socials_accounts_dict
 
     def user_subscriptions(self, user_id):
-        res, _ = self.__query("SELECT socials.social, socials.title, socials.internal_id FROM registrations, socials WHERE  registrations.user_id = ? AND registrations.social_id = socials.social_id ORDER BY socials.social;", user_id, fetch=0)
+        res, _ = self.__query("SELECT socials.social, socials.title, socials.internal_id, registrations.status, registrations.expire_date "
+                              "FROM registrations, socials "
+                              "WHERE  registrations.user_id = ? AND "
+                              "registrations.social_id = socials.social_id ORDER BY socials.social;", user_id, fetch=0)
         return res
 
     def clean_dead_subscriptions(self):
