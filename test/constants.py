@@ -772,7 +772,7 @@ ONE_MESSAGE_STANDARD_INLN_KYBD = {
             [
                 {
                     "text": "🔕",
-                    "callback_data": "notifications_mode_off"
+                    "callback_data": "mute"
                 },
                 {
                     "text": "📖",
@@ -826,7 +826,7 @@ EDIT_MESSAGE_TEXT_INLN_KYBD = {
             [
                 {
                     "text": "🔕",
-                    "callback_data": "notifications_mode_off"
+                    "callback_data": "mute"
                 },
                 {
                     "text": "📖",
@@ -909,7 +909,7 @@ CALLBACK_LIST_PAGE_1["result"][0]["callback_query"]["message"]["reply_markup"] =
             },
             {
                 "text": "🔕",
-                "callback_data": "notifications_mode_off"
+                "callback_data": "mute"
             },
             {
                 "text": "⏹",
@@ -937,7 +937,7 @@ CALLBACK_LIST_PAGE_2["result"][0]["callback_query"]["message"]["reply_markup"] =
             },
             {
                 "text": "🔕",
-                "callback_data": "notifications_mode_off"
+                "callback_data": "mute"
             },
             {
                 "text": "⏹",
@@ -965,7 +965,7 @@ CALLBACK_LIST_PAGE_3["result"][0]["callback_query"]["message"]["reply_markup"] =
             },
             {
                 "text": "🔕",
-                "callback_data": "notifications_mode_off"
+                "callback_data": "mute"
             },
             {
                 "text": "⏹",

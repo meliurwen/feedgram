@@ -298,7 +298,7 @@ class Processinput:
     BUTN_X_ROW = 3
     NUMBER_DICT = {"0": "⓪", "1": "①", "2": "②", "3": "③", "4": "④", "5": "⑤", "6": "⑥", "7": "⑦", "8": "⑧", "9": "⑨"}
     STATUS_DICT = {"0": "", "1": "🔕", "2": "⏹", "3": "⏯️"}
-    LINE_LIMIT = 20
+    LINE_LIMIT = 24
 
     def __list_mss(self, user_id, index):
         user_subscriptions = self.__db.user_subscriptions(user_id)
