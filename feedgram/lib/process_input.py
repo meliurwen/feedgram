@@ -105,8 +105,20 @@ class Processinput:
                                         else:
                                             msg_subs = "<b>⚠️Warning</b>\nError: <code>{}</code>".format(unsub_status["description"])
                                     else:
-                                        msg_subs = "<b>⚠️Warning</b>\n<code>/sub</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/unsub &lt;social&gt; &lt;username&gt;</code>"
+                                        msg_subs = "<b>⚠️Warning</b>\n<code>/unsub</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/unsub &lt;social&gt; &lt;username&gt;</code>"
                                     messages.append(self.__ms_maker(chat_id, msg_subs, "HTML"))
+                                elif text[:5] == "/mute":
+                                    match = re.match(r"(\S+) (\S+) (\d{1,3}d|\d{1,3}h)", text[6:])
+                                    if match:
+                                        unsub_status = self.__set_sub_state({"social": match.group(1), "username": match.group(2), "internal_id": None}, user_id, 1, match.group(3))
+                                        if unsub_status["ok"]:
+                                            msg_subs = "<b>✅🔕 Muted successfully!</b>\n\nSocial: <i>{}</i>\nUser: <i>{}</i>!".format(match.group(1), match.group(2))
+                                        else:
+                                            msg_subs = "<b>⚠️Warning</b>\nError: <code>{}</code>".format(unsub_status["description"])
+                                    else:
+                                        msg_subs = "<b>⚠️Warning</b>\n<code>/mute</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/mute &lt;social&gt; &lt;username&gt; &lt;XXXd&gt;</code>\n<b>OR:</b>\n<code>/mute &lt;social&gt; &lt;username&gt; &lt;XXXh&gt;</code>"
+                                    messages.append(self.__ms_maker(chat_id, msg_subs, "HTML"))
+
                                 elif text == "/start":
                                     messages.append(self.__ms_maker(chat_id, "You're alredy registred.\nType /help to learn the commands available!"))
                                 else:
@@ -185,8 +197,9 @@ class Processinput:
                                     # il numero è presente siamo in una pagina
                                     if match[3] and match[4]:
                                         # Se gli elementi 3 e 4 sono presenti siamo nella pausa di un elemento
-                                        
-                                        # unsub_status = self.__unsubscription({"social": match[2], "username": None, "internal_id": match[3]}, user_id)
+
+                                        unsub_status = self.__set_sub_state({"social": match[3], "username": None, "internal_id": match[4]}, user_id, 1, "{}d".format(match[1]))
+
                                         if unsub_status["ok"]:
                                             messages.append(self.__callback_maker(chat_id, callback_query_id, "Muted", False))
                                         else:
@@ -587,6 +600,45 @@ class Processinput:
             return "Social: " + str(sub["social"]) + "\nMmmh, this shouldn't happen, no method (or specific method) to extract data."
         else:
             return "Social: " + str(sub["social"]) + "\nI don't know what happened! O_o\""
+
+    def __set_sub_state(self, sub, user_id, state, exp_time):
+        # Spostare fuori questo dizionario
+        social_abilited = {"instagram": "instagram", "ig": "instagram"}
+
+        # Check if there's enough data
+        if not ((sub["social"] and sub["username"]) or (sub["social"] and sub["internal_id"])):
+            return {"ok": False, "description": "notEnoughData"}
+
+        # Check if social is abilited
+        if sub["social"] in social_abilited:
+            sub["social"] = social_abilited[sub["social"]]  # Uniforma tutti gli alias dei social ad un unico nome
+        else:
+            return {"ok": False, "description": "socialNotAbilitedOrMisstyped"}
+
+        # Check if user is subscribed to the issued sn profile
+        # if it is subscribed it returns the internal_id otherwise None
+        if sub["internal_id"] is None:
+            is_subscribed, sub["internal_id"] = self.__db.check_if_subscribed(user_id, sub["social"], username=sub["username"])
+        else:
+            is_subscribed, _ = self.__db.check_if_subscribed(user_id, sub["social"], internal_id=sub["internal_id"])
+
+        if exp_time[-1:] == "d":
+            exp_time = int(exp_time[:-1])
+            exp_time = int(time.time()) + exp_time * 86400
+        elif exp_time[-1:] == "h":
+            exp_time = int(exp_time[:-1])
+            exp_time = int(time.time()) + exp_time * 3600
+        else:
+            return {"ok": False, "description": "errorOnTimeFormat"}
+
+        # If subscribed then unsubscribe, otherwise return error
+        if is_subscribed:
+            if self.__db.set_state_of_social_account(user_id, sub["social"], sub["internal_id"], state, exp_time):
+                return {"ok": True, "description": "changedState"}
+            else:
+                return {"ok": False, "description": "userNotSubscribed"}  # It happens only if between the check and the deleted the subscription is deleted by an nother istance/thread (it basically never happens)
+        else:
+            return {"ok": False, "description": "userNotSubscribed"}
 
     def __check_url_validity(self, sub):
         if sub["link"]:

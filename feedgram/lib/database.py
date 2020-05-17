@@ -266,3 +266,12 @@ class MyDatabase:
             return True, res[0]
         else:
             return False, None
+
+    def set_state_of_social_account(self, user_id, social, internal_id, state, exp_date):
+        _, rowcount = self.__query("UPDATE registrations "
+                                   "SET status = ? , expire_date = ?"
+                                   "WHERE registrations.user_id = ? AND "
+                                   "registrations.social_id = ("
+                                   "SELECT socials.social_id "
+                                   "FROM socials WHERE socials.social = ? AND socials.internal_id = ?);", state, exp_date, user_id, social, internal_id)
+        return bool(rowcount)
