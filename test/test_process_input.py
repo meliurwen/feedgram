@@ -193,9 +193,9 @@ def test_list_comand():
         igram = Instagram()
         myprocess_input = Processinput(database, [igram])
 
-        queries = [cnst.MSG_CMD_SUB_STANDARD_2,
-                   cnst.MSG_CMD_SUB_STANDARD_3,
-                   cnst.MSG_CMD_SUB_STANDARD_4]
+        queries = [cnst.MSG_CMD_SUB_IG_TEST1,
+                   cnst.MSG_CMD_SUB_IG_TEST2,
+                   cnst.MSG_CMD_SUB_IG_TEST3]
 
         for query in queries:
             GLOBAL_EXTRCT_DATA_RETURN = query["response"]
@@ -260,6 +260,91 @@ def test_callback_list_old_page():
     assert cnst.CALLBACK_LIST_PAGE_3["result"][0]["callback_query"]["message"]["message_id"] == result[0]["message_id"]
     assert cnst.CALLBACK_LIST_PAGE_3["result"][0]["callback_query"]["message"]["text"] == result[0]["text"]
     assert cnst.CALLBACK_LIST_PAGE_3["result"][0]["callback_query"]["message"]["reply_markup"] == result[0]["reply_markup"]
+
+
+def test_mute_command_no_args():
+    '''
+    Test del comando di mute mal formattato o senza argomenti
+    Il ritorno sarà un messaggio che informa sul coretto utilizzo del comando
+    '''
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_MUTE)
+
+    msm_list = ('<b>⚠️Warning</b>\n<code>/mute</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/mute &lt;social&gt; &lt;username&gt; &lt;XXXd&gt;</code>\n<i>OR:</i>\n<code>/mute &lt;social&gt; &lt;username&gt; &lt;XXXh&gt;</code>')
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_MUTE["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_mute_command_set_mute_hours():
+    '''
+    Test del comando di mute corettamente formattato indicando le ore
+    Il ritorno sarà un messaggio che informa sul coretto mute del profilo social
+    '''
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_MUTE_WORKING_HOURS)
+
+    msm_list = ('<b>✅🔕 Muted successfully!</b>\n\nSocial: <i>ig</i>\nUser: <i>testProfile3</i>!')
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_MUTE_WORKING_HOURS["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_mute_command_set_mute_day():
+    '''
+    Test del comando di mute corettamente formattato indicando i giorni
+    Il ritorno sarà un messaggio che informa sul coretto mute del profilo social
+    '''
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_MUTE_WORKING_DAY)
+
+    msm_list = ('<b>✅🔕 Muted successfully!</b>\n\nSocial: <i>ig</i>\nUser: <i>testProfile3</i>!')
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_MUTE_WORKING_DAY["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_mute_command_not_social():
+    '''
+        Test del comando di mute corettamente formattato ma su di un social
+        non abilitato non ancora implementato nel bot
+    '''
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_MUTE_MISS_SOCIAL)
+
+    msm_list = ('<b>⚠️Warning</b>\nError: <code>socialNotAbilitedOrMisstyped</code>')
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_MUTE_MISS_SOCIAL["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_mute_command_not_subscribed():
+    '''
+        Test del comando di mute corettamente formattato ma su di un social
+        non a cui non si è sottoscritti
+    '''
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_MUTE_MISS_SUBSCRIPTION)
+
+    msm_list = ('<b>⚠️Warning</b>\nError: <code>userNotSubscribed</code>')
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_MUTE_MISS_SUBSCRIPTION["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
 
 
 def test_stop_registred():

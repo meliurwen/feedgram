@@ -309,7 +309,7 @@ SOCIAL_QUERY_PUBLIC_NOW_PRIVATE["result"]["queries"] = {
     ]
 }
 
-COMMAND_START = {
+GENERAL_COMMAND = {
     "ok": True,
     "result": [
         {
@@ -332,42 +332,21 @@ COMMAND_START = {
                     "type": "private",
                 },
                 "dte": 1587049598,
-                "text": "/start",
-                "entities": [{"offset": 0, "length": 6, "type": "bot_command"}],
+                "text": "/comand",
+                "entities": [{"offset": 0, "length": 7, "type": "bot_command"}],
             },
         }
     ],
 }
 
-COMMAND_STOP = {
-    "ok": True,
-    "result": [
-        {
-            "update_id": 731419465,
-            "message": {
-                "message_id": 1257,
-                "from": {
-                    "id": 123456789,
-                    "is_bot": False,
-                    "first_name": "John",
-                    "last_name": "Doe",
-                    "username": "TestUsername",
-                    "language_code": "en",
-                },
-                "chat": {
-                    "id": 123456789,
-                    "first_name": "John",
-                    "last_name": "Doe",
-                    "username": "TestUsername",
-                    "type": "private",
-                },
-                "date": 1587049603,
-                "text": "/stop",
-                "entities": [{"offset": 0, "length": 5, "type": "bot_command"}],
-            },
-        }
-    ],
-}
+COMMAND_START = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_START['result'][0]['message']['text'] = "/start"
+COMMAND_START['result'][0]['message']['entities'] = [{"offset": 0, "length": 6, "type": "bot_command"}]
+
+COMMAND_STOP = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_STOP['result'][0]['message']['text'] = "/stop"
+COMMAND_STOP['result'][0]['message']['entities'] = [{"offset": 0, "length": 5, "type": "bot_command"}]
+
 
 NOT_COMMAND = {
     "ok": True,
@@ -467,65 +446,14 @@ CALLBACK_HELP = {
         }],
 }
 
-WRONG_COMMAND = {
-    "ok": True,
-    "result": [
-        {
-            "update_id": 731419465,
-            "message": {
-                "message_id": 1257,
-                "from": {
-                    "id": 123456789,
-                    "is_bot": False,
-                    "first_name": "John",
-                    "last_name": "Doe",
-                    "username": "TestUsername",
-                    "language_code": "en",
-                },
-                "chat": {
-                    "id": 123456789,
-                    "first_name": "John",
-                    "last_name": "Doe",
-                    "username": "TestUsername",
-                    "type": "private",
-                },
-                "date": 1587049603,
-                "text": "/stops",
-                "entities": [{"offset": 0, "length": 6, "type": "bot_command"}],
-            },
-        }
-    ],
-}
+WRONG_COMMAND = copy.deepcopy(GENERAL_COMMAND)
+WRONG_COMMAND['result'][0]['message']['text'] = "/stops"
+WRONG_COMMAND['result'][0]['message']['entities'] = [{"offset": 0, "length": 6, "type": "bot_command"}]
 
-COMMAND_HELP = {
-    "ok": True,
-    "result": [
-        {
-            "update_id": 731419464,
-            "message": {
-                "message_id": 1256,
-                "from": {
-                    "id": 123456789,
-                    "is_bot": False,
-                    "first_name": "John",
-                    "last_name": "Doe",
-                    "username": "TestUsername",
-                    "language_code": "en",
-                },
-                "chat": {
-                    "id": 123456789,
-                    "first_name": "John",
-                    "last_name": "Doe",
-                    "username": "TestUsername",
-                    "type": "private",
-                },
-                "dte": 1587049598,
-                "text": "/help",
-                "entities": [{"offset": 0, "length": 5, "type": "bot_command"}],
-            },
-        }
-    ],
-}
+COMMAND_HELP = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_HELP['result'][0]['message']['text'] = "/help"
+COMMAND_HELP['result'][0]['message']['entities'] = [{"offset": 0, "length": 5, "type": "bot_command"}]
+
 
 MSG_CMD_SUB_STANDARD = {
     "query": {
@@ -867,35 +795,9 @@ NON_EXISTENT_TYPE = {
     "markdown": "HTML",
 }
 
-COMMAND_LIST = {
-    "ok": True,
-    "result": [
-        {
-            "update_id": 731419465,
-            "message": {
-                "message_id": 1257,
-                "from": {
-                    "id": 123456789,
-                    "is_bot": False,
-                    "first_name": "John",
-                    "last_name": "Doe",
-                    "username": "TestUsername",
-                    "language_code": "en",
-                },
-                "chat": {
-                    "id": 123456789,
-                    "first_name": "John",
-                    "last_name": "Doe",
-                    "username": "TestUsername",
-                    "type": "private",
-                },
-                "date": 1587049603,
-                "text": "/list",
-                "entities": [{"offset": 0, "length": 5, "type": "bot_command"}],
-            },
-        }
-    ],
-}
+COMMAND_LIST = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_LIST['result'][0]['message']['text'] = "/list"
+COMMAND_LIST['result'][0]['message']['entities'] = [{"offset": 0, "length": 5, "type": "bot_command"}]
 
 CALLBACK_LIST_PAGE_1 = copy.deepcopy(CALLBACK_HELP)
 CALLBACK_LIST_PAGE_1["result"][0]["callback_query"]["message"]["text"] = "👥Follow List\n                                                  \nYou are following: \n<b>• instagram</b>\n  • testProfile\n  • testProfilePrivate\n  • testProfileStrangeStatus\n  • testIgProfileLinkHome\n  • testProfile2\n  • testProfile3\n\nPage 1 of 2"
@@ -981,20 +883,40 @@ CALLBACK_LIST_PAGE_3["result"][0]["callback_query"]["message"]["reply_markup"] =
 }
 CALLBACK_LIST_PAGE_3["result"][0]["callback_query"]["data"] = "list_mode 24"
 
-MSG_CMD_SUB_STANDARD_2 = copy.deepcopy(MSG_CMD_SUB_STANDARD)
-MSG_CMD_SUB_STANDARD_2["query"]["result"][0]["message"]["text"] = "/sub instagram testProfile2"
-MSG_CMD_SUB_STANDARD_2["response"]["username"] = "testProfile2"
-MSG_CMD_SUB_STANDARD_2["response"]["internal_id"] = 4345345
-MSG_CMD_SUB_STANDARD_2["response"]["title"] = "testProfile2"
+MSG_CMD_SUB_IG_TEST1 = copy.deepcopy(MSG_CMD_SUB_STANDARD)
+MSG_CMD_SUB_IG_TEST1["query"]["result"][0]["message"]["text"] = "/sub instagram testProfile2"
+MSG_CMD_SUB_IG_TEST1["response"]["username"] = "testProfile2"
+MSG_CMD_SUB_IG_TEST1["response"]["internal_id"] = 4345345
+MSG_CMD_SUB_IG_TEST1["response"]["title"] = "testProfile2"
 
-MSG_CMD_SUB_STANDARD_3 = copy.deepcopy(MSG_CMD_SUB_STANDARD)
-MSG_CMD_SUB_STANDARD_3["query"]["result"][0]["message"]["text"] = "/sub instagram testProfile3"
-MSG_CMD_SUB_STANDARD_3["response"]["username"] = "testProfile3"
-MSG_CMD_SUB_STANDARD_3["response"]["internal_id"] = 782782767
-MSG_CMD_SUB_STANDARD_3["response"]["title"] = "testProfile3"
+MSG_CMD_SUB_IG_TEST2 = copy.deepcopy(MSG_CMD_SUB_STANDARD)
+MSG_CMD_SUB_IG_TEST2["query"]["result"][0]["message"]["text"] = "/sub instagram testProfile3"
+MSG_CMD_SUB_IG_TEST2["response"]["username"] = "testProfile3"
+MSG_CMD_SUB_IG_TEST2["response"]["internal_id"] = 782782767
+MSG_CMD_SUB_IG_TEST2["response"]["title"] = "testProfile3"
 
-MSG_CMD_SUB_STANDARD_4 = copy.deepcopy(MSG_CMD_SUB_STANDARD)
-MSG_CMD_SUB_STANDARD_4["query"]["result"][0]["message"]["text"] = "/sub instagram testProfile4"
-MSG_CMD_SUB_STANDARD_4["response"]["username"] = "testProfile4"
-MSG_CMD_SUB_STANDARD_4["response"]["internal_id"] = 456765579
-MSG_CMD_SUB_STANDARD_4["response"]["title"] = "testProfile4"
+MSG_CMD_SUB_IG_TEST3 = copy.deepcopy(MSG_CMD_SUB_STANDARD)
+MSG_CMD_SUB_IG_TEST3["query"]["result"][0]["message"]["text"] = "/sub instagram testProfile4"
+MSG_CMD_SUB_IG_TEST3["response"]["username"] = "testProfile4"
+MSG_CMD_SUB_IG_TEST3["response"]["internal_id"] = 456765579
+MSG_CMD_SUB_IG_TEST3["response"]["title"] = "testProfile4"
+
+COMMAND_MUTE = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_MUTE['result'][0]['message']['text'] = "/mute"
+COMMAND_MUTE['result'][0]['message']['entities'] = [{"offset": 0, "length": 5, "type": "bot_command"}]
+
+COMMAND_MUTE_WORKING_HOURS = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_MUTE_WORKING_HOURS['result'][0]['message']['text'] = "/mute ig testProfile3 12h"
+COMMAND_MUTE_WORKING_HOURS['result'][0]['message']['entities'] = [{"offset": 0, "length": 25, "type": "bot_command"}]
+
+COMMAND_MUTE_WORKING_DAY = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_MUTE_WORKING_DAY['result'][0]['message']['text'] = "/mute ig testProfile3 1d"
+COMMAND_MUTE_WORKING_DAY['result'][0]['message']['entities'] = [{"offset": 0, "length": 24, "type": "bot_command"}]
+
+COMMAND_MUTE_MISS_SOCIAL = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_MUTE_MISS_SOCIAL['result'][0]['message']['text'] = "/mute youtube testProfile3 1h"
+COMMAND_MUTE_MISS_SOCIAL['result'][0]['message']['entities'] = [{"offset": 0, "length": 28, "type": "bot_command"}]
+
+COMMAND_MUTE_MISS_SUBSCRIPTION = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_MUTE_MISS_SUBSCRIPTION['result'][0]['message']['text'] = "/mute ig testProfile9 1h"
+COMMAND_MUTE_MISS_SUBSCRIPTION['result'][0]['message']['entities'] = [{"offset": 0, "length": 28, "type": "bot_command"}]

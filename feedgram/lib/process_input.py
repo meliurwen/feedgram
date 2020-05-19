@@ -116,7 +116,7 @@ class Processinput:
                                         else:
                                             msg_subs = "<b>⚠️Warning</b>\nError: <code>{}</code>".format(unsub_status["description"])
                                     else:
-                                        msg_subs = "<b>⚠️Warning</b>\n<code>/mute</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/mute &lt;social&gt; &lt;username&gt; &lt;XXXd&gt;</code>\n<b>OR:</b>\n<code>/mute &lt;social&gt; &lt;username&gt; &lt;XXXh&gt;</code>"
+                                        msg_subs = "<b>⚠️Warning</b>\n<code>/mute</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/mute &lt;social&gt; &lt;username&gt; &lt;XXXd&gt;</code>\n<i>OR:</i>\n<code>/mute &lt;social&gt; &lt;username&gt; &lt;XXXh&gt;</code>"
                                     messages.append(self.__ms_maker(chat_id, msg_subs, "HTML"))
 
                                 elif text == "/start":
@@ -632,7 +632,7 @@ class Processinput:
             exp_time = int(exp_time[:-1])
             exp_time = int(time.time()) + exp_time * 3600
         else:
-            return {"ok": False, "description": "errorOnTimeFormat"}
+            return {"ok": False, "description": "errorOnTimeFormat"}  # Caso impossibile da finirci dato il controllo della regexp ma messo per sicurezza
 
         # If subscribed then unsubscribe, otherwise return error
         if is_subscribed:

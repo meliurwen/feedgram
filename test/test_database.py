@@ -177,8 +177,8 @@ def test_database_get_first_social_id_from_internal_user_social_and_if_present_s
 
 def test_database_get_first_social_id_from_internal_user_social_and_if_present_subscribe3():
     '''
-        Tentativo di inscrizione ad un social tramite link senza forzarne
-        l'inserimento nel database del social e relazione con l'utente
+        Tentativo di inscrizione di un secondo utente ad un social tramite link
+        senza forzarne l'inserimento nel database del social e relazione con l'utente
             => il social è presente nel database
             ==> estraggo le informazioni del social dal database
             ===> aggungiamo la relazione tra l'utente e il social
@@ -228,6 +228,9 @@ def test_database_create_dict_of_user_ids_and_socials():
 
 
 def test_database_user_subscriptions():
+    '''
+        Verifica le sottoscrizioni dell'utente
+    '''
     assert path.exists(DATABASE_PATH)
     database = MyDatabase(DATABASE_PATH)
 
@@ -236,6 +239,29 @@ def test_database_user_subscriptions():
     assert res[0][0] == "instagram"
     assert res[0][1] == "il_post"
     assert res[0][2] == "1769583068"
+    assert res[0][3] == 0
+    assert res[0][4] == -1
+
+
+def test_database_set_state_of_social_account():
+    '''
+        Vado a modificare lo stato di una sottoscrizione
+        verifico che la modifica sia avvenuta corettamente
+    '''
+    assert path.exists(DATABASE_PATH)
+    database = MyDatabase(DATABASE_PATH)
+
+    result = database.set_state_of_social_account(6551474276, 'instagram', 1769583068, 1, 1589986672)
+
+    assert result
+
+    res = database.user_subscriptions(6551474276)
+
+    assert res[0][0] == "instagram"
+    assert res[0][1] == "il_post"
+    assert res[0][2] == "1769583068"
+    assert res[0][3] == 1
+    assert res[0][4] == 1589986672
 
 
 def test_database_process_messages_queries1():
