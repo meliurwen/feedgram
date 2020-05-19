@@ -428,14 +428,8 @@ CALLBACK_HELP = {
                     "reply_markup": {
                         "inline_keyboard": [
                             [
-                                {
-                                    "text": "📋",
-                                    "callback_data": "list_mode"
-                                },
-                                {
-                                    "text": "🏷",
-                                    "callback_data": "category_mode"
-                                }
+                                {"text": "📋", "callback_data": "list_mode"},
+                                {"text": "🏷", "callback_data": "category_mode"}
                             ]
                         ]
                     }
@@ -688,24 +682,12 @@ ONE_MESSAGE_STANDARD_INLN_KYBD = {
     "reply_markup": {
         "inline_keyboard": [
             [
-                {
-                    "text": "🗑",
-                    "callback_data": "remove_mode"
-                },
-                {
-                    "text": "✏️",
-                    "callback_data": "add_mode"
-                }
+                {"text": "🗑", "callback_data": "remove_mode"},
+                {"text": "✏️", "callback_data": "add_mode"}
             ],
             [
-                {
-                    "text": "🔕",
-                    "callback_data": "mute"
-                },
-                {
-                    "text": "📖",
-                    "callback_data": "help_mode"
-                }
+                {"text": "🔕", "callback_data": "mute"},
+                {"text": "📖", "callback_data": "help_mode"}
             ]
         ]
     }
@@ -742,24 +724,12 @@ EDIT_MESSAGE_TEXT_INLN_KYBD = {
     "reply_markup": {
         "inline_keyboard": [
             [
-                {
-                    "text": "🗑",
-                    "callback_data": "remove_mode"
-                },
-                {
-                    "text": "✏️",
-                    "callback_data": "add_mode"
-                }
+                {"text": "🗑", "callback_data": "remove_mode"},
+                {"text": "✏️", "callback_data": "add_mode"}
             ],
             [
-                {
-                    "text": "🔕",
-                    "callback_data": "mute"
-                },
-                {
-                    "text": "📖",
-                    "callback_data": "help_mode"
-                }
+                {"text": "🔕", "callback_data": "mute"},
+                {"text": "📖", "callback_data": "help_mode"}
             ]
         ]
     }
@@ -804,24 +774,10 @@ CALLBACK_LIST_PAGE_1["result"][0]["callback_query"]["message"]["text"] = "👥Fo
 CALLBACK_LIST_PAGE_1["result"][0]["callback_query"]["message"]["reply_markup"] = {
     "inline_keyboard": [
         [{'callback_data': 'list_mode 6', 'text': '»'}],
-        [
-            {
-                "text": "⏯️",
-                "callback_data": "pause_mode"
-            },
-            {
-                "text": "🔕",
-                "callback_data": "mute"
-            },
-            {
-                "text": "⏹",
-                "callback_data": "stop_mode"
-            },
-            {
-                "text": "🗑",
-                "callback_data": "remove"
-            }
-        ],
+        [{"text": "⏯️", "callback_data": "pause_mode"},
+         {"text": "🔕", "callback_data": "mute"},
+         {"text": "⏹", "callback_data": "stop_mode"},
+         {"text": "🗑", "callback_data": "remove"}],
         [{"text": "📖", "callback_data": "help_mode"}]
     ]
 }
@@ -832,24 +788,10 @@ CALLBACK_LIST_PAGE_2["result"][0]["callback_query"]["message"]["text"] = "👥Fo
 CALLBACK_LIST_PAGE_2["result"][0]["callback_query"]["message"]["reply_markup"] = {
     "inline_keyboard": [
         [{'callback_data': 'list_mode 0', 'text': '«'}],
-        [
-            {
-                "text": "⏯️",
-                "callback_data": "pause_mode"
-            },
-            {
-                "text": "🔕",
-                "callback_data": "mute"
-            },
-            {
-                "text": "⏹",
-                "callback_data": "stop_mode"
-            },
-            {
-                "text": "🗑",
-                "callback_data": "remove"
-            }
-        ],
+        [{"text": "⏯️", "callback_data": "pause_mode"},
+         {"text": "🔕", "callback_data": "mute"},
+         {"text": "⏹", "callback_data": "stop_mode"},
+         {"text": "🗑", "callback_data": "remove"}],
         [{"text": "📖", "callback_data": "help_mode"}]
     ]
 }
@@ -860,24 +802,10 @@ CALLBACK_LIST_PAGE_3["result"][0]["callback_query"]["message"]["text"] = "👥Fo
 CALLBACK_LIST_PAGE_3["result"][0]["callback_query"]["message"]["reply_markup"] = {
     "inline_keyboard": [
         [{'callback_data': 'list_mode 0', 'text': '«'}],
-        [
-            {
-                "text": "⏯️",
-                "callback_data": "pause_mode"
-            },
-            {
-                "text": "🔕",
-                "callback_data": "mute"
-            },
-            {
-                "text": "⏹",
-                "callback_data": "stop_mode"
-            },
-            {
-                "text": "🗑",
-                "callback_data": "remove"
-            }
-        ],
+        [{"text": "⏯️", "callback_data": "pause_mode"},
+         {"text": "🔕", "callback_data": "mute"},
+         {"text": "⏹", "callback_data": "stop_mode"},
+         {"text": "🗑", "callback_data": "remove"}],
         [{"text": "📖", "callback_data": "help_mode"}]
     ]
 }
@@ -920,3 +848,69 @@ COMMAND_MUTE_MISS_SOCIAL['result'][0]['message']['entities'] = [{"offset": 0, "l
 COMMAND_MUTE_MISS_SUBSCRIPTION = copy.deepcopy(GENERAL_COMMAND)
 COMMAND_MUTE_MISS_SUBSCRIPTION['result'][0]['message']['text'] = "/mute ig testProfile9 1h"
 COMMAND_MUTE_MISS_SUBSCRIPTION['result'][0]['message']['entities'] = [{"offset": 0, "length": 28, "type": "bot_command"}]
+
+CALLBACK_MUTE = copy.deepcopy(CALLBACK_HELP)
+CALLBACK_MUTE["result"][0]["callback_query"]["message"]["text"] = '👥Mute List\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① 🔕 testProfile\n  ② testProfilePrivate\n  ③ testProfileStrangeStatus\n  ④ testIgProfileLinkHome\n  ⑤ testProfile2\n  ⑥ testProfile3\n\nPage 1 of 2'
+CALLBACK_MUTE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'mute 0 3 instagram 546545337', 'text': '1'}, {'callback_data': 'mute 0 3 instagram 741852963', 'text': '2'}, {'callback_data': 'mute 0 3 instagram 963852741', 'text': '3'}],
+        [{'callback_data': 'mute 0 3 instagram 897546782', 'text': '4'}, {'callback_data': 'mute 0 3 instagram 4345345', 'text': '5'}, {'callback_data': 'mute 0 3 instagram 782782767', 'text': '6'}],
+        [{'callback_data': 'mute 6 3', 'text': '»'}],
+        [{'callback_data': 'mute 0 1', 'text': '1 Day'}, {'callback_data': 'mute 0 3', 'text': '✔ 3 Days'}],
+        [{'callback_data': 'mute 0 7', 'text': '7 Days'}, {'callback_data': 'mute 0 0', 'text': 'Un-mute'}],
+        [{'callback_data': 'list_mode', 'text': '📋'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_MUTE["result"][0]["callback_query"]["data"] = "mute"
+
+CALLBACK_MUTE_PAGE2 = copy.deepcopy(CALLBACK_HELP)
+CALLBACK_MUTE_PAGE2["result"][0]["callback_query"]["message"]["text"] = '👥Mute List\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfile4\n\nPage 2 of 2'
+CALLBACK_MUTE_PAGE2["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'mute 6 3 instagram 456765579', 'text': '1'}],
+        [{'callback_data': 'mute 0 3', 'text': '«'}],
+        [{'callback_data': 'mute 6 1', 'text': '1 Day'}, {'callback_data': 'mute 6 3', 'text': '✔ 3 Days'}],
+        [{'callback_data': 'mute 6 7', 'text': '7 Days'}, {'callback_data': 'mute 6 0', 'text': 'Un-mute'}],
+        [{'callback_data': 'list_mode', 'text': '📋'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_MUTE_PAGE2["result"][0]["callback_query"]["data"] = "mute 6 3"
+
+CALLBACK_MUTE_PAGE2_DATE = copy.deepcopy(CALLBACK_HELP)
+CALLBACK_MUTE_PAGE2_DATE["result"][0]["callback_query"]["message"]["text"] = '👥Mute List\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfile4\n\nPage 2 of 2'
+CALLBACK_MUTE_PAGE2_DATE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'mute 6 7 instagram 456765579', 'text': '1'}],
+        [{'callback_data': 'mute 0 7', 'text': '«'}],
+        [{'callback_data': 'mute 6 1', 'text': '1 Day'}, {'callback_data': 'mute 6 3', 'text': '3 Days'}],
+        [{'callback_data': 'mute 6 7', 'text': '✔ 7 Days'}, {'callback_data': 'mute 6 0', 'text': 'Un-mute'}],
+        [{'callback_data': 'list_mode', 'text': '📋'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_MUTE_PAGE2_DATE["result"][0]["callback_query"]["data"] = "mute 6 7"
+
+CALLBACK_MUTE_USE = copy.deepcopy(CALLBACK_HELP)
+CALLBACK_MUTE_USE["result"][0]["callback_query"]["message"]["text"] = '👥Mute List\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① 🔕 testProfile4\n\nPage 2 of 2'
+CALLBACK_MUTE_USE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'mute 6 3 instagram 456765579', 'text': '1'}],
+        [{'callback_data': 'mute 0 3', 'text': '«'}],
+        [{'callback_data': 'mute 6 1', 'text': '1 Day'}, {'callback_data': 'mute 6 3', 'text': '✔ 3 Days'}],
+        [{'callback_data': 'mute 6 7', 'text': '7 Days'}, {'callback_data': 'mute 6 0', 'text': 'Un-mute'}],
+        [{'callback_data': 'list_mode', 'text': '📋'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_MUTE_USE["result"][0]["callback_query"]["data"] = "mute 6 3 instagram 456765579"
+
+CALLBACK_MUTE_USE_UNMUTE = copy.deepcopy(CALLBACK_HELP)
+CALLBACK_MUTE_USE_UNMUTE["result"][0]["callback_query"]["message"]["text"] = '👥Mute List\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfile4\n\nPage 2 of 2'
+CALLBACK_MUTE_USE_UNMUTE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'mute 6 0 instagram 456765579', 'text': '1'}],
+        [{'callback_data': 'mute 0 0', 'text': '«'}],
+        [{'callback_data': 'mute 6 1', 'text': '1 Day'}, {'callback_data': 'mute 6 3', 'text': '3 Days'}],
+        [{'callback_data': 'mute 6 7', 'text': '7 Days'}, {'callback_data': 'mute 6 0', 'text': '✔ Un-mute'}],
+        [{'callback_data': 'list_mode', 'text': '📋'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_MUTE_USE_UNMUTE["result"][0]["callback_query"]["data"] = "mute 6 0 instagram 456765579"

@@ -347,6 +347,75 @@ def test_mute_command_not_subscribed():
     assert result[0]["text"] == msm_list
 
 
+def test_mute_callback_base():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_MUTE)
+
+    assert result[0]["type"] == 'answerCallbackQuery'
+    assert result[0]["text"] == 'Muted list'
+
+    assert result[1]["type"] == "editMessageText"
+    assert cnst.CALLBACK_MUTE["result"][0]["callback_query"]["message"]["chat"]["id"] == result[1]["chat_id"]
+    assert cnst.CALLBACK_MUTE["result"][0]["callback_query"]["message"]["message_id"] == result[1]["message_id"]
+    assert cnst.CALLBACK_MUTE["result"][0]["callback_query"]["message"]["text"] == result[1]["text"]
+    assert cnst.CALLBACK_MUTE["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
+
+
+def test_mute_callback_page():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_MUTE_PAGE2)
+
+    assert result[0]["type"] == "editMessageText"
+    assert cnst.CALLBACK_MUTE_PAGE2["result"][0]["callback_query"]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert cnst.CALLBACK_MUTE_PAGE2["result"][0]["callback_query"]["message"]["message_id"] == result[0]["message_id"]
+    assert cnst.CALLBACK_MUTE_PAGE2["result"][0]["callback_query"]["message"]["text"] == result[0]["text"]
+    assert cnst.CALLBACK_MUTE_PAGE2["result"][0]["callback_query"]["message"]["reply_markup"] == result[0]["reply_markup"]
+
+
+def test_mute_callback_change_date():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_MUTE_PAGE2_DATE)
+
+    assert result[0]["type"] == "editMessageText"
+    assert cnst.CALLBACK_MUTE_PAGE2_DATE["result"][0]["callback_query"]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert cnst.CALLBACK_MUTE_PAGE2_DATE["result"][0]["callback_query"]["message"]["message_id"] == result[0]["message_id"]
+    assert cnst.CALLBACK_MUTE_PAGE2_DATE["result"][0]["callback_query"]["message"]["text"] == result[0]["text"]
+    assert cnst.CALLBACK_MUTE_PAGE2_DATE["result"][0]["callback_query"]["message"]["reply_markup"] == result[0]["reply_markup"]
+
+
+def test_mute_callback_use_mute():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_MUTE_USE)
+
+    assert result[0]["type"] == 'answerCallbackQuery'
+    assert result[0]["text"] == 'Muted'
+
+    assert result[1]["type"] == "editMessageText"
+    assert cnst.CALLBACK_MUTE_USE["result"][0]["callback_query"]["message"]["chat"]["id"] == result[1]["chat_id"]
+    assert cnst.CALLBACK_MUTE_USE["result"][0]["callback_query"]["message"]["message_id"] == result[1]["message_id"]
+    assert cnst.CALLBACK_MUTE_USE["result"][0]["callback_query"]["message"]["text"] == result[1]["text"]
+    assert cnst.CALLBACK_MUTE_USE["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
+
+
+def test_mute_callback_use_unmute():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_MUTE_USE_UNMUTE)
+
+    assert result[0]["type"] == 'answerCallbackQuery'
+    assert result[0]["text"] == 'Un-Muted'
+
+    assert result[1]["type"] == "editMessageText"
+    assert cnst.CALLBACK_MUTE_USE_UNMUTE["result"][0]["callback_query"]["message"]["chat"]["id"] == result[1]["chat_id"]
+    assert cnst.CALLBACK_MUTE_USE_UNMUTE["result"][0]["callback_query"]["message"]["message_id"] == result[1]["message_id"]
+    assert cnst.CALLBACK_MUTE_USE_UNMUTE["result"][0]["callback_query"]["message"]["text"] == result[1]["text"]
+    assert cnst.CALLBACK_MUTE_USE_UNMUTE["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
+
+
 def test_stop_registred():
 
     database = MyDatabase(DATABASE_PATH)
