@@ -121,6 +121,8 @@ class Watchdog(threading.Thread):
                     CODA_TEMP.put(messages_socials)
                     self.__logger.info("Messaggi messi in coda di spedizione.")
 
+                self.__db.clean_expired_state()
+
         if self.mode == "news_retreiver":
             # global condizione_compiler
             while self.still_run:

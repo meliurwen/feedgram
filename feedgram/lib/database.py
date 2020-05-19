@@ -275,3 +275,10 @@ class MyDatabase:
                                    "SELECT socials.social_id "
                                    "FROM socials WHERE socials.social = ? AND socials.internal_id = ?);", state, exp_date, user_id, social, internal_id)
         return bool(rowcount)
+
+    def clean_expired_state(self):
+        _, rowcount = self.__query("UPDATE registrations "
+                                   "SET status = 0 , expire_date = -1 "
+                                   "WHERE registrations.expire_date < ? AND registrations.expire_date != -1;", time.time())
+
+        self.__logger.info("Sottoscrizioni con lo stato scaduto: %s ", rowcount)

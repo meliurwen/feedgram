@@ -251,7 +251,7 @@ def test_database_set_state_of_social_account():
     assert path.exists(DATABASE_PATH)
     database = MyDatabase(DATABASE_PATH)
 
-    result = database.set_state_of_social_account(6551474276, 'instagram', 1769583068, 1, 1589986672)
+    result = database.set_state_of_social_account(6551474276, 'instagram', 1769583068, 1, 1589753073)
 
     assert result
 
@@ -261,7 +261,23 @@ def test_database_set_state_of_social_account():
     assert res[0][1] == "il_post"
     assert res[0][2] == "1769583068"
     assert res[0][3] == 1
-    assert res[0][4] == 1589986672
+    assert res[0][4] == 1589753073
+
+
+def test_database_clean_expired_state():
+    '''
+    Vado a verificare la variazione nel numero di registrazioni
+    '''
+    assert path.exists(DATABASE_PATH)
+    database = MyDatabase(DATABASE_PATH)
+
+    res_before, _ = myquery(DATABASE_PATH, "SELECT count() FROM registrations WHERE registrations.expire_date > -1")
+
+    database.clean_expired_state()
+
+    res_afther, _ = myquery(DATABASE_PATH, "SELECT count() FROM registrations WHERE registrations.expire_date > -1")
+
+    assert res_before > res_afther
 
 
 def test_database_process_messages_queries1():
