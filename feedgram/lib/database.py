@@ -254,12 +254,12 @@ class MyDatabase:
         # Check if user_id is subscribed to the SN profile issued
         if internal_id:
             res, _ = self.__query(
-                "SELECT socials.internal_id FROM socials, registrations WHERE registrations.user_id = ? AND registrations.social_id = (\
-                    SELECT socials.social_id FROM socials WHERE socials.social = ? AND socials.internal_id = ?);", user_id, social, internal_id)
+                "SELECT socials.internal_id FROM socials WHERE socials.social = ? AND socials.internal_id = ? AND socials.social_id = (\
+                    SELECT registrations.social_id FROM registrations WHERE registrations.user_id = ?);", social, internal_id, user_id)
         else:
             res, _ = self.__query(
-                "SELECT socials.internal_id FROM socials, registrations WHERE registrations.user_id = ? AND registrations.social_id = (\
-                    SELECT socials.social_id FROM socials WHERE socials.social = ? AND socials.username = ?);", user_id, social, username)
+                "SELECT socials.internal_id FROM socials WHERE socials.social = ? AND socials.username = ? AND socials.social_id = (\
+                    SELECT registrations.social_id FROM registrations WHERE registrations.user_id = ?);", social, username, user_id)
 
         # If exists return True with the internal_id
         if res:

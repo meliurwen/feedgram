@@ -121,12 +121,11 @@ class Watchdog(threading.Thread):
                     CODA_TEMP.put(messages_socials)
                     self.__logger.info("Messaggi messi in coda di spedizione.")
 
-                self.__db.clean_expired_state()
-
         if self.mode == "news_retreiver":
             # global condizione_compiler
             while self.still_run:
 
+                self.__db.clean_expired_state()  # TODO: Estremamente poco efficiente e costosa, assolutamente da migliorare
                 self.__db.clean_dead_subscriptions()  # Pulisco al tabella "socials" rimuovendo gli account ai quali nessuno è più iscritto
                 SUBSCRIPTIONS_DICT = self.__db.create_dict_of_user_ids_and_socials  # Creo un dizionario di tutte le iscrizioni degli utenti
 

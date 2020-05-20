@@ -120,7 +120,7 @@ class Processinput:
                                     messages.append(self.__ms_maker(chat_id, msg_subs, "HTML"))
 
                                 elif text == "/start":
-                                    messages.append(self.__ms_maker(chat_id, "You're alredy registred.\nType /help to learn the commands available!"))
+                                    messages.append(self.__ms_maker(chat_id, "You're alredy registered.\nType /help to learn the commands available!"))
                                 else:
                                     messages.append(self.__ms_maker(chat_id, "Unrecognized command"))
                         # "chat_id":chat_id non è prevista dalle API di Telegram per answerCallbackQuery, serve solo alla funzione Telegram.send_messages(coda, condizione)
@@ -348,7 +348,7 @@ class Processinput:
         # u_s[2] -> internal_id
         # u_s[3] -> status
         # u_s[4] -> expire_date
-        # u_s[5] -> category (opzional)
+        # u_s[5] -> category (optional)
 
         tmp_message_size = ' ' * 50
         result = "♻️Remove\n" + tmp_message_size + "\nYou are following: \n"
@@ -482,7 +482,7 @@ class Processinput:
             if subscri[4] <= int(time.time()):
                 # If expire_date <= date.now
                 # significa che lo stato è già scaduto quindi
-                # visualizzaimo semplicemente l'elemento
+                # visualizziamo semplicemente l'elemento
                 if by_enum:
                     result += "{}{} {}\n".format(indents, cls.__replace_all(str(counter), cls.NUMBER_DICT), cls.__truncate(subscri[1]))
                 else:

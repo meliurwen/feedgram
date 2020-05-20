@@ -14,7 +14,7 @@ from feedgram.social.instagram import Instagram
 DATABASE_PATH = "./test/processinputTest.sqlite3"
 
 
-def test_stop_not_registred():
+def test_stop_not_registered():
 
     # Verifico se il file esiste. Nel caso eista lo elimino
     if path.exists(DATABASE_PATH):
@@ -36,7 +36,7 @@ def test_stop_not_registred():
     assert result[0]["text"] == "You're not registered, type /start to subscribe!"
 
 
-def test_start_not_registred():
+def test_start_not_registered():
 
     database = MyDatabase(DATABASE_PATH)
     myprocess_input = Processinput(database, [])
@@ -47,7 +47,7 @@ def test_start_not_registred():
     assert result[0]["text"] == "Congratulations, you're now registered!\nType /help to learn the commands available!"
 
 
-def test_start_registred():
+def test_start_registered():
 
     database = MyDatabase(DATABASE_PATH)
     myprocess_input = Processinput(database, [])
@@ -55,7 +55,7 @@ def test_start_registred():
 
     assert result[0]["type"] == "sendMessage"
     assert cnst.COMMAND_START["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
-    assert result[0]["text"] == "You're alredy registred.\nType /help to learn the commands available!"
+    assert result[0]["text"] == "You're alredy registered.\nType /help to learn the commands available!"
 
 
 def test_wrong_command():
@@ -91,7 +91,7 @@ def test_help_command():
     assert result[0]["text"] == msm_help
 
 
-def test_not_command_registred():
+def test_not_command_registered():
 
     database = MyDatabase(DATABASE_PATH)
     myprocess_input = Processinput(database, [])
@@ -184,7 +184,7 @@ def test_sub_command_url():
             assert result[0] == query["result"][0]
 
 
-def test_list_comand():
+def test_list_command():
 
     # Aggungo ulteriori sottoscrizioni in modo da poter testare le pagine
     global GLOBAL_EXTRCT_DATA_RETURN
@@ -193,9 +193,9 @@ def test_list_comand():
         igram = Instagram()
         myprocess_input = Processinput(database, [igram])
 
-        queries = [cnst.MSG_CMD_SUB_IG_TEST1,
-                   cnst.MSG_CMD_SUB_IG_TEST2,
-                   cnst.MSG_CMD_SUB_IG_TEST3]
+        queries = [cnst.MSG_CMD_SUB_IG_TEST2,
+                   cnst.MSG_CMD_SUB_IG_TEST3,
+                   cnst.MSG_CMD_SUB_IG_TEST4]
 
         for query in queries:
             GLOBAL_EXTRCT_DATA_RETURN = query["response"]
@@ -298,8 +298,8 @@ def test_mute_command_set_mute_hours():
 
 def test_mute_command_set_mute_day():
     '''
-    Test del comando di mute corettamente formattato indicando i giorni
-    Il ritorno sarà un messaggio che informa sul coretto mute del profilo social
+        Test del comando di mute correttamente formattato indicando i giorni
+        Il ritorno sarà un messaggio che informa sul coretto mute del profilo social
     '''
     database = MyDatabase(DATABASE_PATH)
     myprocess_input = Processinput(database, [])
@@ -416,7 +416,22 @@ def test_mute_callback_use_unmute():
     assert cnst.CALLBACK_MUTE_USE_UNMUTE["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
 
 
-def test_stop_registred():
+def test_unsub_command():
+    database = MyDatabase(DATABASE_PATH)
+    igram = Instagram()
+    myprocess_input = Processinput(database, [igram])
+
+    queries = [cnst.MSG_CMD_UNSUB_STANDARD,
+               cnst.MSG_CMD_UNSUB_AGAIN,
+               cnst.MSG_CMD_UNSUB_INVALID_SOCIAL,
+               cnst.MSG_CMD_UNSUB_BAD_FORMAT]
+
+    for query in queries:
+        result = myprocess_input.process(query["query"])
+        assert result[0] == query["result"][0]
+
+
+def test_stop_registered():
 
     database = MyDatabase(DATABASE_PATH)
     myprocess_input = Processinput(database, [])

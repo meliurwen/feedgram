@@ -25,6 +25,17 @@ SUB_BY_POST_LINK2 = {"social": "instagram",
                      "status": "public"
                      }
 
+SUB_BY_POST_LINK22 = {"social": "instagram",
+                      "username": "testsocialuser",
+                      "internal_id": "12345929",
+                      "social_id": None,
+                      "link": None,
+                      "data": {},
+                      "subStatus": "subscribable",
+                      "title": "testsocialuser",
+                      "status": "public"
+                      }
+
 QUERY_TODO_UPDATE = {"update": [{"type": "retreive_time",
                                  "social": "instagram",
                                  "internal_id": "1769583068",
@@ -811,23 +822,23 @@ CALLBACK_LIST_PAGE_3["result"][0]["callback_query"]["message"]["reply_markup"] =
 }
 CALLBACK_LIST_PAGE_3["result"][0]["callback_query"]["data"] = "list_mode 24"
 
-MSG_CMD_SUB_IG_TEST1 = copy.deepcopy(MSG_CMD_SUB_STANDARD)
-MSG_CMD_SUB_IG_TEST1["query"]["result"][0]["message"]["text"] = "/sub instagram testProfile2"
-MSG_CMD_SUB_IG_TEST1["response"]["username"] = "testProfile2"
-MSG_CMD_SUB_IG_TEST1["response"]["internal_id"] = 4345345
-MSG_CMD_SUB_IG_TEST1["response"]["title"] = "testProfile2"
-
 MSG_CMD_SUB_IG_TEST2 = copy.deepcopy(MSG_CMD_SUB_STANDARD)
-MSG_CMD_SUB_IG_TEST2["query"]["result"][0]["message"]["text"] = "/sub instagram testProfile3"
-MSG_CMD_SUB_IG_TEST2["response"]["username"] = "testProfile3"
-MSG_CMD_SUB_IG_TEST2["response"]["internal_id"] = 782782767
-MSG_CMD_SUB_IG_TEST2["response"]["title"] = "testProfile3"
+MSG_CMD_SUB_IG_TEST2["query"]["result"][0]["message"]["text"] = "/sub instagram testProfile2"
+MSG_CMD_SUB_IG_TEST2["response"]["username"] = "testProfile2"
+MSG_CMD_SUB_IG_TEST2["response"]["internal_id"] = 4345345
+MSG_CMD_SUB_IG_TEST2["response"]["title"] = "testProfile2"
 
 MSG_CMD_SUB_IG_TEST3 = copy.deepcopy(MSG_CMD_SUB_STANDARD)
-MSG_CMD_SUB_IG_TEST3["query"]["result"][0]["message"]["text"] = "/sub instagram testProfile4"
-MSG_CMD_SUB_IG_TEST3["response"]["username"] = "testProfile4"
-MSG_CMD_SUB_IG_TEST3["response"]["internal_id"] = 456765579
-MSG_CMD_SUB_IG_TEST3["response"]["title"] = "testProfile4"
+MSG_CMD_SUB_IG_TEST3["query"]["result"][0]["message"]["text"] = "/sub instagram testProfile3"
+MSG_CMD_SUB_IG_TEST3["response"]["username"] = "testProfile3"
+MSG_CMD_SUB_IG_TEST3["response"]["internal_id"] = 782782767
+MSG_CMD_SUB_IG_TEST3["response"]["title"] = "testProfile3"
+
+MSG_CMD_SUB_IG_TEST4 = copy.deepcopy(MSG_CMD_SUB_STANDARD)
+MSG_CMD_SUB_IG_TEST4["query"]["result"][0]["message"]["text"] = "/sub instagram testProfile4"
+MSG_CMD_SUB_IG_TEST4["response"]["username"] = "testProfile4"
+MSG_CMD_SUB_IG_TEST4["response"]["internal_id"] = 456765579
+MSG_CMD_SUB_IG_TEST4["response"]["title"] = "testProfile4"
 
 COMMAND_MUTE = copy.deepcopy(GENERAL_COMMAND)
 COMMAND_MUTE['result'][0]['message']['text'] = "/mute"
@@ -914,3 +925,20 @@ CALLBACK_MUTE_USE_UNMUTE["result"][0]["callback_query"]["message"]["reply_markup
     ]
 }
 CALLBACK_MUTE_USE_UNMUTE["result"][0]["callback_query"]["data"] = "mute 6 0 instagram 456765579"
+
+MSG_CMD_UNSUB_STANDARD = copy.deepcopy(MSG_CMD_SUB_STANDARD)
+MSG_CMD_UNSUB_STANDARD["query"]["result"][0]["message"]["text"] = "/unsub instagram testProfile"
+MSG_CMD_UNSUB_STANDARD["response"]["username"] = {}
+MSG_CMD_UNSUB_STANDARD["result"][0]["text"] = "<b>✅🗑 Unsubscribed successfully!</b>\n\nSocial: <i>instagram</i>\nUser: <i>testProfile</i>!"
+
+MSG_CMD_UNSUB_AGAIN = copy.deepcopy(MSG_CMD_UNSUB_STANDARD)
+MSG_CMD_UNSUB_AGAIN["result"][0]["text"] = "<b>⚠️Warning</b>\nError: <code>userNotSubscribed</code>"
+
+
+MSG_CMD_UNSUB_INVALID_SOCIAL = copy.deepcopy(MSG_CMD_UNSUB_STANDARD)
+MSG_CMD_UNSUB_INVALID_SOCIAL["query"]["result"][0]["message"]["text"] = "/unsub banana potato"
+MSG_CMD_UNSUB_INVALID_SOCIAL["result"][0]["text"] = "<b>⚠️Warning</b>\nError: <code>socialNotAbilitedOrMisstyped</code>"
+
+MSG_CMD_UNSUB_BAD_FORMAT = copy.deepcopy(MSG_CMD_UNSUB_STANDARD)
+MSG_CMD_UNSUB_BAD_FORMAT["query"]["result"][0]["message"]["text"] = "/unsub banana"
+MSG_CMD_UNSUB_BAD_FORMAT["result"][0]["text"] = "<b>⚠️Warning</b>\n<code>/unsub</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/unsub &lt;social&gt; &lt;username&gt;</code>"
