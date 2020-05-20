@@ -861,7 +861,7 @@ COMMAND_MUTE_MISS_SUBSCRIPTION['result'][0]['message']['text'] = "/mute ig testP
 COMMAND_MUTE_MISS_SUBSCRIPTION['result'][0]['message']['entities'] = [{"offset": 0, "length": 28, "type": "bot_command"}]
 
 CALLBACK_MUTE = copy.deepcopy(CALLBACK_HELP)
-CALLBACK_MUTE["result"][0]["callback_query"]["message"]["text"] = '👥Mute List\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① 🔕 testProfile\n  ② testProfilePrivate\n  ③ testProfileStrangeStatus\n  ④ testIgProfileLinkHome\n  ⑤ testProfile2\n  ⑥ testProfile3\n\nPage 1 of 2'
+CALLBACK_MUTE["result"][0]["callback_query"]["message"]["text"] = '👥Mute List\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfile\n  ② testProfilePrivate\n  ③ testProfileStrangeStatus\n  ④ testIgProfileLinkHome\n  ⑤ testProfile2\n  ⑥ 🔕 testProfile3\n\nPage 1 of 2'
 CALLBACK_MUTE["result"][0]["callback_query"]["message"]["reply_markup"] = {
     "inline_keyboard": [
         [{'callback_data': 'mute 0 3 instagram 546545337', 'text': '1'}, {'callback_data': 'mute 0 3 instagram 741852963', 'text': '2'}, {'callback_data': 'mute 0 3 instagram 963852741', 'text': '3'}],

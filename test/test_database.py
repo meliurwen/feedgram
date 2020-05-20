@@ -244,8 +244,9 @@ def test_check_if_subscribed():
 def test_unfollow_social_account():
 
     database = MyDatabase(DATABASE_PATH)
-    assert not database.unfollow_social_account(6551474276, "instagram", 1234)
-    assert database.unfollow_social_account(6551474276, "instagram", 1769583068)
+
+    assert not database.unfollow_social_account(1597534565, "instagram", 1234)
+    assert database.unfollow_social_account(1597534565, "instagram", 12345929)
 
 
 def test_create_dict_of_user_ids_and_socials():
@@ -348,12 +349,15 @@ def test_process_messages_queries2():
 
     database = MyDatabase(DATABASE_PATH)
 
+    social_id, _ = myquery(DATABASE_PATH, "SELECT socials.social_id FROM socials WHERE socials.social = ? AND socials.internal_id = ?", QUERY_TODO_DELETE['delete'][0]['social'], QUERY_TODO_DELETE['delete'][0]['internal_id'])
+
     database.process_messages_queries(QUERY_TODO_DELETE)
-    res, _ = myquery(DATABASE_PATH, "SELECT count() FROM registrations")
+
+    res, _ = myquery(DATABASE_PATH, "SELECT count() FROM registrations WHERE registrations.social_id = ?", social_id[0])
 
     assert res[0] == 0
 
-    res, _ = myquery(DATABASE_PATH, "SELECT count() FROM socials")
+    res, _ = myquery(DATABASE_PATH, "SELECT count() FROM socials WHERE socials.internal_id = ?", QUERY_TODO_DELETE['delete'][0]['internal_id'])
 
     assert res[0] == 0
 
@@ -365,20 +369,26 @@ def test_clean_dead_subscriptions():
     # creo una sottoscrizione ad un profilo social di un utente fittizio
     _ = database.get_first_social_id_from_internal_user_social_and_if_present_subscribe(1234567890, cnst.SUB_BY_POST_LINK2, True)
 
+    # verifico quante registrazioni ci sono
+    res_before, _ = myquery(DATABASE_PATH, "SELECT count() FROM registrations")
+
     # rimuovo la relazione tra l'utente e il profilo social
     myquery(DATABASE_PATH, "DELETE FROM registrations WHERE user_id = ?", 1234567890)
-    # verifico che sia stata rimossa
-    res, _ = myquery(DATABASE_PATH, "SELECT count() FROM registrations")
-    assert res[0] == 0
+
+    # verifico quante registrazioni ci sono ora
+    res_after, _ = myquery(DATABASE_PATH, "SELECT count() FROM registrations")
+
+    # verifico che sia avvenuta realmente la rimozione confrontando i 2 count
+    assert res_after[0] == res_before[0] - 1
 
     # verifico che il profilo social sia ancora presente nel database
-    res, _ = myquery(DATABASE_PATH, "SELECT count() FROM socials")
+    res, _ = myquery(DATABASE_PATH, "SELECT count() FROM socials WHERE socials.internal_id = ?", cnst.SUB_BY_POST_LINK2["internal_id"])
     assert res[0] == 1
 
     database.clean_dead_subscriptions()
 
     # verifico che il profilo social sia stato rimosso dal database perchè nessuno è iscritto
-    res, _ = myquery(DATABASE_PATH, "SELECT count() FROM socials")
+    res, _ = myquery(DATABASE_PATH, "SELECT count() FROM socials WHERE socials.internal_id = ?", cnst.SUB_BY_POST_LINK2["internal_id"])
     assert res[0] == 0
 
 
