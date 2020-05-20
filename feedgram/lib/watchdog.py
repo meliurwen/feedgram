@@ -2,6 +2,7 @@
 import threading
 import queue
 import logging
+import time
 # Libs
 from feedgram.lib.process_input import Processinput
 from feedgram.lib.database import MyDatabase
@@ -93,7 +94,12 @@ class Watchdog(threading.Thread):
                     for data_social in DATAS_SOCIAL:
                         if data_social["social"] in SUBSCRIPTIONS_DICT["subscriptions"]:
                             if data_social["internal_id"] in SUBSCRIPTIONS_DICT["subscriptions"][data_social["social"]]:
-                                for chat_id in SUBSCRIPTIONS_DICT["subscriptions"][data_social["social"]][data_social["internal_id"]]:
+                                for user in SUBSCRIPTIONS_DICT["subscriptions"][data_social["social"]][data_social["internal_id"]]:
+
+                                    if user['expire'] <= time.time():
+                                        # so stato è scaduto
+                                        user['state'] = 0
+
                                     message_title = data_social["title"]
                                     if data_social["type"] == "new_post":
                                         text = "<b>[" + data_social["social"].upper() + "]</b>\nUser: <i>" + message_title + "</i>\nLink: " + data_social["post_url"]
@@ -103,14 +109,19 @@ class Watchdog(threading.Thread):
                                         text = "<b>⚠️ALERT⚠️</b>\n<b>[" + data_social["social"].upper() + "]</b>\nThis account has been <b>deleted</b> and also automatically removed from your <i>Follow List</i>.\nUser: <i>" + message_title + "</i>\nLink: " + data_social["post_url"]
                                     else:
                                         text = "<b>⚠️UNKNOWN MESSAGE⚠️</b>\nPlease report it to the creator of this bot."
+
                                     messages_socials.append({'type': 'sendMessage',
                                                              'text': text,
-                                                             'chat_id': str(chat_id),
+                                                             'chat_id': str(user['id']),
+                                                             'disable_notification': bool(user['state'] == 1),
                                                              'markdown': 'HTML'})
+
                 self.__logger.info("Messaggi da inviare: %s ", len(messages_socials))
                 if len(messages_socials) > 0:
                     CODA_TEMP.put(messages_socials)
                     self.__logger.info("Messaggi messi in coda di spedizione.")
+
+                self.__db.clean_expired_state()
 
         if self.mode == "news_retreiver":
             # global condizione_compiler

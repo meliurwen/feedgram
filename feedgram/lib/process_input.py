@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import logging
 import re
+import time
 
 
 class Processinput:
@@ -31,7 +32,7 @@ class Processinput:
     __ilk_help = {"text": "📖", "callback_data": "help_mode"}
 
     __ilk_pause = {"text": "⏯️", "callback_data": "pause_mode"}
-    __ilk_notoff = {"text": "🔕", "callback_data": "notifications_mode_off"}
+    __ilk_notoff = {"text": "🔕", "callback_data": "mute"}
     __ilk_stop = {"text": "⏹", "callback_data": "stop_mode"}
     __ilk_rem = {"text": "🗑", "callback_data": "remove"}
 
@@ -104,8 +105,20 @@ class Processinput:
                                         else:
                                             msg_subs = "<b>⚠️Warning</b>\nError: <code>{}</code>".format(unsub_status["description"])
                                     else:
-                                        msg_subs = "<b>⚠️Warning</b>\n<code>/sub</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/unsub &lt;social&gt; &lt;username&gt;</code>"
+                                        msg_subs = "<b>⚠️Warning</b>\n<code>/unsub</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/unsub &lt;social&gt; &lt;username&gt;</code>"
                                     messages.append(self.__ms_maker(chat_id, msg_subs, "HTML"))
+                                elif text[:5] == "/mute":
+                                    match = re.match(r"(\S+) (\S+) (\d{1,3}d|\d{1,3}h)", text[6:])
+                                    if match:
+                                        unsub_status = self.__set_sub_state({"social": match.group(1), "username": match.group(2), "internal_id": None}, user_id, 1, match.group(3))
+                                        if unsub_status["ok"]:
+                                            msg_subs = "<b>✅🔕 Muted successfully!</b>\n\nSocial: <i>{}</i>\nUser: <i>{}</i>!".format(match.group(1), match.group(2))
+                                        else:
+                                            msg_subs = "<b>⚠️Warning</b>\nError: <code>{}</code>".format(unsub_status["description"])
+                                    else:
+                                        msg_subs = "<b>⚠️Warning</b>\n<code>/mute</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/mute &lt;social&gt; &lt;username&gt; &lt;XXXd&gt;</code>\n<i>OR:</i>\n<code>/mute &lt;social&gt; &lt;username&gt; &lt;XXXh&gt;</code>"
+                                    messages.append(self.__ms_maker(chat_id, msg_subs, "HTML"))
+
                                 elif text == "/start":
                                     messages.append(self.__ms_maker(chat_id, "You're alredy registred.\nType /help to learn the commands available!"))
                                 else:
@@ -171,6 +184,38 @@ class Processinput:
                                     # Se il numero non è presente siamo nel caso base della remvoe a pagina 0
                                     messages.append(self.__callback_maker(chat_id, callback_query_id, "Be careful, you'll not receive confirmation alert upon removing!", True))
                                     message, button = self.__list_remove_mss(user_id, 0)
+
+                                messages.append(self.__ms_edit(chat_id, message_id, message, "HTML", {"inline_keyboard": button}))
+
+                            # mute
+                            # mute <page> <day>
+                            # mute <page> <day> <socail> <internal_id>
+                            elif bool(re.findall(r"^(mute)( \d+)?( \d+)?( \S+ \S+)?", callback_data)):
+
+                                match = re.findall(r"^(mute)( \d+)?( \d+)? ?(\S+)? ?(\S+)?", callback_data)[0]
+                                if match[1] and match[2]:
+                                    # il numero è presente siamo in una pagina
+                                    if match[3] and match[4]:
+                                        # Se gli elementi 3 e 4 sono presenti siamo nella pausa di un elemento
+
+                                        unsub_status = self.__set_sub_state({"social": match[3], "username": None, "internal_id": match[4]}, user_id, 1, "{}d".format(match[2]))
+
+                                        if unsub_status["ok"]:
+                                            if int(match[2]) != 0:
+                                                messages.append(self.__callback_maker(chat_id, callback_query_id, "Muted", False))
+                                            else:
+                                                messages.append(self.__callback_maker(chat_id, callback_query_id, "Un-Muted", False))
+                                        else:
+                                            alert_msg = "Alert: {}".format(unsub_status["description"])
+                                            messages.append(self.__callback_maker(chat_id, callback_query_id, alert_msg, True))
+
+                                    # In ogni caso genereremo il messaggio data la pagina e il day indicati
+                                    message, button = self.__list_mute_mss(user_id, int(match[1]), int(match[2]))
+
+                                else:
+                                    # Se non  abbiamo ne day ne pagina siamo nel caso base
+                                    messages.append(self.__callback_maker(chat_id, callback_query_id, "Muted list", False))
+                                    message, button = self.__list_mute_mss(user_id, 0, 3)
 
                                 messages.append(self.__ms_edit(chat_id, message_id, message, "HTML", {"inline_keyboard": button}))
 
@@ -252,13 +297,17 @@ class Processinput:
     SUB_X_PAGE = 6
     BUTN_X_ROW = 3
     NUMBER_DICT = {"0": "⓪", "1": "①", "2": "②", "3": "③", "4": "④", "5": "⑤", "6": "⑥", "7": "⑦", "8": "⑧", "9": "⑨"}
-    LINE_LIMIT = 29
+    STATUS_DICT = {"0": "", "1": "🔕", "2": "⏹", "3": "⏯️"}
+    LINE_LIMIT = 24
 
     def __list_mss(self, user_id, index):
         user_subscriptions = self.__db.user_subscriptions(user_id)
         # u_s[0] -> social
         # u_s[1] -> title
         # u_s[2] -> internal_id
+        # u_s[3] -> status
+        # u_s[4] -> expire_date
+        # u_s[5] -> category (opzional)
 
         tmp_message_size = ' ' * 50
         result = "👥Follow List\n" + tmp_message_size + "\nYou are following: \n"
@@ -297,7 +346,9 @@ class Processinput:
         # u_s[0] -> social
         # u_s[1] -> title
         # u_s[2] -> internal_id
-        # u_s[3] -> category (opzional)
+        # u_s[3] -> status
+        # u_s[4] -> expire_date
+        # u_s[5] -> category (opzional)
 
         tmp_message_size = ' ' * 50
         result = "♻️Remove\n" + tmp_message_size + "\nYou are following: \n"
@@ -319,7 +370,7 @@ class Processinput:
         )
 
         # Bottoni per rimuovere elementi
-        temporary_buttons_list = self.make_button_list(user_subscriptions, i, self.SUB_X_PAGE, i, self.BUTN_X_ROW)
+        temporary_buttons_list = self.make_button_list('remove {}'.format(i), user_subscriptions, i, self.SUB_X_PAGE, self.BUTN_X_ROW)
 
         # Funzionamento per non visualizzare il tasto se si è arrivato
         # al limite superiore o inferiore della lista
@@ -335,13 +386,68 @@ class Processinput:
 
         return result, temporary_buttons_list
 
+    def __list_mute_mss(self, user_id, index, day):
+        user_subscriptions = self.__db.user_subscriptions(user_id)
+        # u_s[0] -> social
+        # u_s[1] -> title
+        # u_s[2] -> internal_id
+        # u_s[3] -> status
+        # u_s[4] -> expire_date
+        # u_s[5] -> category (opzional)
+
+        tmp_message_size = ' ' * 50
+        result = "👥Mute List\n" + tmp_message_size + "\nYou are following: \n"
+        i = 0  # indice di partenza degli elementi nella pagina
+        temporary_buttons_list = []
+
+        # verifico se la posizione della pagina è coretta
+        if index > len(user_subscriptions) - 1:
+            i = ((len(user_subscriptions) - 1) // self.SUB_X_PAGE) * 6
+        else:
+            i = index
+
+        result += self.indent_array_table(user_subscriptions, i, self.SUB_X_PAGE, [0], True)
+
+        result += "\nPage {} of {}".format(
+            i // self.SUB_X_PAGE + 1,
+            (len(user_subscriptions) - 1) // self.SUB_X_PAGE + 1
+        )
+
+        # Bottoni numerici per le azzioni
+        temporary_buttons_list = self.make_button_list('mute {} {}'.format(i, day), user_subscriptions, i, self.SUB_X_PAGE, self.BUTN_X_ROW)
+
+        # Funzionamento per non visualizzare il tasto se si è arrivato
+        # al limite superiore o inferiore della lista
+        temp_motion_button = []
+        if i - self.SUB_X_PAGE >= 0:
+            temp_motion_button.append({"text": "«", "callback_data": "mute {} {}".format(i - self.SUB_X_PAGE, day)})
+        if i + self.SUB_X_PAGE < len(user_subscriptions):
+            temp_motion_button.append({"text": "»", "callback_data": "mute {} {}".format(i + self.SUB_X_PAGE, day)})
+        temporary_buttons_list.append(temp_motion_button)
+
+        # prima fila di bottoni per i giorni
+        temp_motion_button = []
+        temp_motion_button.append({"text": "{}1 Day".format("✔ " if day == 1 else ""), "callback_data": "mute {} {}".format(i, 1)})
+        temp_motion_button.append({"text": "{}3 Days".format("✔ " if day == 3 else ""), "callback_data": "mute {} {}".format(i, 3)})
+        temporary_buttons_list.append(temp_motion_button)
+        # seconda fila dei bottoni per i giorni
+        temp_motion_button = []
+        temp_motion_button.append({"text": "{}7 Days".format("✔ " if day == 7 else ""), "callback_data": "mute {} {}".format(i, 7)})
+        temp_motion_button.append({"text": "{}Un-mute".format("✔ " if day == 0 else ""), "callback_data": "mute {} {}".format(i, 0)})
+        temporary_buttons_list.append(temp_motion_button)
+
+        # Bottoni di navigazione
+        temporary_buttons_list.append([self.__ilk_list, self.__ilk_help])
+
+        return result, temporary_buttons_list
+
     @classmethod
-    def make_button_list(cls, array, start, lent, page, row_len):
+    def make_button_list(cls, callbk_data, array, start, lent, row_len):
         i = 1
         result = []
         tmp = []
         for subscri in array[start: start + lent]:
-            tmp.append({"text": str(i), "callback_data": "remove {} {} {}".format(page, subscri[0], subscri[2])})
+            tmp.append({"text": str(i), "callback_data": "{} {} {}".format(callbk_data, subscri[0], subscri[2])})
             # tmp.append({"text": str(i), "callback_data": "remove " + subscri[0] + " " + subscri[2]})
             if len(tmp) == row_len:
                 result.append(tmp)
@@ -354,6 +460,11 @@ class Processinput:
 
     @classmethod
     def indent_array_table(cls, array, start, lent, key_index, by_enum=False):
+        # subscri[0] -> social
+        # subscri[1] -> title
+        # subscri[2] -> internal_id
+        # subscri[3] -> status
+        # subscri[4] -> expire_date
         result = ""
         key_value = [None] * len(key_index)
         counter = 1
@@ -368,12 +479,21 @@ class Processinput:
                     test = True
                 indent += 2
             indents = ' ' * indent
-            if by_enum:
-                # str_number = cls.__replace_all(str(counter), cls.NUMBER_DICT) + ' '
-                # result += indents + str_number + subscri[1] + "\n"
-                result += "{}{} {}\n".format(indents, cls.__replace_all(str(counter), cls.NUMBER_DICT), cls.__truncate(subscri[1]))
+            if subscri[4] <= int(time.time()):
+                # If expire_date <= date.now
+                # significa che lo stato è già scaduto quindi
+                # visualizzaimo semplicemente l'elemento
+                if by_enum:
+                    result += "{}{} {}\n".format(indents, cls.__replace_all(str(counter), cls.NUMBER_DICT), cls.__truncate(subscri[1]))
+                else:
+                    result += "{}• {}\n".format(indents, cls.__truncate(subscri[1]))
             else:
-                result += "{}• {}\n".format(indents, cls.__truncate(subscri[1]))
+                # Lo stato non è ancora scaduto, dobbiamo visualizzare lo stato
+                if by_enum:
+                    result += "{}{} {} {}\n".format(indents, cls.__replace_all(str(counter), cls.NUMBER_DICT), cls.__replace_all(str(subscri[3]), cls.STATUS_DICT), cls.__truncate(subscri[1]))
+                else:
+                    result += "{}• {} {}\n".format(indents, cls.__replace_all(str(subscri[3]), cls.STATUS_DICT), cls.__truncate(subscri[1]))
+
             counter += 1
 
         return result
@@ -483,6 +603,45 @@ class Processinput:
             return "Social: " + str(sub["social"]) + "\nMmmh, this shouldn't happen, no method (or specific method) to extract data."
         else:
             return "Social: " + str(sub["social"]) + "\nI don't know what happened! O_o\""
+
+    def __set_sub_state(self, sub, user_id, state, exp_time):
+        # Spostare fuori questo dizionario
+        social_abilited = {"instagram": "instagram", "ig": "instagram"}
+
+        # Check if there's enough data
+        if not ((sub["social"] and sub["username"]) or (sub["social"] and sub["internal_id"])):
+            return {"ok": False, "description": "notEnoughData"}
+
+        # Check if social is abilited
+        if sub["social"] in social_abilited:
+            sub["social"] = social_abilited[sub["social"]]  # Uniforma tutti gli alias dei social ad un unico nome
+        else:
+            return {"ok": False, "description": "socialNotAbilitedOrMisstyped"}
+
+        # Check if user is subscribed to the issued sn profile
+        # if it is subscribed it returns the internal_id otherwise None
+        if sub["internal_id"] is None:
+            is_subscribed, sub["internal_id"] = self.__db.check_if_subscribed(user_id, sub["social"], username=sub["username"])
+        else:
+            is_subscribed, _ = self.__db.check_if_subscribed(user_id, sub["social"], internal_id=sub["internal_id"])
+
+        if exp_time[-1:] == "d":
+            exp_time = int(exp_time[:-1])
+            exp_time = int(time.time()) + exp_time * 86400
+        elif exp_time[-1:] == "h":
+            exp_time = int(exp_time[:-1])
+            exp_time = int(time.time()) + exp_time * 3600
+        else:
+            return {"ok": False, "description": "errorOnTimeFormat"}  # Caso impossibile da finirci dato il controllo della regexp ma messo per sicurezza
+
+        # If subscribed then unsubscribe, otherwise return error
+        if is_subscribed:
+            if self.__db.set_state_of_social_account(user_id, sub["social"], sub["internal_id"], state, exp_time):
+                return {"ok": True, "description": "changedState"}
+            else:
+                return {"ok": False, "description": "userNotSubscribed"}  # It happens only if between the check and the deleted the subscription is deleted by an nother istance/thread (it basically never happens)
+        else:
+            return {"ok": False, "description": "userNotSubscribed"}
 
     def __check_url_validity(self, sub):
         if sub["link"]:

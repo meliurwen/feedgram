@@ -38,6 +38,8 @@ class Telegram:
                 if "markdown" in message:
                     if (message["markdown"] == "HTML") or (message["markdown"] == "markdown"):
                         url = url + "&parse_mode={}".format(message["markdown"])
+                if "disable_notification" in message:
+                    url = url + "&disable_notification={}".format(message["disable_notification"])
                 if "reply_markup" in message:
                     url = url + "&reply_markup={}".format(quote_plus(json.dumps(message["reply_markup"])))
                 # TODO: Finire di aggiungere le funzionalità della modalità sendMessage
