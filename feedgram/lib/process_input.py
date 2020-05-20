@@ -174,7 +174,7 @@ class Processinput:
                                         if unsub_status["ok"]:
                                             messages.append(self.__callback_maker(chat_id, callback_query_id, "Unfollowed", False))
                                         else:
-                                            alert_msg = "Alert: {}".format(unsub_status["description"])
+                                            alert_msg = "Error: {}".format(unsub_status["description"])
                                             messages.append(self.__callback_maker(chat_id, callback_query_id, alert_msg, True))
 
                                     # In ogni caso genereremo il messaggio nella pagina

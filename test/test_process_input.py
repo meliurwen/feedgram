@@ -106,16 +106,16 @@ def test_callback_help():
 
     database = MyDatabase(DATABASE_PATH)
     myprocess_input = Processinput(database, [])
-    result = myprocess_input.process(cnst.CALLBACK_HELP)
+    result = myprocess_input.process(cnst.CLBK_MODE_HELP["query"])
 
     assert result[0]["type"] == "answerCallbackQuery"
     assert result[0]["text"] == "Help"
 
     assert result[1]["type"] == "editMessageText"
-    assert cnst.CALLBACK_HELP["result"][0]["callback_query"]["message"]["chat"]["id"] == result[1]["chat_id"]
-    assert cnst.CALLBACK_HELP["result"][0]["callback_query"]["message"]["message_id"] == result[1]["message_id"]
-    assert cnst.CALLBACK_HELP["result"][0]["callback_query"]["message"]["text"] == result[1]["text"]
-    assert cnst.CALLBACK_HELP["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
+    assert cnst.CLBK_MODE_HELP["query"]["result"][0]["callback_query"]["message"]["chat"]["id"] == result[1]["chat_id"]
+    assert cnst.CLBK_MODE_HELP["query"]["result"][0]["callback_query"]["message"]["message_id"] == result[1]["message_id"]
+    assert cnst.CLBK_MODE_HELP["query"]["result"][0]["callback_query"]["message"]["text"] == result[1]["text"]
+    assert cnst.CLBK_MODE_HELP["query"]["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
 
 
 GLOBAL_EXTRCT_DATA_RETURN = None
@@ -429,6 +429,21 @@ def test_unsub_command():
     for query in queries:
         result = myprocess_input.process(query["query"])
         assert result[0] == query["result"][0]
+
+
+def test_unsub_callback():
+    database = MyDatabase(DATABASE_PATH)
+    igram = Instagram()
+    myprocess_input = Processinput(database, [igram])
+
+    queries = [cnst.CLBK_UNSUB_MODE,
+               cnst.CLBK_UNSUB_MODE_PAGE,
+               cnst.CLBK_UNSUB_MODE_EXST_WRNG_PAGE,
+               cnst.CLBK_UNSUB_MODE_EXST_wRNG_PAGE_AND_SOCL]
+
+    for query in queries:
+        result = myprocess_input.process(query["query"])
+        assert result == query["result"]
 
 
 def test_stop_registered():
