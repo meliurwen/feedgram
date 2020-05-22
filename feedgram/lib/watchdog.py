@@ -67,7 +67,7 @@ class Watchdog(threading.Thread):
             message_list = []
             # TODO: dare un'occhiata alla logica di questa roba qua sotto, c'è qualquadra che non cosa... :/
             while self.still_run:
-                if CODA_TEMP.empty() and len(delivering_list) == 0:  # Se la coda è vuota aspetto che non diventi più vuota per aggiungere i messaggi in ddelivering_list
+                if CODA_TEMP.empty() and len(delivering_list) == 0:  # Se la coda è vuota aspetto che non diventi più vuota per aggiungere i messaggi in delivering_list
                     message_list = CODA_TEMP.get()
                     delivering_list = delivering_list + message_list
                     # print("Ho appena ricevuto dei messaggini nuovi da spedirez! ^_^")
@@ -96,8 +96,9 @@ class Watchdog(threading.Thread):
                             if data_social["internal_id"] in SUBSCRIPTIONS_DICT["subscriptions"][data_social["social"]]:
                                 for user in SUBSCRIPTIONS_DICT["subscriptions"][data_social["social"]][data_social["internal_id"]]:
 
+                                    # Controllo la data di scadenza della sottoscrizione
+                                    # Se è scaduta resetto allo stato 0 (di default)
                                     if user['expire'] <= time.time():
-                                        # so stato è scaduto
                                         user['state'] = 0
 
                                     message_title = data_social["title"]
@@ -110,11 +111,13 @@ class Watchdog(threading.Thread):
                                     else:
                                         text = "<b>⚠️UNKNOWN MESSAGE⚠️</b>\nPlease report it to the creator of this bot."
 
-                                    messages_socials.append({'type': 'sendMessage',
-                                                             'text': text,
-                                                             'chat_id': str(user['id']),
-                                                             'disable_notification': bool(user['state'] == 1),
-                                                             'markdown': 'HTML'})
+                                    # Se l'utente ha impostato lo stato 2 (muted) alla sottoscrizione, allora non riceve nessun messaggio a riguardo
+                                    if user['state'] != 2:
+                                        messages_socials.append({'type': 'sendMessage',
+                                                                 'text': text,
+                                                                 'chat_id': str(user['id']),
+                                                                 'disable_notification': bool(user['state'] == 1),
+                                                                 'markdown': 'HTML'})
 
                 self.__logger.info("Messaggi da inviare: %s ", len(messages_socials))
                 if len(messages_socials) > 0:
