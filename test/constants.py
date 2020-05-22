@@ -977,12 +977,7 @@ CLBK_UNSUB_MODE["result"] = [
                 ],
                 [],
                 [
-                    {"text": "⏯️", "callback_data": "pause_mode"},
-                    {"text": "🔕", "callback_data": "mute"},
-                    {"text": "⏹", "callback_data": "halt"},
-                    {"text": "📋", "callback_data": "list_mode"}
-                ],
-                [
+                    {"text": "📋", "callback_data": "list_mode"},
                     {"text": "📖", "callback_data": "help_mode"}
                 ]
             ]

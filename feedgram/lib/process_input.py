@@ -382,7 +382,7 @@ class Processinput:
         # Verifica e corezzione del overflow della pagina
         page_idx = self.__page_corrector(len(user_subscriptions), index)
 
-        mss_text = self.__text_mss_maker("♻️Remove", user_subscriptions, page_idx)
+        mss_text = self.__text_mss_maker("♻️Remove", user_subscriptions, page_idx, True)
 
         temporary_buttons_list = []
 
@@ -403,7 +403,7 @@ class Processinput:
         # Verifica e corezzione del overflow della pagina
         page_idx = self.__page_corrector(len(user_subscriptions), index)
 
-        mss_text = self.__text_mss_maker("👥Mute List", user_subscriptions, page_idx)
+        mss_text = self.__text_mss_maker("👥Mute List", user_subscriptions, page_idx, True)
 
         temporary_buttons_list = []
 
@@ -430,7 +430,7 @@ class Processinput:
         # Verifica e corezzione del overflow della pagina
         page_idx = self.__page_corrector(len(user_subscriptions), index)
 
-        mss_text = self.__text_mss_maker("👥Stop List", user_subscriptions, page_idx)
+        mss_text = self.__text_mss_maker("👥Stop List", user_subscriptions, page_idx, True)
 
         temporary_buttons_list = []
 
@@ -516,10 +516,10 @@ class Processinput:
             new_page = page
         return new_page
 
-    def __text_mss_maker(self, title, subscriptions, page_idx):
+    def __text_mss_maker(self, title, subscriptions, page_idx, by_enum=False):
         tmp_message_size = ' ' * 50
         result = "{}\n{}\nYou are following: \n".format(title, tmp_message_size)
-        result += self.indent_array_table(subscriptions, page_idx, self.SUB_X_PAGE, [0])
+        result += self.indent_array_table(subscriptions, page_idx, self.SUB_X_PAGE, [0], by_enum)
         result += "\nPage {} of {}".format(
             page_idx // self.SUB_X_PAGE + 1,
             (len(subscriptions) - 1) // self.SUB_X_PAGE + 1
