@@ -386,12 +386,7 @@ class Processinput:
         )
         # Funzionamento per non visualizzare il tasto se si è arrivato
         # al limite superiore o inferiore della lista
-        temp_motion_button = []
-        if i - self.SUB_X_PAGE >= 0:
-            temp_motion_button.append({"text": "«", "callback_data": "list_mode {}".format(i - self.SUB_X_PAGE)})
-        if i + self.SUB_X_PAGE < len(user_subscriptions):
-            temp_motion_button.append({"text": "»", "callback_data": "list_mode {}".format(i + self.SUB_X_PAGE)})
-        temporary_buttons_list.append(temp_motion_button)
+        temporary_buttons_list.append(self.__make_navigation_button("list_mode", i, len(user_subscriptions)))
 
         temporary_buttons_list.append([self.__ilk_pause, self.__ilk_notoff, self.__ilk_halt, self.__ilk_rem])
         temporary_buttons_list.append([self.__ilk_help])
@@ -427,16 +422,11 @@ class Processinput:
         )
 
         # Bottoni per rimuovere elementi
-        temporary_buttons_list = self.make_button_list('remove {}'.format(i), user_subscriptions, i, self.SUB_X_PAGE, self.BUTN_X_ROW)
+        temporary_buttons_list = self.__make_numeric_button('remove {}'.format(i), user_subscriptions, i, self.SUB_X_PAGE, self.BUTN_X_ROW)
 
         # Funzionamento per non visualizzare il tasto se si è arrivato
         # al limite superiore o inferiore della lista
-        temp_motion_button = []
-        if i - self.SUB_X_PAGE >= 0:
-            temp_motion_button.append({"text": "«", "callback_data": "remove {}".format(i - self.SUB_X_PAGE)})
-        if i + self.SUB_X_PAGE < len(user_subscriptions):
-            temp_motion_button.append({"text": "»", "callback_data": "remove {}".format(i + self.SUB_X_PAGE)})
-        temporary_buttons_list.append(temp_motion_button)
+        temporary_buttons_list.append(self.__make_navigation_button("remove", i, len(user_subscriptions)))
 
         temporary_buttons_list.append([self.__ilk_pause, self.__ilk_notoff, self.__ilk_halt, self.__ilk_list])
         temporary_buttons_list.append([self.__ilk_help])
@@ -471,16 +461,11 @@ class Processinput:
         )
 
         # Bottoni numerici per le azzioni
-        temporary_buttons_list = self.make_button_list('mute {} {}'.format(i, day), user_subscriptions, i, self.SUB_X_PAGE, self.BUTN_X_ROW)
+        temporary_buttons_list = self.__make_numeric_button('mute {} {}'.format(i, day), user_subscriptions, i, self.SUB_X_PAGE, self.BUTN_X_ROW)
 
         # Funzionamento per non visualizzare il tasto se si è arrivato
         # al limite superiore o inferiore della lista
-        temp_motion_button = []
-        if i - self.SUB_X_PAGE >= 0:
-            temp_motion_button.append({"text": "«", "callback_data": "mute {} {}".format(i - self.SUB_X_PAGE, day)})
-        if i + self.SUB_X_PAGE < len(user_subscriptions):
-            temp_motion_button.append({"text": "»", "callback_data": "mute {} {}".format(i + self.SUB_X_PAGE, day)})
-        temporary_buttons_list.append(temp_motion_button)
+        temporary_buttons_list.append(self.__make_navigation_button("mute", i, len(user_subscriptions), day))
 
         # prima fila di bottoni per i giorni
         temp_motion_button = []
@@ -525,16 +510,11 @@ class Processinput:
         )
 
         # Bottoni numerici per le azzioni
-        temporary_buttons_list = self.make_button_list('halt {} {}'.format(i, day), user_subscriptions, i, self.SUB_X_PAGE, self.BUTN_X_ROW)
+        temporary_buttons_list = self.__make_numeric_button('halt {} {}'.format(i, day), user_subscriptions, i, self.SUB_X_PAGE, self.BUTN_X_ROW)
 
         # Funzionamento per non visualizzare il tasto se si è arrivato
         # al limite superiore o inferiore della lista
-        temp_motion_button = []
-        if i - self.SUB_X_PAGE >= 0:
-            temp_motion_button.append({"text": "«", "callback_data": "halt {} {}".format(i - self.SUB_X_PAGE, day)})
-        if i + self.SUB_X_PAGE < len(user_subscriptions):
-            temp_motion_button.append({"text": "»", "callback_data": "halt {} {}".format(i + self.SUB_X_PAGE, day)})
-        temporary_buttons_list.append(temp_motion_button)
+        temporary_buttons_list.append(self.__make_navigation_button("halt", i, len(user_subscriptions), day))
 
         # prima fila di bottoni per i giorni
         temp_motion_button = []
@@ -553,7 +533,7 @@ class Processinput:
         return result, temporary_buttons_list
 
     @classmethod
-    def make_button_list(cls, callbk_data, array, start, lent, row_len):
+    def __make_numeric_button(cls, callbk_data, array, start, lent, row_len):
         i = 1
         result = []
         tmp = []
@@ -568,6 +548,28 @@ class Processinput:
             result.append(tmp)
 
         return result
+
+    def __make_navigation_button(self, command, page, length, dtime=None):
+        # remove <page>
+        # list <page>
+        # mute <page> <time>
+        # halt <page> <time>
+        # pause <page> <time>
+        page_minus = page - self.SUB_X_PAGE
+        page_plus = page + self.SUB_X_PAGE
+        if dtime is None:
+            dtime = ""
+        else:
+            dtime = " {}".format(dtime)
+
+        temp_motion_button = []
+        if page_minus >= 0:
+            temp_motion_button.append({"text": "«", "callback_data": "{} {}{}".format(command, page_minus, dtime)})
+
+        if page_plus < length:
+            temp_motion_button.append({"text": "»", "callback_data": "{} {}{}".format(command, page_plus, dtime)})
+
+        return temp_motion_button
 
     @classmethod
     def indent_array_table(cls, array, start, lent, key_index, by_enum=False):

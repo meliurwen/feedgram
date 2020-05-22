@@ -443,7 +443,7 @@ def test_unsub_callback():
     queries = [cnst.CLBK_UNSUB_MODE,
                cnst.CLBK_UNSUB_MODE_PAGE,
                cnst.CLBK_UNSUB_MODE_EXST_WRNG_PAGE,
-               cnst.CLBK_UNSUB_MODE_EXST_wRNG_PAGE_AND_SOCL]
+               cnst.CLBK_UNSUB_MODE_EXST_WRNG_PAGE_AND_SOCL]
 
     for query in queries:
         result = myprocess_input.process(query["query"])
