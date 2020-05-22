@@ -436,7 +436,7 @@ CLBK_MODE_HELP = {
                             "type": "private"
                         },
                         "date": 1588349911,
-                        "text": "📖 Help\n\nYou can follow up to <i>10 social accounts</i>.\nSocials currently supported:\n • <i>Instagram</i>\nYou can follow only <b>public</b> accounts.\n\n<b>Receive Feeds:</b>\n • /sub <i>social</i> <i>username</i>\n • /sub <i>link</i>\n<b>Bot:</b>\n • /stop to stop and unsubscribe from the bot.",
+                        "text": "📖 Help\n\nYou can follow up to <i>10 social accounts</i>.\nSocials currently supported:\n • <i>Instagram</i>\nYou can follow only <b>public</b> accounts.\n\n<b>Receive Feeds:</b>\n • /sub <i>social</i> <i>username</i>\n • /sub <i>link</i>\n • /unsub <i>social</i> <i>username</i>\n • /mute <i>social</i> <i>username</i> <i>time</i>\n • /halt <i>social</i> <i>username</i> <i>time</i>\n • /pause <i>social</i> <i>username</i> <i>time</i>\n<b>Bot:</b>\n • /stop to stop and unsubscribe from the bot.",
                         "reply_markup": {
                             "inline_keyboard": [
                                 [
@@ -791,7 +791,7 @@ CALLBACK_LIST_PAGE_1["result"][0]["callback_query"]["message"]["reply_markup"] =
         [{'callback_data': 'list_mode 6', 'text': '»'}],
         [{"text": "⏯️", "callback_data": "pause_mode"},
          {"text": "🔕", "callback_data": "mute"},
-         {"text": "⏹", "callback_data": "stop_mode"},
+         {"text": "⏹", "callback_data": "halt"},
          {"text": "🗑", "callback_data": "remove"}],
         [{"text": "📖", "callback_data": "help_mode"}]
     ]
@@ -805,7 +805,7 @@ CALLBACK_LIST_PAGE_2["result"][0]["callback_query"]["message"]["reply_markup"] =
         [{'callback_data': 'list_mode 0', 'text': '«'}],
         [{"text": "⏯️", "callback_data": "pause_mode"},
          {"text": "🔕", "callback_data": "mute"},
-         {"text": "⏹", "callback_data": "stop_mode"},
+         {"text": "⏹", "callback_data": "halt"},
          {"text": "🗑", "callback_data": "remove"}],
         [{"text": "📖", "callback_data": "help_mode"}]
     ]
@@ -819,7 +819,7 @@ CALLBACK_LIST_PAGE_3["result"][0]["callback_query"]["message"]["reply_markup"] =
         [{'callback_data': 'list_mode 0', 'text': '«'}],
         [{"text": "⏯️", "callback_data": "pause_mode"},
          {"text": "🔕", "callback_data": "mute"},
-         {"text": "⏹", "callback_data": "stop_mode"},
+         {"text": "⏹", "callback_data": "halt"},
          {"text": "🗑", "callback_data": "remove"}],
         [{"text": "📖", "callback_data": "help_mode"}]
     ]
@@ -872,7 +872,7 @@ CALLBACK_MUTE["result"][0]["callback_query"]["message"]["reply_markup"] = {
         [{'callback_data': 'mute 0 3 instagram 897546782', 'text': '4'}, {'callback_data': 'mute 0 3 instagram 4345345', 'text': '5'}, {'callback_data': 'mute 0 3 instagram 782782767', 'text': '6'}],
         [{'callback_data': 'mute 6 3', 'text': '»'}],
         [{'callback_data': 'mute 0 1', 'text': '1 Day'}, {'callback_data': 'mute 0 3', 'text': '✔ 3 Days'}],
-        [{'callback_data': 'mute 0 7', 'text': '7 Days'}, {'callback_data': 'mute 0 0', 'text': 'Un-mute'}],
+        [{'callback_data': 'mute 0 7', 'text': '7 Days'}, {'callback_data': 'mute 0 0', 'text': 'Reset state'}],
         [{'callback_data': 'list_mode', 'text': '📋'}, {'callback_data': 'help_mode', 'text': '📖'}]
     ]
 }
@@ -885,7 +885,7 @@ CALLBACK_MUTE_PAGE2["result"][0]["callback_query"]["message"]["reply_markup"] = 
         [{'callback_data': 'mute 6 3 instagram 456765579', 'text': '1'}],
         [{'callback_data': 'mute 0 3', 'text': '«'}],
         [{'callback_data': 'mute 6 1', 'text': '1 Day'}, {'callback_data': 'mute 6 3', 'text': '✔ 3 Days'}],
-        [{'callback_data': 'mute 6 7', 'text': '7 Days'}, {'callback_data': 'mute 6 0', 'text': 'Un-mute'}],
+        [{'callback_data': 'mute 6 7', 'text': '7 Days'}, {'callback_data': 'mute 6 0', 'text': 'Reset state'}],
         [{'callback_data': 'list_mode', 'text': '📋'}, {'callback_data': 'help_mode', 'text': '📖'}]
     ]
 }
@@ -898,7 +898,7 @@ CALLBACK_MUTE_PAGE2_DATE["result"][0]["callback_query"]["message"]["reply_markup
         [{'callback_data': 'mute 6 7 instagram 456765579', 'text': '1'}],
         [{'callback_data': 'mute 0 7', 'text': '«'}],
         [{'callback_data': 'mute 6 1', 'text': '1 Day'}, {'callback_data': 'mute 6 3', 'text': '3 Days'}],
-        [{'callback_data': 'mute 6 7', 'text': '✔ 7 Days'}, {'callback_data': 'mute 6 0', 'text': 'Un-mute'}],
+        [{'callback_data': 'mute 6 7', 'text': '✔ 7 Days'}, {'callback_data': 'mute 6 0', 'text': 'Reset state'}],
         [{'callback_data': 'list_mode', 'text': '📋'}, {'callback_data': 'help_mode', 'text': '📖'}]
     ]
 }
@@ -911,7 +911,7 @@ CALLBACK_MUTE_USE["result"][0]["callback_query"]["message"]["reply_markup"] = {
         [{'callback_data': 'mute 6 3 instagram 456765579', 'text': '1'}],
         [{'callback_data': 'mute 0 3', 'text': '«'}],
         [{'callback_data': 'mute 6 1', 'text': '1 Day'}, {'callback_data': 'mute 6 3', 'text': '✔ 3 Days'}],
-        [{'callback_data': 'mute 6 7', 'text': '7 Days'}, {'callback_data': 'mute 6 0', 'text': 'Un-mute'}],
+        [{'callback_data': 'mute 6 7', 'text': '7 Days'}, {'callback_data': 'mute 6 0', 'text': 'Reset state'}],
         [{'callback_data': 'list_mode', 'text': '📋'}, {'callback_data': 'help_mode', 'text': '📖'}]
     ]
 }
@@ -924,7 +924,7 @@ CALLBACK_MUTE_USE_UNMUTE["result"][0]["callback_query"]["message"]["reply_markup
         [{'callback_data': 'mute 6 0 instagram 456765579', 'text': '1'}],
         [{'callback_data': 'mute 0 0', 'text': '«'}],
         [{'callback_data': 'mute 6 1', 'text': '1 Day'}, {'callback_data': 'mute 6 3', 'text': '3 Days'}],
-        [{'callback_data': 'mute 6 7', 'text': '7 Days'}, {'callback_data': 'mute 6 0', 'text': '✔ Un-mute'}],
+        [{'callback_data': 'mute 6 7', 'text': '7 Days'}, {'callback_data': 'mute 6 0', 'text': '✔ Reset state'}],
         [{'callback_data': 'list_mode', 'text': '📋'}, {'callback_data': 'help_mode', 'text': '📖'}]
     ]
 }
@@ -979,7 +979,7 @@ CLBK_UNSUB_MODE["result"] = [
                 [
                     {"text": "⏯️", "callback_data": "pause_mode"},
                     {"text": "🔕", "callback_data": "mute"},
-                    {"text": "⏹", "callback_data": "stop_mode"},
+                    {"text": "⏹", "callback_data": "halt"},
                     {"text": "📋", "callback_data": "list_mode"}
                 ],
                 [
