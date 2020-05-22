@@ -357,99 +357,68 @@ class Processinput:
     STATUS_DICT = {"0": "", "1": "🔕", "2": "⏹", "3": "⏯️"}
     LINE_LIMIT = 24
 
+    def __textmessage(self, index, user_subscriptions, txt_prepend="", by_enum=False):
+        user_subscriptions_len = len(user_subscriptions)
+
+        # Verifico che l'indice di pagina non superi la lunghezza massima stabilita,
+        # se tale valore viene superato, allora verrà impostato il più alto indice di pagina
+        if index > user_subscriptions_len - 1:
+            page_idx = ((user_subscriptions_len - 1) // self.SUB_X_PAGE) * self.SUB_X_PAGE
+        else:
+            page_idx = index
+
+        txt_prepend += self.__indent_array_table(user_subscriptions, page_idx, self.SUB_X_PAGE, [0], by_enum)
+        txt_prepend += "\nPage {} of {}".format(
+            page_idx // self.SUB_X_PAGE + 1,
+            (user_subscriptions_len - 1) // self.SUB_X_PAGE + 1
+        )
+        return txt_prepend, page_idx
+
     def __list_mss(self, user_id, index):
         user_subscriptions = self.__db.user_subscriptions(user_id)
+        txt_prepend, page_idx = self.__textmessage(index, user_subscriptions, "👥Follow List\n" + ' ' * 50 + "\nYou are following: \n")
 
-        # Verifica e corezzione del overflow della pagina
-        page_idx = self.__page_corrector(len(user_subscriptions), index)
+        buttons_list = []
+        buttons_list.append(self.__make_navigation_button("list_mode", page_idx, len(user_subscriptions)))
+        buttons_list.append([self.__ilk_pause, self.__ilk_notoff, self.__ilk_halt, self.__ilk_rem])
+        buttons_list.append([self.__ilk_help])
 
-        mss_text = self.__text_mss_maker("👥Follow List", user_subscriptions, page_idx)
-
-        temporary_buttons_list = []
-
-        # Funzionamento per non visualizzare il tasto se si è arrivato
-        # al limite superiore o inferiore della lista
-        temporary_buttons_list.append(self.__make_navigation_button("list_mode", page_idx, len(user_subscriptions)))
-
-        temporary_buttons_list.append([self.__ilk_pause, self.__ilk_notoff, self.__ilk_halt, self.__ilk_rem])
-        temporary_buttons_list.append([self.__ilk_help])
-
-        return mss_text, temporary_buttons_list
+        return txt_prepend, buttons_list
 
     def __list_remove_mss(self, user_id, index):
         user_subscriptions = self.__db.user_subscriptions(user_id)
+        txt_prepend, page_idx = self.__textmessage(index, user_subscriptions, "♻️Remove\n" + ' ' * 50 + "\nYou are following: \n", True)
 
-        # Verifica e corezzione del overflow della pagina
-        page_idx = self.__page_corrector(len(user_subscriptions), index)
+        buttons_list = []
+        buttons_list = self.__make_numeric_button('remove {}'.format(page_idx), user_subscriptions, page_idx, self.SUB_X_PAGE, self.BUTN_X_ROW)
+        buttons_list.append(self.__make_navigation_button("remove", page_idx, len(user_subscriptions)))
+        buttons_list.append([self.__ilk_list, self.__ilk_help])
 
-        mss_text = self.__text_mss_maker("♻️Remove", user_subscriptions, page_idx, True)
+        return txt_prepend, buttons_list
 
-        temporary_buttons_list = []
-
-        # Bottoni per rimuovere elementi
-        temporary_buttons_list = self.__make_numeric_button('remove {}'.format(page_idx), user_subscriptions, page_idx, self.SUB_X_PAGE, self.BUTN_X_ROW)
-
-        # Funzionamento per non visualizzare il tasto se si è arrivato
-        # al limite superiore o inferiore della lista
-        temporary_buttons_list.append(self.__make_navigation_button("remove", page_idx, len(user_subscriptions)))
-
-        temporary_buttons_list.append([self.__ilk_list, self.__ilk_help])
-
-        return mss_text, temporary_buttons_list
-
-    def __list_mute_mss(self, user_id, index, day):
+    def __list_mute_mss(self, user_id, index, dtime):
         user_subscriptions = self.__db.user_subscriptions(user_id)
+        txt_prepend, page_idx = self.__textmessage(index, user_subscriptions, "👥Mute List\n" + ' ' * 50 + "\nYou are following: \n", True)
 
-        # Verifica e corezzione del overflow della pagina
-        page_idx = self.__page_corrector(len(user_subscriptions), index)
+        buttons_list = []
+        buttons_list = self.__make_numeric_button('mute {} {}'.format(page_idx, dtime), user_subscriptions, page_idx, self.SUB_X_PAGE, self.BUTN_X_ROW)
+        buttons_list.append(self.__make_navigation_button("mute", page_idx, len(user_subscriptions), dtime))
+        buttons_list = buttons_list + self.__make_time_button("mute", dtime, page_idx)
+        buttons_list.append([self.__ilk_list, self.__ilk_help])
 
-        mss_text = self.__text_mss_maker("👥Mute List", user_subscriptions, page_idx, True)
+        return txt_prepend, buttons_list
 
-        temporary_buttons_list = []
-
-        # Bottoni numerici per le azzioni
-        temporary_buttons_list = self.__make_numeric_button('mute {} {}'.format(page_idx, day), user_subscriptions, page_idx, self.SUB_X_PAGE, self.BUTN_X_ROW)
-
-        # Funzionamento per non visualizzare il tasto se si è arrivato
-        # al limite superiore o inferiore della lista
-        temporary_buttons_list.append(self.__make_navigation_button("mute", page_idx, len(user_subscriptions), day))
-
-        # Creazione bottoni dei giorni
-        temp = self.__make_time_button("mute", day, page_idx)
-        for row in temp:
-            temporary_buttons_list.append(row)
-
-        # Bottoni di navigazione
-        temporary_buttons_list.append([self.__ilk_list, self.__ilk_help])
-
-        return mss_text, temporary_buttons_list
-
-    def __list_halt_mss(self, user_id, index, day):
+    def __list_halt_mss(self, user_id, index, dtime):
         user_subscriptions = self.__db.user_subscriptions(user_id)
+        txt_prepend, page_idx = self.__textmessage(index, user_subscriptions, "👥Stop List\n" + ' ' * 50 + "\nYou are following: \n", True)
 
-        # Verifica e corezzione del overflow della pagina
-        page_idx = self.__page_corrector(len(user_subscriptions), index)
+        buttons_list = []
+        buttons_list = self.__make_numeric_button('halt {} {}'.format(page_idx, dtime), user_subscriptions, page_idx, self.SUB_X_PAGE, self.BUTN_X_ROW)
+        buttons_list.append(self.__make_navigation_button("halt", page_idx, len(user_subscriptions), dtime))
+        buttons_list = buttons_list + self.__make_time_button("halt", dtime, page_idx)
+        buttons_list.append([self.__ilk_list, self.__ilk_help])
 
-        mss_text = self.__text_mss_maker("👥Stop List", user_subscriptions, page_idx, True)
-
-        temporary_buttons_list = []
-
-        # Bottoni numerici per le azzioni
-        temporary_buttons_list = self.__make_numeric_button('halt {} {}'.format(page_idx, day), user_subscriptions, page_idx, self.SUB_X_PAGE, self.BUTN_X_ROW)
-
-        # Funzionamento per non visualizzare il tasto se si è arrivato
-        # al limite superiore o inferiore della lista
-        temporary_buttons_list.append(self.__make_navigation_button("halt", page_idx, len(user_subscriptions), day))
-
-        # Creazione bottoni dei giorni
-        temp = self.__make_time_button("halt", day, page_idx)
-        for row in temp:
-            temporary_buttons_list.append(row)
-
-        # Bottoni di navigazione
-        temporary_buttons_list.append([self.__ilk_list, self.__ilk_help])
-
-        return mss_text, temporary_buttons_list
+        return txt_prepend, buttons_list
 
     @classmethod
     def __make_numeric_button(cls, callbk_data, array, start, lent, row_len):
@@ -507,27 +476,8 @@ class Processinput:
 
         return temp_button
 
-    def __page_corrector(self, length, page):
-        # Verifico che il index di pagina non superi la lunghezza massima stabilita
-        # se tale valore supera verrà impostato il più alto indice di pagina
-        if page > length - 1:
-            new_page = ((length - 1) // self.SUB_X_PAGE) * self.SUB_X_PAGE
-        else:
-            new_page = page
-        return new_page
-
-    def __text_mss_maker(self, title, subscriptions, page_idx, by_enum=False):
-        tmp_message_size = ' ' * 50
-        result = "{}\n{}\nYou are following: \n".format(title, tmp_message_size)
-        result += self.indent_array_table(subscriptions, page_idx, self.SUB_X_PAGE, [0], by_enum)
-        result += "\nPage {} of {}".format(
-            page_idx // self.SUB_X_PAGE + 1,
-            (len(subscriptions) - 1) // self.SUB_X_PAGE + 1
-        )
-        return result
-
     @classmethod
-    def indent_array_table(cls, array, start, lent, key_index, by_enum=False):
+    def __indent_array_table(cls, array, start, lent, key_index, by_enum=False):
         # subscri[0] -> social
         # subscri[1] -> title
         # subscri[2] -> internal_id
