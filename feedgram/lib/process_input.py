@@ -467,16 +467,10 @@ class Processinput:
         # al limite superiore o inferiore della lista
         temporary_buttons_list.append(self.__make_navigation_button("mute", i, len(user_subscriptions), day))
 
-        # prima fila di bottoni per i giorni
-        temp_motion_button = []
-        temp_motion_button.append({"text": "{}1 Day".format("✔ " if day == 1 else ""), "callback_data": "mute {} {}".format(i, 1)})
-        temp_motion_button.append({"text": "{}3 Days".format("✔ " if day == 3 else ""), "callback_data": "mute {} {}".format(i, 3)})
-        temporary_buttons_list.append(temp_motion_button)
-        # seconda fila dei bottoni per i giorni
-        temp_motion_button = []
-        temp_motion_button.append({"text": "{}7 Days".format("✔ " if day == 7 else ""), "callback_data": "mute {} {}".format(i, 7)})
-        temp_motion_button.append({"text": "{}Reset state".format("✔ " if day == 0 else ""), "callback_data": "mute {} {}".format(i, 0)})
-        temporary_buttons_list.append(temp_motion_button)
+        # Creazione bottoni dei giorni
+        temp = self.__make_time_button("mute", day, i)
+        for row in temp:
+            temporary_buttons_list.append(row)
 
         # Bottoni di navigazione
         temporary_buttons_list.append([self.__ilk_list, self.__ilk_help])
@@ -516,16 +510,10 @@ class Processinput:
         # al limite superiore o inferiore della lista
         temporary_buttons_list.append(self.__make_navigation_button("halt", i, len(user_subscriptions), day))
 
-        # prima fila di bottoni per i giorni
-        temp_motion_button = []
-        temp_motion_button.append({"text": "{}1 Day".format("✔ " if day == 1 else ""), "callback_data": "halt {} {}".format(i, 1)})
-        temp_motion_button.append({"text": "{}3 Days".format("✔ " if day == 3 else ""), "callback_data": "halt {} {}".format(i, 3)})
-        temporary_buttons_list.append(temp_motion_button)
-        # seconda fila dei bottoni per i giorni
-        temp_motion_button = []
-        temp_motion_button.append({"text": "{}7 Days".format("✔ " if day == 7 else ""), "callback_data": "halt {} {}".format(i, 7)})
-        temp_motion_button.append({"text": "{}Reset state".format("✔ " if day == 0 else ""), "callback_data": "halt {} {}".format(i, 0)})
-        temporary_buttons_list.append(temp_motion_button)
+        # Creazione bottoni dei giorni
+        temp = self.__make_time_button("halt", day, i)
+        for row in temp:
+            temporary_buttons_list.append(row)
 
         # Bottoni di navigazione
         temporary_buttons_list.append([self.__ilk_list, self.__ilk_help])
@@ -570,6 +558,23 @@ class Processinput:
             temp_motion_button.append({"text": "»", "callback_data": "{} {}{}".format(command, page_plus, dtime)})
 
         return temp_motion_button
+
+    @classmethod
+    def __make_time_button(cls, command, day, page):
+        temp_button = []
+        # prima fila di bottoni per i giorni
+        temp_row_button = []
+        temp_row_button.append({"text": "{}1 Day".format("✔ " if day == 1 else ""), "callback_data": "{} {} {}".format(command, page, 1)})
+        temp_row_button.append({"text": "{}3 Days".format("✔ " if day == 3 else ""), "callback_data": "{} {} {}".format(command, page, 3)})
+        temp_button.append(temp_row_button)
+
+        # seconda fila dei bottoni per i giorni
+        temp_row_button = []
+        temp_row_button.append({"text": "{}7 Days".format("✔ " if day == 7 else ""), "callback_data": "{} {} {}".format(command, page, 7)})
+        temp_row_button.append({"text": "{}Reset state".format("✔ " if day == 0 else ""), "callback_data": "{} {} {}".format(command, page, 0)})
+        temp_button.append(temp_row_button)
+
+        return temp_button
 
     @classmethod
     def indent_array_table(cls, array, start, lent, key_index, by_enum=False):
