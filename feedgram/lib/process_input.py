@@ -368,25 +368,20 @@ class Processinput:
 
         tmp_message_size = ' ' * 50
         result = "👥Follow List\n" + tmp_message_size + "\nYou are following: \n"
-        i = 0  # indice di partenza degli elementi nella pagina
         temporary_buttons_list = []
 
-        # verifico che il nuovo index non superi la lunghezza massima della lista
-        # se il nuovo indice supera viene resettato
-        if index > len(user_subscriptions) - 1:
-            i = ((len(user_subscriptions) - 1) // self.SUB_X_PAGE) * 6
-        else:
-            i = index
+        # Verifica e corezzione del overflow della pagina
+        page_idx = self.__page_corector(len(user_subscriptions), index)
 
-        result += self.indent_array_table(user_subscriptions, i, self.SUB_X_PAGE, [0])
+        result += self.indent_array_table(user_subscriptions, page_idx, self.SUB_X_PAGE, [0])
 
         result += "\nPage {} of {}".format(
-            i // self.SUB_X_PAGE + 1,
+            page_idx // self.SUB_X_PAGE + 1,
             (len(user_subscriptions) - 1) // self.SUB_X_PAGE + 1
         )
         # Funzionamento per non visualizzare il tasto se si è arrivato
         # al limite superiore o inferiore della lista
-        temporary_buttons_list.append(self.__make_navigation_button("list_mode", i, len(user_subscriptions)))
+        temporary_buttons_list.append(self.__make_navigation_button("list_mode", page_idx, len(user_subscriptions)))
 
         temporary_buttons_list.append([self.__ilk_pause, self.__ilk_notoff, self.__ilk_halt, self.__ilk_rem])
         temporary_buttons_list.append([self.__ilk_help])
@@ -404,29 +399,24 @@ class Processinput:
 
         tmp_message_size = ' ' * 50
         result = "♻️Remove\n" + tmp_message_size + "\nYou are following: \n"
-        i = 0  # indice di partenza degli elementi nella pagina
         temporary_buttons_list = []
 
-        # verifico che il nuovo index non superi la lunghezza massima della lista
-        # se il nuovo indice supera viene resettato
-        if index > len(user_subscriptions) - 1:
-            i = ((len(user_subscriptions) - 1) // self.SUB_X_PAGE) * 6
-        else:
-            i = index
+        # Verifica e corezzione del overflow della pagina
+        page_idx = self.__page_corector(len(user_subscriptions), index)
 
-        result += self.indent_array_table(user_subscriptions, i, self.SUB_X_PAGE, [0], True)
+        result += self.indent_array_table(user_subscriptions, page_idx, self.SUB_X_PAGE, [0], True)
 
         result += "\nPage {} of {}".format(
-            i // self.SUB_X_PAGE + 1,
+            page_idx // self.SUB_X_PAGE + 1,
             (len(user_subscriptions) - 1) // self.SUB_X_PAGE + 1
         )
 
         # Bottoni per rimuovere elementi
-        temporary_buttons_list = self.__make_numeric_button('remove {}'.format(i), user_subscriptions, i, self.SUB_X_PAGE, self.BUTN_X_ROW)
+        temporary_buttons_list = self.__make_numeric_button('remove {}'.format(page_idx), user_subscriptions, page_idx, self.SUB_X_PAGE, self.BUTN_X_ROW)
 
         # Funzionamento per non visualizzare il tasto se si è arrivato
         # al limite superiore o inferiore della lista
-        temporary_buttons_list.append(self.__make_navigation_button("remove", i, len(user_subscriptions)))
+        temporary_buttons_list.append(self.__make_navigation_button("remove", page_idx, len(user_subscriptions)))
 
         temporary_buttons_list.append([self.__ilk_pause, self.__ilk_notoff, self.__ilk_halt, self.__ilk_list])
         temporary_buttons_list.append([self.__ilk_help])
@@ -444,31 +434,27 @@ class Processinput:
 
         tmp_message_size = ' ' * 50
         result = "👥Mute List\n" + tmp_message_size + "\nYou are following: \n"
-        i = 0  # indice di partenza degli elementi nella pagina
         temporary_buttons_list = []
 
-        # verifico se la posizione della pagina è coretta
-        if index > len(user_subscriptions) - 1:
-            i = ((len(user_subscriptions) - 1) // self.SUB_X_PAGE) * 6
-        else:
-            i = index
+        # Verifica e corezzione del overflow della pagina
+        page_idx = self.__page_corector(len(user_subscriptions), index)
 
-        result += self.indent_array_table(user_subscriptions, i, self.SUB_X_PAGE, [0], True)
+        result += self.indent_array_table(user_subscriptions, page_idx, self.SUB_X_PAGE, [0], True)
 
         result += "\nPage {} of {}".format(
-            i // self.SUB_X_PAGE + 1,
+            page_idx // self.SUB_X_PAGE + 1,
             (len(user_subscriptions) - 1) // self.SUB_X_PAGE + 1
         )
 
         # Bottoni numerici per le azzioni
-        temporary_buttons_list = self.__make_numeric_button('mute {} {}'.format(i, day), user_subscriptions, i, self.SUB_X_PAGE, self.BUTN_X_ROW)
+        temporary_buttons_list = self.__make_numeric_button('mute {} {}'.format(page_idx, day), user_subscriptions, page_idx, self.SUB_X_PAGE, self.BUTN_X_ROW)
 
         # Funzionamento per non visualizzare il tasto se si è arrivato
         # al limite superiore o inferiore della lista
-        temporary_buttons_list.append(self.__make_navigation_button("mute", i, len(user_subscriptions), day))
+        temporary_buttons_list.append(self.__make_navigation_button("mute", page_idx, len(user_subscriptions), day))
 
         # Creazione bottoni dei giorni
-        temp = self.__make_time_button("mute", day, i)
+        temp = self.__make_time_button("mute", day, page_idx)
         for row in temp:
             temporary_buttons_list.append(row)
 
@@ -487,31 +473,27 @@ class Processinput:
 
         tmp_message_size = ' ' * 50
         result = "👥Stop List\n" + tmp_message_size + "\nYou are following: \n"
-        i = 0  # indice di partenza degli elementi nella pagina
         temporary_buttons_list = []
 
-        # verifico se la posizione della pagina è coretta
-        if index > len(user_subscriptions) - 1:
-            i = ((len(user_subscriptions) - 1) // self.SUB_X_PAGE) * 6
-        else:
-            i = index
+        # Verifica e corezzione del overflow della pagina
+        page_idx = self.__page_corector(len(user_subscriptions), index)
 
-        result += self.indent_array_table(user_subscriptions, i, self.SUB_X_PAGE, [0], True)
+        result += self.indent_array_table(user_subscriptions, page_idx, self.SUB_X_PAGE, [0], True)
 
         result += "\nPage {} of {}".format(
-            i // self.SUB_X_PAGE + 1,
+            page_idx // self.SUB_X_PAGE + 1,
             (len(user_subscriptions) - 1) // self.SUB_X_PAGE + 1
         )
 
         # Bottoni numerici per le azzioni
-        temporary_buttons_list = self.__make_numeric_button('halt {} {}'.format(i, day), user_subscriptions, i, self.SUB_X_PAGE, self.BUTN_X_ROW)
+        temporary_buttons_list = self.__make_numeric_button('halt {} {}'.format(page_idx, day), user_subscriptions, page_idx, self.SUB_X_PAGE, self.BUTN_X_ROW)
 
         # Funzionamento per non visualizzare il tasto se si è arrivato
         # al limite superiore o inferiore della lista
-        temporary_buttons_list.append(self.__make_navigation_button("halt", i, len(user_subscriptions), day))
+        temporary_buttons_list.append(self.__make_navigation_button("halt", page_idx, len(user_subscriptions), day))
 
         # Creazione bottoni dei giorni
-        temp = self.__make_time_button("halt", day, i)
+        temp = self.__make_time_button("halt", day, page_idx)
         for row in temp:
             temporary_buttons_list.append(row)
 
@@ -575,6 +557,15 @@ class Processinput:
         temp_button.append(temp_row_button)
 
         return temp_button
+
+    def __page_corector(self, length, page):
+        # Verifico che il index di pagina non superi la lunghezza massima stabilita
+        # se tale valore supera verrà impostato il più alto indice di pagina
+        if page > length - 1:
+            new_page = ((length - 1) // self.SUB_X_PAGE) * self.SUB_X_PAGE
+        else:
+            new_page = page
+        return new_page
 
     @classmethod
     def indent_array_table(cls, array, start, lent, key_index, by_enum=False):
