@@ -25,6 +25,10 @@ class Processinput:
                   "<b>Receive Feeds:</b>\n"
                   " • /sub <i>social</i> <i>username</i>\n"
                   " • /sub <i>link</i>\n"
+                  " • /unsub <i>social</i> <i>username</i>\n"
+                  " • /mute <i>social</i> <i>username</i> <i>time</i>\n"
+                  " • /halt <i>social</i> <i>username</i> <i>time</i>\n"
+                  " • /pause <i>social</i> <i>username</i> <i>time</i>\n"
                   "<b>Bot:</b>\n"
                   " • /stop to stop and unsubscribe from the bot.")
 
@@ -33,7 +37,7 @@ class Processinput:
 
     __ilk_pause = {"text": "⏯️", "callback_data": "pause_mode"}
     __ilk_notoff = {"text": "🔕", "callback_data": "mute"}
-    __ilk_stop = {"text": "⏹", "callback_data": "stop_mode"}
+    __ilk_halt = {"text": "⏹", "callback_data": "halt"}
     __ilk_rem = {"text": "🗑", "callback_data": "remove"}
 
     __ilk_list = {"text": "📋", "callback_data": "list_mode"}
@@ -119,6 +123,18 @@ class Processinput:
                                         msg_subs = "<b>⚠️Warning</b>\n<code>/mute</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/mute &lt;social&gt; &lt;username&gt; &lt;XXXd&gt;</code>\n<i>OR:</i>\n<code>/mute &lt;social&gt; &lt;username&gt; &lt;XXXh&gt;</code>"
                                     messages.append(self.__ms_maker(chat_id, msg_subs, "HTML"))
 
+                                elif text[:5] == "/halt":
+                                    match = re.match(r"(\S+) (\S+) (\d{1,3}d|\d{1,3}h)", text[6:])
+                                    if match:
+                                        unsub_status = self.__set_sub_state({"social": match.group(1), "username": match.group(2), "internal_id": None}, user_id, 2, match.group(3))
+                                        if unsub_status["ok"]:
+                                            msg_subs = "<b>✅⏹ Stopped successfully!</b>\n\nSocial: <i>{}</i>\nUser: <i>{}</i>!".format(match.group(1), match.group(2))
+                                        else:
+                                            msg_subs = "<b>⚠️Warning</b>\nError: <code>{}</code>".format(unsub_status["description"])
+                                    else:
+                                        msg_subs = "<b>⚠️Warning</b>\n<code>/halt</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/halt &lt;social&gt; &lt;username&gt; &lt;XXXd&gt;</code>\n<i>OR:</i>\n<code>/halt &lt;social&gt; &lt;username&gt; &lt;XXXh&gt;</code>"
+                                    messages.append(self.__ms_maker(chat_id, msg_subs, "HTML"))
+
                                 elif text == "/start":
                                     messages.append(self.__ms_maker(chat_id, "You're alredy registered.\nType /help to learn the commands available!"))
                                 else:
@@ -191,6 +207,11 @@ class Processinput:
                             # mute <page> <day>
                             # mute <page> <day> <socail> <internal_id>
                             elif bool(re.findall(r"^(mute)( \d+)?( \d+)?( \S+ \S+)?", callback_data)):
+                                # 0: mute
+                                # 1: <page>
+                                # 2: <day>
+                                # 3: <social>
+                                # 4: <internal_id>
 
                                 match = re.findall(r"^(mute)( \d+)?( \d+)? ?(\S+)? ?(\S+)?", callback_data)[0]
                                 if match[1] and match[2]:
@@ -216,6 +237,42 @@ class Processinput:
                                     # Se non  abbiamo ne day ne pagina siamo nel caso base
                                     messages.append(self.__callback_maker(chat_id, callback_query_id, "Muted list", False))
                                     message, button = self.__list_mute_mss(user_id, 0, 3)
+
+                                messages.append(self.__ms_edit(chat_id, message_id, message, "HTML", {"inline_keyboard": button}))
+
+                            # halt
+                            # halt <page> <day>
+                            # halt <page> <day> <socail> <internal_id>
+                            elif bool(re.findall(r"^(halt)( \d+)?( \d+)?( \S+ \S+)?", callback_data)):
+                                # 0: halt
+                                # 1: <page>
+                                # 2: <day>
+                                # 3: <social>
+                                # 4: <internal_id>
+                                match = re.findall(r"^(halt)( \d+)?( \d+)? ?(\S+)? ?(\S+)?", callback_data)[0]
+                                if match[1] and match[2]:
+                                    # il numero è presente siamo in una pagina
+                                    if match[3] and match[4]:
+                                        # Se gli elementi 3 e 4 sono presenti siamo nella pausa di un elemento
+
+                                        unsub_status = self.__set_sub_state({"social": match[3], "username": None, "internal_id": match[4]}, user_id, 2, "{}d".format(match[2]))
+
+                                        if unsub_status["ok"]:
+                                            if int(match[2]) != 0:
+                                                messages.append(self.__callback_maker(chat_id, callback_query_id, "Stopped", False))
+                                            else:
+                                                messages.append(self.__callback_maker(chat_id, callback_query_id, "Un-Stopped", False))
+                                        else:
+                                            alert_msg = "Alert: {}".format(unsub_status["description"])
+                                            messages.append(self.__callback_maker(chat_id, callback_query_id, alert_msg, True))
+
+                                    # In ogni caso genereremo il messaggio data la pagina e il day indicati
+                                    message, button = self.__list_halt_mss(user_id, int(match[1]), int(match[2]))
+
+                                else:
+                                    # Se non  abbiamo ne day ne pagina siamo nel caso base
+                                    messages.append(self.__callback_maker(chat_id, callback_query_id, "Stop list", False))
+                                    message, button = self.__list_halt_mss(user_id, 0, 3)
 
                                 messages.append(self.__ms_edit(chat_id, message_id, message, "HTML", {"inline_keyboard": button}))
 
@@ -336,7 +393,7 @@ class Processinput:
             temp_motion_button.append({"text": "»", "callback_data": "list_mode {}".format(i + self.SUB_X_PAGE)})
         temporary_buttons_list.append(temp_motion_button)
 
-        temporary_buttons_list.append([self.__ilk_pause, self.__ilk_notoff, self.__ilk_stop, self.__ilk_rem])
+        temporary_buttons_list.append([self.__ilk_pause, self.__ilk_notoff, self.__ilk_halt, self.__ilk_rem])
         temporary_buttons_list.append([self.__ilk_help])
 
         return result, temporary_buttons_list
@@ -381,7 +438,7 @@ class Processinput:
             temp_motion_button.append({"text": "»", "callback_data": "remove {}".format(i + self.SUB_X_PAGE)})
         temporary_buttons_list.append(temp_motion_button)
 
-        temporary_buttons_list.append([self.__ilk_pause, self.__ilk_notoff, self.__ilk_stop, self.__ilk_list])
+        temporary_buttons_list.append([self.__ilk_pause, self.__ilk_notoff, self.__ilk_halt, self.__ilk_list])
         temporary_buttons_list.append([self.__ilk_help])
 
         return result, temporary_buttons_list
@@ -433,7 +490,61 @@ class Processinput:
         # seconda fila dei bottoni per i giorni
         temp_motion_button = []
         temp_motion_button.append({"text": "{}7 Days".format("✔ " if day == 7 else ""), "callback_data": "mute {} {}".format(i, 7)})
-        temp_motion_button.append({"text": "{}Un-mute".format("✔ " if day == 0 else ""), "callback_data": "mute {} {}".format(i, 0)})
+        temp_motion_button.append({"text": "{}Reset state".format("✔ " if day == 0 else ""), "callback_data": "mute {} {}".format(i, 0)})
+        temporary_buttons_list.append(temp_motion_button)
+
+        # Bottoni di navigazione
+        temporary_buttons_list.append([self.__ilk_list, self.__ilk_help])
+
+        return result, temporary_buttons_list
+
+    def __list_halt_mss(self, user_id, index, day):
+        user_subscriptions = self.__db.user_subscriptions(user_id)
+        # u_s[0] -> social
+        # u_s[1] -> title
+        # u_s[2] -> internal_id
+        # u_s[3] -> status
+        # u_s[4] -> expire_date
+
+        tmp_message_size = ' ' * 50
+        result = "👥Stop List\n" + tmp_message_size + "\nYou are following: \n"
+        i = 0  # indice di partenza degli elementi nella pagina
+        temporary_buttons_list = []
+
+        # verifico se la posizione della pagina è coretta
+        if index > len(user_subscriptions) - 1:
+            i = ((len(user_subscriptions) - 1) // self.SUB_X_PAGE) * 6
+        else:
+            i = index
+
+        result += self.indent_array_table(user_subscriptions, i, self.SUB_X_PAGE, [0], True)
+
+        result += "\nPage {} of {}".format(
+            i // self.SUB_X_PAGE + 1,
+            (len(user_subscriptions) - 1) // self.SUB_X_PAGE + 1
+        )
+
+        # Bottoni numerici per le azzioni
+        temporary_buttons_list = self.make_button_list('halt {} {}'.format(i, day), user_subscriptions, i, self.SUB_X_PAGE, self.BUTN_X_ROW)
+
+        # Funzionamento per non visualizzare il tasto se si è arrivato
+        # al limite superiore o inferiore della lista
+        temp_motion_button = []
+        if i - self.SUB_X_PAGE >= 0:
+            temp_motion_button.append({"text": "«", "callback_data": "halt {} {}".format(i - self.SUB_X_PAGE, day)})
+        if i + self.SUB_X_PAGE < len(user_subscriptions):
+            temp_motion_button.append({"text": "»", "callback_data": "halt {} {}".format(i + self.SUB_X_PAGE, day)})
+        temporary_buttons_list.append(temp_motion_button)
+
+        # prima fila di bottoni per i giorni
+        temp_motion_button = []
+        temp_motion_button.append({"text": "{}1 Day".format("✔ " if day == 1 else ""), "callback_data": "halt {} {}".format(i, 1)})
+        temp_motion_button.append({"text": "{}3 Days".format("✔ " if day == 3 else ""), "callback_data": "halt {} {}".format(i, 3)})
+        temporary_buttons_list.append(temp_motion_button)
+        # seconda fila dei bottoni per i giorni
+        temp_motion_button = []
+        temp_motion_button.append({"text": "{}7 Days".format("✔ " if day == 7 else ""), "callback_data": "halt {} {}".format(i, 7)})
+        temp_motion_button.append({"text": "{}Reset state".format("✔ " if day == 0 else ""), "callback_data": "halt {} {}".format(i, 0)})
         temporary_buttons_list.append(temp_motion_button)
 
         # Bottoni di navigazione

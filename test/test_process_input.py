@@ -79,6 +79,10 @@ def test_help_command():
                 "<b>Receive Feeds:</b>\n"
                 " • /sub <i>social</i> <i>username</i>\n"
                 " • /sub <i>link</i>\n"
+                " • /unsub <i>social</i> <i>username</i>\n"
+                " • /mute <i>social</i> <i>username</i> <i>time</i>\n"
+                " • /halt <i>social</i> <i>username</i> <i>time</i>\n"
+                " • /pause <i>social</i> <i>username</i> <i>time</i>\n"
                 "<b>Bot:</b>\n"
                 " • /stop to stop and unsubscribe from the bot.")
 
@@ -102,7 +106,7 @@ def test_not_command_registered():
     assert result[0]["text"] == "[AUTHORIZED] You can send text only!"
 
 
-def test_callback_help():
+def test_help_callback():
 
     database = MyDatabase(DATABASE_PATH)
     myprocess_input = Processinput(database, [])
