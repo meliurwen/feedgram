@@ -307,9 +307,9 @@ class Processinput:
 
                                         if unsub_status["ok"]:
                                             if int(match[2]) != 0:
-                                                messages.append(self.__callback_maker(chat_id, callback_query_id, "Pause", False))
+                                                messages.append(self.__callback_maker(chat_id, callback_query_id, "Paused", False))
                                             else:
-                                                messages.append(self.__callback_maker(chat_id, callback_query_id, "Un-paused", False))
+                                                messages.append(self.__callback_maker(chat_id, callback_query_id, "Un-Paused", False))
                                         else:
                                             alert_msg = "Alert: {}".format(unsub_status["description"])
                                             messages.append(self.__callback_maker(chat_id, callback_query_id, alert_msg, True))

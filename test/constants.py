@@ -846,23 +846,18 @@ MSG_CMD_SUB_IG_TEST4["response"]["title"] = "testProfile4"
 
 COMMAND_MUTE = copy.deepcopy(GENERAL_COMMAND)
 COMMAND_MUTE['result'][0]['message']['text'] = "/mute"
-COMMAND_MUTE['result'][0]['message']['entities'] = [{"offset": 0, "length": 5, "type": "bot_command"}]
 
 COMMAND_MUTE_WORKING_HOURS = copy.deepcopy(GENERAL_COMMAND)
 COMMAND_MUTE_WORKING_HOURS['result'][0]['message']['text'] = "/mute ig testProfile3 12h"
-COMMAND_MUTE_WORKING_HOURS['result'][0]['message']['entities'] = [{"offset": 0, "length": 25, "type": "bot_command"}]
 
 COMMAND_MUTE_WORKING_DAY = copy.deepcopy(GENERAL_COMMAND)
 COMMAND_MUTE_WORKING_DAY['result'][0]['message']['text'] = "/mute ig testProfile3 1d"
-COMMAND_MUTE_WORKING_DAY['result'][0]['message']['entities'] = [{"offset": 0, "length": 24, "type": "bot_command"}]
 
 COMMAND_MUTE_MISS_SOCIAL = copy.deepcopy(GENERAL_COMMAND)
 COMMAND_MUTE_MISS_SOCIAL['result'][0]['message']['text'] = "/mute youtube testProfile3 1h"
-COMMAND_MUTE_MISS_SOCIAL['result'][0]['message']['entities'] = [{"offset": 0, "length": 28, "type": "bot_command"}]
 
 COMMAND_MUTE_MISS_SUBSCRIPTION = copy.deepcopy(GENERAL_COMMAND)
 COMMAND_MUTE_MISS_SUBSCRIPTION['result'][0]['message']['text'] = "/mute ig testProfile9 1h"
-COMMAND_MUTE_MISS_SUBSCRIPTION['result'][0]['message']['entities'] = [{"offset": 0, "length": 28, "type": "bot_command"}]
 
 CALLBACK_MUTE = copy.deepcopy(CLBK_MODE_HELP["query"])
 CALLBACK_MUTE["result"][0]["callback_query"]["message"]["text"] = '👥Mute List\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfile\n  ② testProfilePrivate\n  ③ testProfileStrangeStatus\n  ④ testIgProfileLinkHome\n  ⑤ testProfile2\n  ⑥ 🔕 testProfile3\n\nPage 1 of 2'
@@ -961,7 +956,7 @@ CLBK_UNSUB_MODE["result"] = [
         "type": "editMessageText",
         "chat_id": 123456789,
         "message_id": 2120,
-        "text": "♻️Remove\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfilePrivate\n  ② testProfileStrangeStatus\n  ③ testIgProfileLinkHome\n  ④ testProfile2\n  ⑤ 🔕 testProfile3\n  ⑥ testProfile4\n\nPage 1 of 1",
+        "text": "♻️Remove\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfilePrivate\n  ② testProfileStrangeStatus\n  ③ testIgProfileLinkHome\n  ④ testProfile2\n  ⑤ ⏯️ testProfile3\n  ⑥ testProfile4\n\nPage 1 of 1",
         "markdown": "HTML",
         "reply_markup": {
             "inline_keyboard": [
@@ -993,11 +988,92 @@ CLBK_UNSUB_MODE_EXST_WRNG_PAGE = copy.deepcopy(CLBK_UNSUB_MODE)
 CLBK_UNSUB_MODE_EXST_WRNG_PAGE["query"]["result"][0]["callback_query"]["data"] = "remove 66 instagram 456765579"
 CLBK_UNSUB_MODE_EXST_WRNG_PAGE["result"][0]["text"] = "Unfollowed"
 del CLBK_UNSUB_MODE_EXST_WRNG_PAGE["result"][0]["show_alert"]
-CLBK_UNSUB_MODE_EXST_WRNG_PAGE["result"][1]["text"] = "♻️Remove\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfilePrivate\n  ② testProfileStrangeStatus\n  ③ testIgProfileLinkHome\n  ④ testProfile2\n  ⑤ 🔕 testProfile3\n\nPage 1 of 1"
+CLBK_UNSUB_MODE_EXST_WRNG_PAGE["result"][1]["text"] = "♻️Remove\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfilePrivate\n  ② testProfileStrangeStatus\n  ③ testIgProfileLinkHome\n  ④ testProfile2\n  ⑤ ⏯️ testProfile3\n\nPage 1 of 1"
 del CLBK_UNSUB_MODE_EXST_WRNG_PAGE["result"][1]["reply_markup"]["inline_keyboard"][1][2]
 
 CLBK_UNSUB_MODE_EXST_WRNG_PAGE_AND_SOCL = copy.deepcopy(CLBK_UNSUB_MODE_EXST_WRNG_PAGE)
 CLBK_UNSUB_MODE_EXST_WRNG_PAGE_AND_SOCL["query"]["result"][0]["callback_query"]["data"] = "remove 66 banana 1546448"
 CLBK_UNSUB_MODE_EXST_WRNG_PAGE_AND_SOCL["result"][0]["text"] = "Error: socialNotAbilitedOrMisstyped"
 CLBK_UNSUB_MODE_EXST_WRNG_PAGE_AND_SOCL["result"][0]["show_alert"] = True
-CLBK_UNSUB_MODE_EXST_WRNG_PAGE_AND_SOCL["result"][1]["text"] = "♻️Remove\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfilePrivate\n  ② testProfileStrangeStatus\n  ③ testIgProfileLinkHome\n  ④ testProfile2\n  ⑤ 🔕 testProfile3\n\nPage 1 of 1"
+CLBK_UNSUB_MODE_EXST_WRNG_PAGE_AND_SOCL["result"][1]["text"] = "♻️Remove\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfilePrivate\n  ② testProfileStrangeStatus\n  ③ testIgProfileLinkHome\n  ④ testProfile2\n  ⑤ ⏯️ testProfile3\n\nPage 1 of 1"
+
+COMMAND_PAUSE = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_PAUSE['result'][0]['message']['text'] = "/pause"
+
+COMMAND_PAUSE_WORKING_HOURS = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_PAUSE_WORKING_HOURS['result'][0]['message']['text'] = "/pause ig testProfile3 12h"
+
+COMMAND_PAUSE_WORKING_DAY = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_PAUSE_WORKING_DAY['result'][0]['message']['text'] = "/pause ig testProfile3 1d"
+
+COMMAND_PAUSE_MISS_SOCIAL = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_PAUSE_MISS_SOCIAL['result'][0]['message']['text'] = "/pause youtube testProfile3 1h"
+
+COMMAND_PAUSE_MISS_SUBSCRIPTION = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_PAUSE_MISS_SUBSCRIPTION['result'][0]['message']['text'] = "/pause ig testProfile9 1h"
+
+CALLBACK_PAUSE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_PAUSE["result"][0]["callback_query"]["message"]["text"] = '👥Pause List\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfile\n  ② testProfilePrivate\n  ③ testProfileStrangeStatus\n  ④ testIgProfileLinkHome\n  ⑤ testProfile2\n  ⑥ ⏯️ testProfile3\n\nPage 1 of 2'
+CALLBACK_PAUSE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'pause 0 3 instagram 546545337', 'text': '1'}, {'callback_data': 'pause 0 3 instagram 741852963', 'text': '2'}, {'callback_data': 'pause 0 3 instagram 963852741', 'text': '3'}],
+        [{'callback_data': 'pause 0 3 instagram 897546782', 'text': '4'}, {'callback_data': 'pause 0 3 instagram 4345345', 'text': '5'}, {'callback_data': 'pause 0 3 instagram 782782767', 'text': '6'}],
+        [{'callback_data': 'pause 6 3', 'text': '»'}],
+        [{'callback_data': 'pause 0 1', 'text': '1 Day'}, {'callback_data': 'pause 0 3', 'text': '✔ 3 Days'}],
+        [{'callback_data': 'pause 0 7', 'text': '7 Days'}, {'callback_data': 'pause 0 0', 'text': 'Reset state'}],
+        [{'callback_data': 'list_mode', 'text': '📋'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_PAUSE["result"][0]["callback_query"]["data"] = "pause"
+
+CALLBACK_PAUSE_PAGE2 = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_PAUSE_PAGE2["result"][0]["callback_query"]["message"]["text"] = '👥Pause List\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfile4\n\nPage 2 of 2'
+CALLBACK_PAUSE_PAGE2["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'pause 6 3 instagram 456765579', 'text': '1'}],
+        [{'callback_data': 'pause 0 3', 'text': '«'}],
+        [{'callback_data': 'pause 6 1', 'text': '1 Day'}, {'callback_data': 'pause 6 3', 'text': '✔ 3 Days'}],
+        [{'callback_data': 'pause 6 7', 'text': '7 Days'}, {'callback_data': 'pause 6 0', 'text': 'Reset state'}],
+        [{'callback_data': 'list_mode', 'text': '📋'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_PAUSE_PAGE2["result"][0]["callback_query"]["data"] = "pause 6 3"
+
+CALLBACK_PAUSE_PAGE2_DATE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_PAUSE_PAGE2_DATE["result"][0]["callback_query"]["message"]["text"] = '👥Pause List\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfile4\n\nPage 2 of 2'
+CALLBACK_PAUSE_PAGE2_DATE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'pause 6 7 instagram 456765579', 'text': '1'}],
+        [{'callback_data': 'pause 0 7', 'text': '«'}],
+        [{'callback_data': 'pause 6 1', 'text': '1 Day'}, {'callback_data': 'pause 6 3', 'text': '3 Days'}],
+        [{'callback_data': 'pause 6 7', 'text': '✔ 7 Days'}, {'callback_data': 'pause 6 0', 'text': 'Reset state'}],
+        [{'callback_data': 'list_mode', 'text': '📋'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_PAUSE_PAGE2_DATE["result"][0]["callback_query"]["data"] = "pause 6 7"
+
+CALLBACK_PAUSE_USE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_PAUSE_USE["result"][0]["callback_query"]["message"]["text"] = '👥Pause List\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① ⏯️ testProfile4\n\nPage 2 of 2'
+CALLBACK_PAUSE_USE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'pause 6 3 instagram 456765579', 'text': '1'}],
+        [{'callback_data': 'pause 0 3', 'text': '«'}],
+        [{'callback_data': 'pause 6 1', 'text': '1 Day'}, {'callback_data': 'pause 6 3', 'text': '✔ 3 Days'}],
+        [{'callback_data': 'pause 6 7', 'text': '7 Days'}, {'callback_data': 'pause 6 0', 'text': 'Reset state'}],
+        [{'callback_data': 'list_mode', 'text': '📋'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_PAUSE_USE["result"][0]["callback_query"]["data"] = "pause 6 3 instagram 456765579"
+
+CALLBACK_PAUSE_USE_UNMUTE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_PAUSE_USE_UNMUTE["result"][0]["callback_query"]["message"]["text"] = '👥Pause List\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfile4\n\nPage 2 of 2'
+CALLBACK_PAUSE_USE_UNMUTE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'pause 6 0 instagram 456765579', 'text': '1'}],
+        [{'callback_data': 'pause 0 0', 'text': '«'}],
+        [{'callback_data': 'pause 6 1', 'text': '1 Day'}, {'callback_data': 'pause 6 3', 'text': '3 Days'}],
+        [{'callback_data': 'pause 6 7', 'text': '7 Days'}, {'callback_data': 'pause 6 0', 'text': '✔ Reset state'}],
+        [{'callback_data': 'list_mode', 'text': '📋'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_PAUSE_USE_UNMUTE["result"][0]["callback_query"]["data"] = "pause 6 0 instagram 456765579"
