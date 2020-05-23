@@ -789,7 +789,7 @@ CALLBACK_LIST_PAGE_1["result"][0]["callback_query"]["message"]["text"] = "👥Fo
 CALLBACK_LIST_PAGE_1["result"][0]["callback_query"]["message"]["reply_markup"] = {
     "inline_keyboard": [
         [{'callback_data': 'list_mode 6', 'text': '»'}],
-        [{"text": "⏯️", "callback_data": "pause_mode"},
+        [{"text": "⏯️", "callback_data": "pause"},
          {"text": "🔕", "callback_data": "mute"},
          {"text": "⏹", "callback_data": "halt"},
          {"text": "🗑", "callback_data": "remove"}],
@@ -803,7 +803,7 @@ CALLBACK_LIST_PAGE_2["result"][0]["callback_query"]["message"]["text"] = "👥Fo
 CALLBACK_LIST_PAGE_2["result"][0]["callback_query"]["message"]["reply_markup"] = {
     "inline_keyboard": [
         [{'callback_data': 'list_mode 0', 'text': '«'}],
-        [{"text": "⏯️", "callback_data": "pause_mode"},
+        [{"text": "⏯️", "callback_data": "pause"},
          {"text": "🔕", "callback_data": "mute"},
          {"text": "⏹", "callback_data": "halt"},
          {"text": "🗑", "callback_data": "remove"}],
@@ -817,7 +817,7 @@ CALLBACK_LIST_PAGE_3["result"][0]["callback_query"]["message"]["text"] = "👥Fo
 CALLBACK_LIST_PAGE_3["result"][0]["callback_query"]["message"]["reply_markup"] = {
     "inline_keyboard": [
         [{'callback_data': 'list_mode 0', 'text': '«'}],
-        [{"text": "⏯️", "callback_data": "pause_mode"},
+        [{"text": "⏯️", "callback_data": "pause"},
          {"text": "🔕", "callback_data": "mute"},
          {"text": "⏹", "callback_data": "halt"},
          {"text": "🗑", "callback_data": "remove"}],

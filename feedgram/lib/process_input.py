@@ -35,7 +35,7 @@ class Processinput:
     # inline keyboard
     __ilk_help = {"text": "📖", "callback_data": "help_mode"}
 
-    __ilk_pause = {"text": "⏯️", "callback_data": "pause_mode"}
+    __ilk_pause = {"text": "⏯️", "callback_data": "pause"}
     __ilk_notoff = {"text": "🔕", "callback_data": "mute"}
     __ilk_halt = {"text": "⏹", "callback_data": "halt"}
     __ilk_rem = {"text": "🗑", "callback_data": "remove"}
@@ -133,6 +133,18 @@ class Processinput:
                                             msg_subs = "<b>⚠️Warning</b>\nError: <code>{}</code>".format(unsub_status["description"])
                                     else:
                                         msg_subs = "<b>⚠️Warning</b>\n<code>/halt</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/halt &lt;social&gt; &lt;username&gt; &lt;XXXd&gt;</code>\n<i>OR:</i>\n<code>/halt &lt;social&gt; &lt;username&gt; &lt;XXXh&gt;</code>"
+                                    messages.append(self.__ms_maker(chat_id, msg_subs, "HTML"))
+
+                                elif text[:6] == "/pause":
+                                    match = re.match(r"(\S+) (\S+) (\d{1,3}d|\d{1,3}h)", text[7:])
+                                    if match:
+                                        unsub_status = self.__set_sub_state({"social": match.group(1), "username": match.group(2), "internal_id": None}, user_id, 3, match.group(3))
+                                        if unsub_status["ok"]:
+                                            msg_subs = "<b>✅⏯️ Paused successfully!</b>\n\nSocial: <i>{}</i>\nUser: <i>{}</i>!".format(match.group(1), match.group(2))
+                                        else:
+                                            msg_subs = "<b>⚠️Warning</b>\nError: <code>{}</code>".format(unsub_status["description"])
+                                    else:
+                                        msg_subs = "<b>⚠️Warning</b>\n<code>/pause</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/pause &lt;social&gt; &lt;username&gt; &lt;XXXd&gt;</code>\n<i>OR:</i>\n<code>/pause &lt;social&gt; &lt;username&gt; &lt;XXXh&gt;</code>"
                                     messages.append(self.__ms_maker(chat_id, msg_subs, "HTML"))
 
                                 elif text == "/start":
@@ -276,6 +288,42 @@ class Processinput:
 
                                 messages.append(self.__ms_edit(chat_id, message_id, message, "HTML", {"inline_keyboard": button}))
 
+                            # pause
+                            # pause <page> <day>
+                            # pause <page> <day> <socail> <internal_id>
+                            elif bool(re.findall(r"^(pause)( \d+)?( \d+)?( \S+ \S+)?", callback_data)):
+                                # 0: pause
+                                # 1: <page>
+                                # 2: <day>
+                                # 3: <social>
+                                # 4: <internal_id>
+                                match = re.findall(r"^(pause)( \d+)?( \d+)? ?(\S+)? ?(\S+)?", callback_data)[0]
+                                if match[1] and match[2]:
+                                    # il numero è presente siamo in una pagina
+                                    if match[3] and match[4]:
+                                        # Se gli elementi 3 e 4 sono presenti siamo nella pausa di un elemento
+
+                                        unsub_status = self.__set_sub_state({"social": match[3], "username": None, "internal_id": match[4]}, user_id, 3, "{}d".format(match[2]))
+
+                                        if unsub_status["ok"]:
+                                            if int(match[2]) != 0:
+                                                messages.append(self.__callback_maker(chat_id, callback_query_id, "Pause", False))
+                                            else:
+                                                messages.append(self.__callback_maker(chat_id, callback_query_id, "Un-paused", False))
+                                        else:
+                                            alert_msg = "Alert: {}".format(unsub_status["description"])
+                                            messages.append(self.__callback_maker(chat_id, callback_query_id, alert_msg, True))
+
+                                    # In ogni caso genereremo il messaggio data la pagina e il day indicati
+                                    message, button = self.__list_pause_mss(user_id, int(match[1]), int(match[2]))
+
+                                else:
+                                    # Se non  abbiamo ne day ne pagina siamo nel caso base
+                                    messages.append(self.__callback_maker(chat_id, callback_query_id, "Pause list", False))
+                                    message, button = self.__list_pause_mss(user_id, 0, 3)
+
+                                messages.append(self.__ms_edit(chat_id, message_id, message, "HTML", {"inline_keyboard": button}))
+
                         else:
                             messages.append(self.__ms_maker(chat_id, "[AUTHORIZED] You can send text only!"))
                     else:
@@ -416,6 +464,18 @@ class Processinput:
         buttons_list = self.__make_numeric_button('halt {} {}'.format(page_idx, dtime), user_subscriptions, page_idx, self.SUB_X_PAGE, self.BUTN_X_ROW)
         buttons_list.append(self.__make_navigation_button("halt", page_idx, len(user_subscriptions), dtime))
         buttons_list = buttons_list + self.__make_time_button("halt", dtime, page_idx)
+        buttons_list.append([self.__ilk_list, self.__ilk_help])
+
+        return txt_prepend, buttons_list
+
+    def __list_pause_mss(self, user_id, index, dtime):
+        user_subscriptions = self.__db.user_subscriptions(user_id)
+        txt_prepend, page_idx = self.__textmessage(index, user_subscriptions, "👥Pause List\n" + ' ' * 50 + "\nYou are following: \n", True)
+
+        buttons_list = []
+        buttons_list = self.__make_numeric_button('pause {} {}'.format(page_idx, dtime), user_subscriptions, page_idx, self.SUB_X_PAGE, self.BUTN_X_ROW)
+        buttons_list.append(self.__make_navigation_button("pause", page_idx, len(user_subscriptions), dtime))
+        buttons_list = buttons_list + self.__make_time_button("pause", dtime, page_idx)
         buttons_list.append([self.__ilk_list, self.__ilk_help])
 
         return txt_prepend, buttons_list
@@ -643,15 +703,18 @@ class Processinput:
         else:
             is_subscribed, _ = self.__db.check_if_subscribed(user_id, sub["social"], internal_id=sub["internal_id"])
 
-        if exp_time[-1:] == "d":
-            exp_time = int(exp_time[:-1])
-            exp_time = int(time.time()) + exp_time * 86400
-        elif exp_time[-1:] == "h":
-            exp_time = int(exp_time[:-1])
-            exp_time = int(time.time()) + exp_time * 3600
+        if int(exp_time[:-1]) != 0:
+            if exp_time[-1:] == "d":
+                exp_time = int(exp_time[:-1])
+                exp_time = int(time.time()) + exp_time * 86400
+            elif exp_time[-1:] == "h":
+                exp_time = int(exp_time[:-1])
+                exp_time = int(time.time()) + exp_time * 3600
+            else:
+                return {"ok": False, "description": "errorOnTimeFormat"}  # Caso impossibile da finirci dato il controllo della regexp ma messo per sicurezza
         else:
-            return {"ok": False, "description": "errorOnTimeFormat"}  # Caso impossibile da finirci dato il controllo della regexp ma messo per sicurezza
-
+            exp_time = -1
+            state = 0
         # If subscribed then unsubscribe, otherwise return error
         if is_subscribed:
             if self.__db.set_state_of_social_account(user_id, sub["social"], sub["internal_id"], state, exp_time):

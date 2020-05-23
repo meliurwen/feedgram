@@ -3,6 +3,7 @@ import threading
 import queue
 import logging
 import time
+import json
 # Libs
 from feedgram.lib.process_input import Processinput
 from feedgram.lib.database import MyDatabase
@@ -37,10 +38,13 @@ class Watchdog(threading.Thread):
 
         self.__logger = logging.getLogger("telegram_bot.WD.{}".format(self.name))
 
+        # inizializazione della variabile database solo nei thread necessari
+        if self.mode == "telegram_user_interface" or self.mode == "news_retreiver" or self.mode == "news_compiler" or self.mode == "pause_manger":
+            self.__db = MyDatabase(self.__conf_dict["BOT"]["databasefilepath"])
+
         # Inizializazione dei social da fare solo ne caso del news_retreiver e del telegram_user_interface
         if self.mode == "telegram_user_interface" or self.mode == "news_retreiver":
             self.__instagram_interface = Instagram()
-            self.__db = MyDatabase(self.__conf_dict["BOT"]["databasefilepath"])
 
         if self.mode == "telegram_user_interface" or self.mode == "sender":
             self.__tel_interface = Telegram(self.__conf_dict["API"]["telegramkey"])  # <- cambiare config_dict
@@ -83,6 +87,7 @@ class Watchdog(threading.Thread):
         if self.mode == "sender":
             while self.still_run:
                 self.__tel_interface.send_messages(CODA)
+
         if self.mode == "news_compiler":
             while self.still_run:
                 with self.condizione:
@@ -113,11 +118,15 @@ class Watchdog(threading.Thread):
 
                                     # Se l'utente ha impostato lo stato 2 (muted) alla sottoscrizione, allora non riceve nessun messaggio a riguardo
                                     if user['state'] != 2:
-                                        messages_socials.append({'type': 'sendMessage',
-                                                                 'text': text,
-                                                                 'chat_id': str(user['id']),
-                                                                 'disable_notification': bool(user['state'] == 1),
-                                                                 'markdown': 'HTML'})
+                                        message = {'type': 'sendMessage',
+                                                   'text': text,
+                                                   'chat_id': str(user['user_id']),
+                                                   'disable_notification': bool(user['state'] == 1),
+                                                   'markdown': 'HTML'}
+                                        if user['state'] != 3:
+                                            messages_socials.append(message)
+                                        else:
+                                            self.__db.archive_message(user['user_id'], user["social_id"], data_social["post_date"], message)
 
                 self.__logger.info("Messaggi da inviare: %s ", len(messages_socials))
                 if len(messages_socials) > 0:
@@ -214,3 +223,49 @@ class Watchdog(threading.Thread):
 
                 with self.condizione:
                     self.condizione.wait(self.delay)
+
+        if self.mode == "pause_manger":
+            while self.still_run:
+                messages = self.__db.detect_stop_pause_or_expired
+                # for mess in message:
+                # mess[0] -> message_id
+                # mess[1] -> user_id
+                # mess[2] -> social_id
+                # mess[3] -> update_date
+                # mess[4] -> message
+                # mess[5] -> status
+                # mess[6] -> expire_date
+
+                messages_list = []  # lista dei messaggi che dovranno essere inviati
+                trash_list = []  # lista che conterrà gli id dei messaggi da rimuovere
+                if messages:
+                    self.__logger.info("Ho trovato %s messaggi archivati da gestire", len(messages))
+                    for mess in messages:
+                        # Per ogni messaggio andremo ad analizzare lo stato.
+                        # In ogni caso i messaggi selezionati dovranno essere rimossi dal database.
+                        trash_list.append(mess[0])  # aggungo il messaggio nella lista di quelli da rimuovere
+
+                        # Se lo stato è 2 (stop) non verrà inviato nessun messaggio
+                        if mess[5] != 2:
+                            # se lo stato è:
+                            # 0 (normale) -> cambio di stato in 0
+                            # 1 (mute) -> cambio di stato in 1
+                            # 3 (pausa) -> l'expire_date è scaduto
+                            # inviamo normalmente il messaggio
+
+                            temp = json.loads(mess[4])  # oggettizzo il json
+
+                            if mess[5] == 1:
+                                # stato di mute, il messaggio dovrà essere inviato silenziosamente
+                                temp['disable_notification'] = True
+
+                            messages_list.append(temp)  # append del messaggio alla lista
+
+                self.__db.remove_messages(trash_list)
+
+                self.__logger.info("Messaggi da inviare: %s ", len(messages_list))
+                if len(messages_list) > 0:
+                    CODA_TEMP.put(messages_list)
+                    self.__logger.info("Messaggi messi in coda di spedizione.")
+
+                time.sleep(self.delay)

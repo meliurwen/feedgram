@@ -2,6 +2,7 @@ import os.path
 import sqlite3
 import logging
 import time
+import json
 
 
 class MyDatabase:
@@ -68,6 +69,7 @@ class MyDatabase:
         self.__query("CREATE TABLE `users` (`user_id` INTEGER NOT NULL, `username` TEXT, `chat_id` INTEGER NOT NULL, `notifications` INTEGER NOT NULL DEFAULT 1, `max_registrations` INTEGER NOT NULL DEFAULT 10, `subscription_time` INTEGER NOT NULL, PRIMARY KEY(`user_id`));")
         self.__query("CREATE TABLE `registrations` (`user_id` INTEGER NOT NULL, `social_id` INTEGER NOT NULL, `status` INTEGER NOT NULL DEFAULT 0, `expire_date` INTEGER NOT NULL DEFAULT -1, PRIMARY KEY(`user_id`,`social_id`), FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE, FOREIGN KEY(`social_id`) REFERENCES `socials`(`social_id`) ON DELETE CASCADE ON UPDATE CASCADE);")
         self.__query("CREATE TABLE `socials` (`social_id` INTEGER NOT NULL, `social` TEXT NOT NULL, `username` TEXT NOT NULL, `title` TEXT NOT NULL, `internal_id` TEXT NOT NULL, `retreive_time` INTEGER NOT NULL, `status` TEXT NOT NULL DEFAULT 'public', PRIMARY KEY(`social_id`));")
+        # self.__query("CREATE TABLE `messages` (`message_id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, `user_id` INTEGER NOT NULL, `social_id` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `message` TEXT NOT NULL);")
         self.__logger.info("Database e tabelle create con successo")
 
     def __query(self, query, *args, foreign=False, fetch=1):
@@ -189,7 +191,7 @@ class MyDatabase:
 
     @property
     def create_dict_of_user_ids_and_socials(self):
-        res, _ = self.__query("SELECT registrations.user_id, socials.social, socials.internal_id, socials.username, socials.title, socials.retreive_time, socials.status, registrations.status, registrations.expire_date FROM registrations, socials WHERE registrations.social_id = socials.social_id;", fetch=0)
+        res, _ = self.__query("SELECT registrations.user_id, socials.social, socials.internal_id, socials.username, socials.title, socials.retreive_time, socials.status, registrations.status, registrations.expire_date, socials.social_id FROM registrations, socials WHERE registrations.social_id = socials.social_id;", fetch=0)
         socials_accounts_dict = {"social_accounts": {}, "subscriptions": {}}
         if res:
             for row in res:
@@ -205,7 +207,7 @@ class MyDatabase:
                     account_temp["retreive_time"] = str(row[5])
                     account_temp["status"] = str(row[6])
                     socials_accounts_dict["social_accounts"][row[1]].append(account_temp)
-                socials_accounts_dict["subscriptions"][row[1]][row[2]].append({'id': row[0], 'state': row[7], 'expire': row[8]})
+                socials_accounts_dict["subscriptions"][row[1]][row[2]].append({'user_id': row[0], 'social_id': row[9], 'state': row[7], 'expire': row[8]})
         return socials_accounts_dict
 
     def user_subscriptions(self, user_id):
@@ -240,7 +242,7 @@ class MyDatabase:
         _, rowcount = self.__query("DELETE FROM registrations \
             WHERE registrations.user_id = ? AND \
             registrations.social_id = (\
-                SELECT socials.social_id FROM socials WHERE socials.social = ? AND socials.internal_id = ?);", user_id, social, internal_id)
+                SELECT socials.social_id FROM socials WHERE socials.social = ? AND socials.internal_id = ?);", user_id, social, internal_id, foreign=True)
 
         # If deletes something return True
         return bool(rowcount)
@@ -286,6 +288,27 @@ class MyDatabase:
                                    "SELECT socials.social_id "
                                    "FROM socials WHERE socials.social = ? AND socials.internal_id = ?);", state, exp_date, user_id, social, internal_id)
         return bool(rowcount)
+
+    def archive_message(self, user_id, social_id, post_date, message):
+        self.__query("INSERT INTO message (user_id, social_id, timestamp, message) VALUES (?, ?, ?, ?);",
+                     user_id, social_id, post_date, json.dumps(message))
+
+    @property
+    def detect_stop_pause_or_expired(self):
+        res, _ = self.__query("SELECT message.*, t_reg.status, t_reg.expire_date "
+                              "FROM message "
+                              "INNER JOIN(SELECT  * "
+                              "FROM registrations "
+                              "WHERE registrations.status != 3 OR (registrations.status = 3 AND registrations.expire_date < ?)) t_reg "
+                              "ON message.user_id = t_reg.user_id AND message.social_id = t_reg.social_id "
+                              "ORDER BY message.update_date;",
+                              time.time(), fetch=0)
+        return res
+
+    def remove_messages(self, messages):
+        for mess in messages:
+            self.__query("DELETE FROM message "
+                         "WHERE message.message_id = ?;", mess)
 
     def clean_expired_state(self):
         _, rowcount = self.__query("UPDATE registrations "

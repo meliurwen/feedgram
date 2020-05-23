@@ -269,7 +269,7 @@ def test_create_dict_of_user_ids_and_socials():
     assert res['social_accounts']['instagram'][0]['username'] == il_post['username']
     assert res['social_accounts']['instagram'][0]['title'] == il_post['title']
     assert res['social_accounts']['instagram'][0]['status'] == il_post['status']
-    assert res['subscriptions']['instagram'][il_post['internal_id']] == [{'id': 6551474276, 'state': 0, 'expire': -1}, {'id': 57356765765, 'state': 0, 'expire': -1}]
+    assert res['subscriptions']['instagram'][il_post['internal_id']] == [{'user_id': 6551474276, 'social_id': 1, 'state': 0, 'expire': -1}, {'user_id': 57356765765, 'social_id': 1, 'state': 0, 'expire': -1}]
 
 
 def test_user_subscriptions():
