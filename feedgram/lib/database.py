@@ -13,7 +13,7 @@ class MyDatabase:
 
         self.__logger.info("################### INIZIALIZAZIONE CONFIGURAZIONE #########################")
 
-        self.__tables = ['admins', 'users', 'registrations', 'socials']
+        self.__tables = ['admins', 'users', 'registrations', 'socials', 'messages']
         self.__dbpath = dbPath
         self.__state = 1
 
@@ -69,7 +69,7 @@ class MyDatabase:
         self.__query("CREATE TABLE `users` (`user_id` INTEGER NOT NULL, `username` TEXT, `chat_id` INTEGER NOT NULL, `notifications` INTEGER NOT NULL DEFAULT 1, `max_registrations` INTEGER NOT NULL DEFAULT 10, `subscription_time` INTEGER NOT NULL, PRIMARY KEY(`user_id`));")
         self.__query("CREATE TABLE `registrations` (`user_id` INTEGER NOT NULL, `social_id` INTEGER NOT NULL, `status` INTEGER NOT NULL DEFAULT 0, `expire_date` INTEGER NOT NULL DEFAULT -1, PRIMARY KEY(`user_id`,`social_id`), FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE, FOREIGN KEY(`social_id`) REFERENCES `socials`(`social_id`) ON DELETE CASCADE ON UPDATE CASCADE);")
         self.__query("CREATE TABLE `socials` (`social_id` INTEGER NOT NULL, `social` TEXT NOT NULL, `username` TEXT NOT NULL, `title` TEXT NOT NULL, `internal_id` TEXT NOT NULL, `retreive_time` INTEGER NOT NULL, `status` TEXT NOT NULL DEFAULT 'public', PRIMARY KEY(`social_id`));")
-        # self.__query("CREATE TABLE `messages` (`message_id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, `user_id` INTEGER NOT NULL, `social_id` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `message` TEXT NOT NULL);")
+        self.__query("CREATE TABLE `messages` ( `message_id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,`user_id` INTEGER NOT NULL, `social_id` INTEGER NOT NULL, `update_date` INTEGER NOT NULL, `message` TEXT NOT NULL, FOREIGN KEY(`user_id`,`social_id`) REFERENCES `registrations`(`user_id`,`social_id`) ON DELETE CASCADE ON UPDATE CASCADE );")
         self.__logger.info("Database e tabelle create con successo")
 
     def __query(self, query, *args, foreign=False, fetch=1):
@@ -290,25 +290,29 @@ class MyDatabase:
         return bool(rowcount)
 
     def archive_message(self, user_id, social_id, post_date, message):
-        self.__query("INSERT INTO message (user_id, social_id, timestamp, message) VALUES (?, ?, ?, ?);",
+        self.__query("INSERT INTO messages (user_id, social_id, update_date, message) VALUES (?, ?, ?, ?);",
                      user_id, social_id, post_date, json.dumps(message))
 
     @property
-    def detect_stop_pause_or_expired(self):
-        res, _ = self.__query("SELECT message.*, t_reg.status, t_reg.expire_date "
-                              "FROM message "
+    def get_pause_expired_or_removed_messages(self):
+        '''
+            Ottengo i messaggi archiviati che hanno la pausa scaduta o non sono più in pausa
+            :return: <List> of <List>
+        '''
+        res, _ = self.__query("SELECT messages.message_id, messages.message, t_reg.status "
+                              "FROM messages "
                               "INNER JOIN(SELECT  * "
                               "FROM registrations "
                               "WHERE registrations.status != 3 OR (registrations.status = 3 AND registrations.expire_date < ?)) t_reg "
-                              "ON message.user_id = t_reg.user_id AND message.social_id = t_reg.social_id "
-                              "ORDER BY message.update_date;",
+                              "ON messages.user_id = t_reg.user_id AND messages.social_id = t_reg.social_id "
+                              "ORDER BY messages.update_date;",
                               time.time(), fetch=0)
         return res
 
     def remove_messages(self, messages):
         for mess in messages:
-            self.__query("DELETE FROM message "
-                         "WHERE message.message_id = ?;", mess)
+            self.__query("DELETE FROM messages "
+                         "WHERE messages.message_id = ?;", mess)
 
     def clean_expired_state(self):
         _, rowcount = self.__query("UPDATE registrations "

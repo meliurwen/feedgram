@@ -226,15 +226,11 @@ class Watchdog(threading.Thread):
 
         if self.mode == "pause_manger":
             while self.still_run:
-                messages = self.__db.detect_stop_pause_or_expired
+                messages = self.__db.get_pause_expired_or_removed_messages
                 # for mess in message:
                 # mess[0] -> message_id
-                # mess[1] -> user_id
-                # mess[2] -> social_id
-                # mess[3] -> update_date
-                # mess[4] -> message
-                # mess[5] -> status
-                # mess[6] -> expire_date
+                # mess[1] -> message
+                # mess[2] -> status
 
                 messages_list = []  # lista dei messaggi che dovranno essere inviati
                 trash_list = []  # lista che conterrà gli id dei messaggi da rimuovere
@@ -246,26 +242,26 @@ class Watchdog(threading.Thread):
                         trash_list.append(mess[0])  # aggungo il messaggio nella lista di quelli da rimuovere
 
                         # Se lo stato è 2 (stop) non verrà inviato nessun messaggio
-                        if mess[5] != 2:
+                        if mess[2] != 2:
                             # se lo stato è:
                             # 0 (normale) -> cambio di stato in 0
                             # 1 (mute) -> cambio di stato in 1
                             # 3 (pausa) -> l'expire_date è scaduto
                             # inviamo normalmente il messaggio
 
-                            temp = json.loads(mess[4])  # oggettizzo il json
+                            temp = json.loads(mess[1])  # oggettizzo il json
 
-                            if mess[5] == 1:
+                            if mess[2] == 1:
                                 # stato di mute, il messaggio dovrà essere inviato silenziosamente
                                 temp['disable_notification'] = True
 
                             messages_list.append(temp)  # append del messaggio alla lista
 
-                self.__db.remove_messages(trash_list)
+                    self.__db.remove_messages(trash_list)
 
-                self.__logger.info("Messaggi da inviare: %s ", len(messages_list))
-                if len(messages_list) > 0:
-                    CODA_TEMP.put(messages_list)
-                    self.__logger.info("Messaggi messi in coda di spedizione.")
+                    self.__logger.info("Messaggi da inviare: %s ", len(messages_list))
+                    if len(messages_list) > 0:
+                        CODA_TEMP.put(messages_list)
+                        self.__logger.info("Messaggi messi in coda di spedizione.")
 
                 time.sleep(self.delay)

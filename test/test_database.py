@@ -4,6 +4,7 @@ import test.constants as cnst
 
 from os import path, remove
 import sqlite3
+import json
 from feedgram.lib.database import MyDatabase
 
 
@@ -324,6 +325,50 @@ def test_clean_expired_state():
     assert res_before > res_afther
 
 
+def test_archive_message():
+    '''
+        Testo il funzionamento della funzione per archivare i mesaggi per un futuro invioo
+    '''
+    assert path.exists(DATABASE_PATH)
+    database = MyDatabase(DATABASE_PATH)
+
+    database.archive_message(6551474276, 1, 1590320771, cnst.ARCHIVE_MESSAGE)
+
+    res, _ = myquery(DATABASE_PATH, "SELECT * FROM messages", fetch=0)
+    # assert res[0][1] == 6551474276  # user_id
+    # assert res[0][2] == 1  # social_id
+    # assert res[0][3] == 1590320771  # date
+    # assert json.loads(res[0][4]) == cnst.ARCHIVE_MESSAGE  # message
+    assert res[0] == (1, 6551474276, 1, 1590320771, json.dumps(cnst.ARCHIVE_MESSAGE))
+
+
+def test_get_pause_expired_or_removed_messages():
+    '''
+        Testo l'estrazione dei messaggi che hanno lo stato scaduto o che non sono più in pausa
+    '''
+    assert path.exists(DATABASE_PATH)
+    database = MyDatabase(DATABASE_PATH)
+
+    message = database.get_pause_expired_or_removed_messages
+
+    assert message[0] == (1, json.dumps(cnst.ARCHIVE_MESSAGE), 0)
+
+
+def test_remove_messages():
+    assert path.exists(DATABASE_PATH)
+    database = MyDatabase(DATABASE_PATH)
+
+    res, _ = myquery(DATABASE_PATH, "SELECT count() FROM messages WHERE messages.message_id = 1")
+
+    assert res[0] == 1
+
+    database.remove_messages([1])
+
+    res, _ = myquery(DATABASE_PATH, "SELECT count() FROM messages WHERE messages.message_id = 1")
+
+    assert res[0] == 0
+
+
 def test_process_messages_queries1():
 
     database = MyDatabase(DATABASE_PATH)
@@ -336,28 +381,19 @@ def test_process_messages_queries1():
     assert res[1] == 'private'
 
 
-QUERY_TODO_DELETE = {"delete": [{"type": "socialAccount",
-                                 "social": "instagram",
-                                 "internal_id": "1769583068"
-                                 }
-                                ],
-                     "update": []
-                     }
-
-
 def test_process_messages_queries2():
 
     database = MyDatabase(DATABASE_PATH)
 
-    social_id, _ = myquery(DATABASE_PATH, "SELECT socials.social_id FROM socials WHERE socials.social = ? AND socials.internal_id = ?", QUERY_TODO_DELETE['delete'][0]['social'], QUERY_TODO_DELETE['delete'][0]['internal_id'])
+    social_id, _ = myquery(DATABASE_PATH, "SELECT socials.social_id FROM socials WHERE socials.social = ? AND socials.internal_id = ?", cnst.QUERY_TODO_DELETE['delete'][0]['social'], cnst.QUERY_TODO_DELETE['delete'][0]['internal_id'])
 
-    database.process_messages_queries(QUERY_TODO_DELETE)
+    database.process_messages_queries(cnst.QUERY_TODO_DELETE)
 
     res, _ = myquery(DATABASE_PATH, "SELECT count() FROM registrations WHERE registrations.social_id = ?", social_id[0])
 
     assert res[0] == 0
 
-    res, _ = myquery(DATABASE_PATH, "SELECT count() FROM socials WHERE socials.internal_id = ?", QUERY_TODO_DELETE['delete'][0]['internal_id'])
+    res, _ = myquery(DATABASE_PATH, "SELECT count() FROM socials WHERE socials.internal_id = ?", cnst.QUERY_TODO_DELETE['delete'][0]['internal_id'])
 
     assert res[0] == 0
 

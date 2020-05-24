@@ -50,6 +50,13 @@ QUERY_TODO_UPDATE = {"update": [{"type": "retreive_time",
                      "delete": []
                      }
 
+QUERY_TODO_DELETE = {"delete": [{"type": "socialAccount",
+                                 "social": "instagram",
+                                 "internal_id": "1769583068"
+                                 }
+                                ],
+                     "update": []
+                     }
 
 # Module: test.test_instagram
 
@@ -1077,3 +1084,10 @@ CALLBACK_PAUSE_USE_UNMUTE["result"][0]["callback_query"]["message"]["reply_marku
     ]
 }
 CALLBACK_PAUSE_USE_UNMUTE["result"][0]["callback_query"]["data"] = "pause 6 0 instagram 456765579"
+
+ARCHIVE_MESSAGE = {'type': 'sendMessage',
+                   'text': "Messaggio da archivare",
+                   'chat_id': 6551474276,
+                   'disable_notification': False,
+                   'markdown': 'HTML',
+                   }
