@@ -42,14 +42,14 @@ def main():
     # Inizializzo il logger per la stampa dei messaggi
     logger = setup_loger()
 
-    logger.info("Benvenuto nel programma")
+    logger.info("App started")
 
     # Instanzio l'ogetto contentente la configurazione
     config = Config(FILE_CONFIG)
 
     # Verifico che lo stato dell'oggetto sia coretto altrimenti chiudo il programma
     if config.status <= 0:
-        logger.error("Arresto del programma...")
+        logger.error("Shutting down the app...")
         sys.exit(0)
 
     # Instanzio l'ogetto del database data la configurazione caricata
@@ -57,7 +57,7 @@ def main():
 
     # Verifico che lo stato del database sia valido altrimenti chiudo il programma
     if database.status <= 0:
-        logger.error("Arresto del programma...")
+        logger.error("Shutting down the app...")
         sys.exit(0)
 
     still_run = True
@@ -68,19 +68,22 @@ def main():
     thread2 = Watchdog(1, "Sender", "sender", 0, condizione_sender, config.dictionary, still_run)
     thread3 = Watchdog(1, "ElaborazioneCode", "elaborazione_code", 0, None, None, still_run)
     thread4 = Watchdog(1, "NewsRetreiver", "news_retreiver", RETR_INTERVAL, condizione_compiler, config.dictionary, still_run)
-    thread5 = Watchdog(1, "NewsCompiler", "news_compiler", 0, condizione_compiler, None, still_run)
+    thread5 = Watchdog(1, "NewsCompiler", "news_compiler", 0, condizione_compiler, config.dictionary, still_run)
+    thread6 = Watchdog(1, "PauseMenager", "pause_manger", 30, None, config.dictionary, still_run)
 
     thread1.daemon = True
     thread2.daemon = True
     thread3.daemon = True
     thread4.daemon = True
     thread5.daemon = True
+    thread6.daemon = True
 
     thread1.start()
     thread2.start()
     thread3.start()
     thread4.start()
     thread5.start()
+    thread6.start()
 
     while True:
         try:

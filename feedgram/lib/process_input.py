@@ -35,7 +35,7 @@ class Processinput:
     # inline keyboard
     __ilk_help = {"text": "📖", "callback_data": "help_mode"}
 
-    __ilk_pause = {"text": "⏯️", "callback_data": "pause_mode"}
+    __ilk_pause = {"text": "⏯️", "callback_data": "pause"}
     __ilk_notoff = {"text": "🔕", "callback_data": "mute"}
     __ilk_halt = {"text": "⏹", "callback_data": "halt"}
     __ilk_rem = {"text": "🗑", "callback_data": "remove"}
@@ -133,6 +133,18 @@ class Processinput:
                                             msg_subs = "<b>⚠️Warning</b>\nError: <code>{}</code>".format(unsub_status["description"])
                                     else:
                                         msg_subs = "<b>⚠️Warning</b>\n<code>/halt</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/halt &lt;social&gt; &lt;username&gt; &lt;XXXd&gt;</code>\n<i>OR:</i>\n<code>/halt &lt;social&gt; &lt;username&gt; &lt;XXXh&gt;</code>"
+                                    messages.append(self.__ms_maker(chat_id, msg_subs, "HTML"))
+
+                                elif text[:6] == "/pause":
+                                    match = re.match(r"(\S+) (\S+) (\d{1,3}d|\d{1,3}h)", text[7:])
+                                    if match:
+                                        unsub_status = self.__set_sub_state({"social": match.group(1), "username": match.group(2), "internal_id": None}, user_id, 3, match.group(3))
+                                        if unsub_status["ok"]:
+                                            msg_subs = "<b>✅⏯️ Paused successfully!</b>\n\nSocial: <i>{}</i>\nUser: <i>{}</i>!".format(match.group(1), match.group(2))
+                                        else:
+                                            msg_subs = "<b>⚠️Warning</b>\nError: <code>{}</code>".format(unsub_status["description"])
+                                    else:
+                                        msg_subs = "<b>⚠️Warning</b>\n<code>/pause</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/pause &lt;social&gt; &lt;username&gt; &lt;XXXd&gt;</code>\n<i>OR:</i>\n<code>/pause &lt;social&gt; &lt;username&gt; &lt;XXXh&gt;</code>"
                                     messages.append(self.__ms_maker(chat_id, msg_subs, "HTML"))
 
                                 elif text == "/start":
@@ -276,6 +288,42 @@ class Processinput:
 
                                 messages.append(self.__ms_edit(chat_id, message_id, message, "HTML", {"inline_keyboard": button}))
 
+                            # pause
+                            # pause <page> <day>
+                            # pause <page> <day> <socail> <internal_id>
+                            elif bool(re.findall(r"^(pause)( \d+)?( \d+)?( \S+ \S+)?", callback_data)):
+                                # 0: pause
+                                # 1: <page>
+                                # 2: <day>
+                                # 3: <social>
+                                # 4: <internal_id>
+                                match = re.findall(r"^(pause)( \d+)?( \d+)? ?(\S+)? ?(\S+)?", callback_data)[0]
+                                if match[1] and match[2]:
+                                    # il numero è presente siamo in una pagina
+                                    if match[3] and match[4]:
+                                        # Se gli elementi 3 e 4 sono presenti siamo nella pausa di un elemento
+
+                                        unsub_status = self.__set_sub_state({"social": match[3], "username": None, "internal_id": match[4]}, user_id, 3, "{}d".format(match[2]))
+
+                                        if unsub_status["ok"]:
+                                            if int(match[2]) != 0:
+                                                messages.append(self.__callback_maker(chat_id, callback_query_id, "Paused", False))
+                                            else:
+                                                messages.append(self.__callback_maker(chat_id, callback_query_id, "Un-Paused", False))
+                                        else:
+                                            alert_msg = "Alert: {}".format(unsub_status["description"])
+                                            messages.append(self.__callback_maker(chat_id, callback_query_id, alert_msg, True))
+
+                                    # In ogni caso genereremo il messaggio data la pagina e il day indicati
+                                    message, button = self.__list_pause_mss(user_id, int(match[1]), int(match[2]))
+
+                                else:
+                                    # Se non  abbiamo ne day ne pagina siamo nel caso base
+                                    messages.append(self.__callback_maker(chat_id, callback_query_id, "Pause list", False))
+                                    message, button = self.__list_pause_mss(user_id, 0, 3)
+
+                                messages.append(self.__ms_edit(chat_id, message_id, message, "HTML", {"inline_keyboard": button}))
+
                         else:
                             messages.append(self.__ms_maker(chat_id, "[AUTHORIZED] You can send text only!"))
                     else:
@@ -295,7 +343,7 @@ class Processinput:
         return messages
 
     @classmethod
-    def __ms_maker(cls, chatid, text, markdown=None, link_preview=None, notification=None, markup=None):
+    def __ms_maker(cls, chatid, text, markdown=None, disable_web_page_preview=None, disable_notification=None, reply_markup=None):
         temp_dict = {}
 
         temp_dict["type"] = "sendMessage"
@@ -306,14 +354,14 @@ class Processinput:
         if markdown:
             temp_dict["markdown"] = markdown
 
-        if link_preview:
-            temp_dict["disable_web_page_preview"] = link_preview
+        if isinstance(disable_web_page_preview, bool):
+            temp_dict["disable_web_page_preview"] = disable_web_page_preview
 
-        if notification:
-            temp_dict["disable_notification"] = not notification
+        if isinstance(disable_notification, bool):
+            temp_dict["disable_notification"] = disable_notification
 
-        if markup:
-            temp_dict["reply_markup"] = markup
+        if reply_markup:
+            temp_dict["reply_markup"] = reply_markup
 
         return temp_dict
 
@@ -334,7 +382,7 @@ class Processinput:
         return temp_dict
 
     @classmethod
-    def __ms_edit(cls, chat_id, message_id, text, markdown=None, markup=None):
+    def __ms_edit(cls, chat_id, message_id, text, markdown=None, reply_markup=None):
         temp_dict = {}
 
         temp_dict["type"] = "editMessageText"
@@ -346,8 +394,8 @@ class Processinput:
         if markdown:
             temp_dict["markdown"] = markdown
 
-        if markup:
-            temp_dict["reply_markup"] = markup
+        if reply_markup:
+            temp_dict["reply_markup"] = reply_markup
 
         return temp_dict
 
@@ -357,203 +405,83 @@ class Processinput:
     STATUS_DICT = {"0": "", "1": "🔕", "2": "⏹", "3": "⏯️"}
     LINE_LIMIT = 24
 
+    def __textmessage(self, index, user_subscriptions, txt_prepend="", by_enum=False):
+        user_subscriptions_len = len(user_subscriptions)
+
+        # Verifico che l'indice di pagina non superi la lunghezza massima stabilita,
+        # se tale valore viene superato, allora verrà impostato il più alto indice di pagina
+        if index > user_subscriptions_len - 1:
+            page_idx = ((user_subscriptions_len - 1) // self.SUB_X_PAGE) * self.SUB_X_PAGE
+        else:
+            page_idx = index
+
+        txt_prepend += self.__indent_array_table(user_subscriptions, page_idx, self.SUB_X_PAGE, [0], by_enum)
+        txt_prepend += "\nPage {} of {}".format(
+            page_idx // self.SUB_X_PAGE + 1,
+            (user_subscriptions_len - 1) // self.SUB_X_PAGE + 1
+        )
+        return txt_prepend, page_idx
+
     def __list_mss(self, user_id, index):
         user_subscriptions = self.__db.user_subscriptions(user_id)
-        # u_s[0] -> social
-        # u_s[1] -> title
-        # u_s[2] -> internal_id
-        # u_s[3] -> status
-        # u_s[4] -> expire_date
-        # u_s[5] -> category (opzional)
+        txt_prepend, page_idx = self.__textmessage(index, user_subscriptions, "👥Follow List\n" + ' ' * 50 + "\nYou are following: \n")
 
-        tmp_message_size = ' ' * 50
-        result = "👥Follow List\n" + tmp_message_size + "\nYou are following: \n"
-        i = 0  # indice di partenza degli elementi nella pagina
-        temporary_buttons_list = []
+        buttons_list = []
+        buttons_list.append(self.__make_navigation_button("list_mode", page_idx, len(user_subscriptions)))
+        buttons_list.append([self.__ilk_pause, self.__ilk_notoff, self.__ilk_halt, self.__ilk_rem])
+        buttons_list.append([self.__ilk_help])
 
-        # verifico che il nuovo index non superi la lunghezza massima della lista
-        # se il nuovo indice supera viene resettato
-        if index > len(user_subscriptions) - 1:
-            i = ((len(user_subscriptions) - 1) // self.SUB_X_PAGE) * 6
-        else:
-            i = index
-
-        result += self.indent_array_table(user_subscriptions, i, self.SUB_X_PAGE, [0])
-
-        result += "\nPage {} of {}".format(
-            i // self.SUB_X_PAGE + 1,
-            (len(user_subscriptions) - 1) // self.SUB_X_PAGE + 1
-        )
-        # Funzionamento per non visualizzare il tasto se si è arrivato
-        # al limite superiore o inferiore della lista
-        temp_motion_button = []
-        if i - self.SUB_X_PAGE >= 0:
-            temp_motion_button.append({"text": "«", "callback_data": "list_mode {}".format(i - self.SUB_X_PAGE)})
-        if i + self.SUB_X_PAGE < len(user_subscriptions):
-            temp_motion_button.append({"text": "»", "callback_data": "list_mode {}".format(i + self.SUB_X_PAGE)})
-        temporary_buttons_list.append(temp_motion_button)
-
-        temporary_buttons_list.append([self.__ilk_pause, self.__ilk_notoff, self.__ilk_halt, self.__ilk_rem])
-        temporary_buttons_list.append([self.__ilk_help])
-
-        return result, temporary_buttons_list
+        return txt_prepend, buttons_list
 
     def __list_remove_mss(self, user_id, index):
         user_subscriptions = self.__db.user_subscriptions(user_id)
-        # u_s[0] -> social
-        # u_s[1] -> title
-        # u_s[2] -> internal_id
-        # u_s[3] -> status
-        # u_s[4] -> expire_date
-        # u_s[5] -> category (optional)
+        txt_prepend, page_idx = self.__textmessage(index, user_subscriptions, "♻️Remove\n" + ' ' * 50 + "\nYou are following: \n", True)
 
-        tmp_message_size = ' ' * 50
-        result = "♻️Remove\n" + tmp_message_size + "\nYou are following: \n"
-        i = 0  # indice di partenza degli elementi nella pagina
-        temporary_buttons_list = []
+        buttons_list = []
+        buttons_list = self.__make_numeric_button('remove {}'.format(page_idx), user_subscriptions, page_idx, self.SUB_X_PAGE, self.BUTN_X_ROW)
+        buttons_list.append(self.__make_navigation_button("remove", page_idx, len(user_subscriptions)))
+        buttons_list.append([self.__ilk_list, self.__ilk_help])
 
-        # verifico che il nuovo index non superi la lunghezza massima della lista
-        # se il nuovo indice supera viene resettato
-        if index > len(user_subscriptions) - 1:
-            i = ((len(user_subscriptions) - 1) // self.SUB_X_PAGE) * 6
-        else:
-            i = index
+        return txt_prepend, buttons_list
 
-        result += self.indent_array_table(user_subscriptions, i, self.SUB_X_PAGE, [0], True)
-
-        result += "\nPage {} of {}".format(
-            i // self.SUB_X_PAGE + 1,
-            (len(user_subscriptions) - 1) // self.SUB_X_PAGE + 1
-        )
-
-        # Bottoni per rimuovere elementi
-        temporary_buttons_list = self.make_button_list('remove {}'.format(i), user_subscriptions, i, self.SUB_X_PAGE, self.BUTN_X_ROW)
-
-        # Funzionamento per non visualizzare il tasto se si è arrivato
-        # al limite superiore o inferiore della lista
-        temp_motion_button = []
-        if i - self.SUB_X_PAGE >= 0:
-            temp_motion_button.append({"text": "«", "callback_data": "remove {}".format(i - self.SUB_X_PAGE)})
-        if i + self.SUB_X_PAGE < len(user_subscriptions):
-            temp_motion_button.append({"text": "»", "callback_data": "remove {}".format(i + self.SUB_X_PAGE)})
-        temporary_buttons_list.append(temp_motion_button)
-
-        temporary_buttons_list.append([self.__ilk_pause, self.__ilk_notoff, self.__ilk_halt, self.__ilk_list])
-        temporary_buttons_list.append([self.__ilk_help])
-
-        return result, temporary_buttons_list
-
-    def __list_mute_mss(self, user_id, index, day):
+    def __list_mute_mss(self, user_id, index, dtime):
         user_subscriptions = self.__db.user_subscriptions(user_id)
-        # u_s[0] -> social
-        # u_s[1] -> title
-        # u_s[2] -> internal_id
-        # u_s[3] -> status
-        # u_s[4] -> expire_date
-        # u_s[5] -> category (opzional)
+        txt_prepend, page_idx = self.__textmessage(index, user_subscriptions, "👥Mute List\n" + ' ' * 50 + "\nYou are following: \n", True)
 
-        tmp_message_size = ' ' * 50
-        result = "👥Mute List\n" + tmp_message_size + "\nYou are following: \n"
-        i = 0  # indice di partenza degli elementi nella pagina
-        temporary_buttons_list = []
+        buttons_list = []
+        buttons_list = self.__make_numeric_button('mute {} {}'.format(page_idx, dtime), user_subscriptions, page_idx, self.SUB_X_PAGE, self.BUTN_X_ROW)
+        buttons_list.append(self.__make_navigation_button("mute", page_idx, len(user_subscriptions), dtime))
+        buttons_list = buttons_list + self.__make_time_button("mute", dtime, page_idx)
+        buttons_list.append([self.__ilk_list, self.__ilk_help])
 
-        # verifico se la posizione della pagina è coretta
-        if index > len(user_subscriptions) - 1:
-            i = ((len(user_subscriptions) - 1) // self.SUB_X_PAGE) * 6
-        else:
-            i = index
+        return txt_prepend, buttons_list
 
-        result += self.indent_array_table(user_subscriptions, i, self.SUB_X_PAGE, [0], True)
-
-        result += "\nPage {} of {}".format(
-            i // self.SUB_X_PAGE + 1,
-            (len(user_subscriptions) - 1) // self.SUB_X_PAGE + 1
-        )
-
-        # Bottoni numerici per le azzioni
-        temporary_buttons_list = self.make_button_list('mute {} {}'.format(i, day), user_subscriptions, i, self.SUB_X_PAGE, self.BUTN_X_ROW)
-
-        # Funzionamento per non visualizzare il tasto se si è arrivato
-        # al limite superiore o inferiore della lista
-        temp_motion_button = []
-        if i - self.SUB_X_PAGE >= 0:
-            temp_motion_button.append({"text": "«", "callback_data": "mute {} {}".format(i - self.SUB_X_PAGE, day)})
-        if i + self.SUB_X_PAGE < len(user_subscriptions):
-            temp_motion_button.append({"text": "»", "callback_data": "mute {} {}".format(i + self.SUB_X_PAGE, day)})
-        temporary_buttons_list.append(temp_motion_button)
-
-        # prima fila di bottoni per i giorni
-        temp_motion_button = []
-        temp_motion_button.append({"text": "{}1 Day".format("✔ " if day == 1 else ""), "callback_data": "mute {} {}".format(i, 1)})
-        temp_motion_button.append({"text": "{}3 Days".format("✔ " if day == 3 else ""), "callback_data": "mute {} {}".format(i, 3)})
-        temporary_buttons_list.append(temp_motion_button)
-        # seconda fila dei bottoni per i giorni
-        temp_motion_button = []
-        temp_motion_button.append({"text": "{}7 Days".format("✔ " if day == 7 else ""), "callback_data": "mute {} {}".format(i, 7)})
-        temp_motion_button.append({"text": "{}Reset state".format("✔ " if day == 0 else ""), "callback_data": "mute {} {}".format(i, 0)})
-        temporary_buttons_list.append(temp_motion_button)
-
-        # Bottoni di navigazione
-        temporary_buttons_list.append([self.__ilk_list, self.__ilk_help])
-
-        return result, temporary_buttons_list
-
-    def __list_halt_mss(self, user_id, index, day):
+    def __list_halt_mss(self, user_id, index, dtime):
         user_subscriptions = self.__db.user_subscriptions(user_id)
-        # u_s[0] -> social
-        # u_s[1] -> title
-        # u_s[2] -> internal_id
-        # u_s[3] -> status
-        # u_s[4] -> expire_date
+        txt_prepend, page_idx = self.__textmessage(index, user_subscriptions, "👥Stop List\n" + ' ' * 50 + "\nYou are following: \n", True)
 
-        tmp_message_size = ' ' * 50
-        result = "👥Stop List\n" + tmp_message_size + "\nYou are following: \n"
-        i = 0  # indice di partenza degli elementi nella pagina
-        temporary_buttons_list = []
+        buttons_list = []
+        buttons_list = self.__make_numeric_button('halt {} {}'.format(page_idx, dtime), user_subscriptions, page_idx, self.SUB_X_PAGE, self.BUTN_X_ROW)
+        buttons_list.append(self.__make_navigation_button("halt", page_idx, len(user_subscriptions), dtime))
+        buttons_list = buttons_list + self.__make_time_button("halt", dtime, page_idx)
+        buttons_list.append([self.__ilk_list, self.__ilk_help])
 
-        # verifico se la posizione della pagina è coretta
-        if index > len(user_subscriptions) - 1:
-            i = ((len(user_subscriptions) - 1) // self.SUB_X_PAGE) * 6
-        else:
-            i = index
+        return txt_prepend, buttons_list
 
-        result += self.indent_array_table(user_subscriptions, i, self.SUB_X_PAGE, [0], True)
+    def __list_pause_mss(self, user_id, index, dtime):
+        user_subscriptions = self.__db.user_subscriptions(user_id)
+        txt_prepend, page_idx = self.__textmessage(index, user_subscriptions, "👥Pause List\n" + ' ' * 50 + "\nYou are following: \n", True)
 
-        result += "\nPage {} of {}".format(
-            i // self.SUB_X_PAGE + 1,
-            (len(user_subscriptions) - 1) // self.SUB_X_PAGE + 1
-        )
+        buttons_list = []
+        buttons_list = self.__make_numeric_button('pause {} {}'.format(page_idx, dtime), user_subscriptions, page_idx, self.SUB_X_PAGE, self.BUTN_X_ROW)
+        buttons_list.append(self.__make_navigation_button("pause", page_idx, len(user_subscriptions), dtime))
+        buttons_list = buttons_list + self.__make_time_button("pause", dtime, page_idx)
+        buttons_list.append([self.__ilk_list, self.__ilk_help])
 
-        # Bottoni numerici per le azzioni
-        temporary_buttons_list = self.make_button_list('halt {} {}'.format(i, day), user_subscriptions, i, self.SUB_X_PAGE, self.BUTN_X_ROW)
-
-        # Funzionamento per non visualizzare il tasto se si è arrivato
-        # al limite superiore o inferiore della lista
-        temp_motion_button = []
-        if i - self.SUB_X_PAGE >= 0:
-            temp_motion_button.append({"text": "«", "callback_data": "halt {} {}".format(i - self.SUB_X_PAGE, day)})
-        if i + self.SUB_X_PAGE < len(user_subscriptions):
-            temp_motion_button.append({"text": "»", "callback_data": "halt {} {}".format(i + self.SUB_X_PAGE, day)})
-        temporary_buttons_list.append(temp_motion_button)
-
-        # prima fila di bottoni per i giorni
-        temp_motion_button = []
-        temp_motion_button.append({"text": "{}1 Day".format("✔ " if day == 1 else ""), "callback_data": "halt {} {}".format(i, 1)})
-        temp_motion_button.append({"text": "{}3 Days".format("✔ " if day == 3 else ""), "callback_data": "halt {} {}".format(i, 3)})
-        temporary_buttons_list.append(temp_motion_button)
-        # seconda fila dei bottoni per i giorni
-        temp_motion_button = []
-        temp_motion_button.append({"text": "{}7 Days".format("✔ " if day == 7 else ""), "callback_data": "halt {} {}".format(i, 7)})
-        temp_motion_button.append({"text": "{}Reset state".format("✔ " if day == 0 else ""), "callback_data": "halt {} {}".format(i, 0)})
-        temporary_buttons_list.append(temp_motion_button)
-
-        # Bottoni di navigazione
-        temporary_buttons_list.append([self.__ilk_list, self.__ilk_help])
-
-        return result, temporary_buttons_list
+        return txt_prepend, buttons_list
 
     @classmethod
-    def make_button_list(cls, callbk_data, array, start, lent, row_len):
+    def __make_numeric_button(cls, callbk_data, array, start, lent, row_len):
         i = 1
         result = []
         tmp = []
@@ -569,8 +497,47 @@ class Processinput:
 
         return result
 
+    def __make_navigation_button(self, command, page, length, dtime=None):
+        # remove <page>
+        # list <page>
+        # mute <page> <time>
+        # halt <page> <time>
+        # pause <page> <time>
+        page_minus = page - self.SUB_X_PAGE
+        page_plus = page + self.SUB_X_PAGE
+        if dtime is None:
+            dtime = ""
+        else:
+            dtime = " {}".format(dtime)
+
+        temp_motion_button = []
+        if page_minus >= 0:
+            temp_motion_button.append({"text": "«", "callback_data": "{} {}{}".format(command, page_minus, dtime)})
+
+        if page_plus < length:
+            temp_motion_button.append({"text": "»", "callback_data": "{} {}{}".format(command, page_plus, dtime)})
+
+        return temp_motion_button
+
     @classmethod
-    def indent_array_table(cls, array, start, lent, key_index, by_enum=False):
+    def __make_time_button(cls, command, day, page):
+        temp_button = []
+        # prima fila di bottoni per i giorni
+        temp_row_button = []
+        temp_row_button.append({"text": "{}1 Day".format("✔ " if day == 1 else ""), "callback_data": "{} {} {}".format(command, page, 1)})
+        temp_row_button.append({"text": "{}3 Days".format("✔ " if day == 3 else ""), "callback_data": "{} {} {}".format(command, page, 3)})
+        temp_button.append(temp_row_button)
+
+        # seconda fila dei bottoni per i giorni
+        temp_row_button = []
+        temp_row_button.append({"text": "{}7 Days".format("✔ " if day == 7 else ""), "callback_data": "{} {} {}".format(command, page, 7)})
+        temp_row_button.append({"text": "{}Reset state".format("✔ " if day == 0 else ""), "callback_data": "{} {} {}".format(command, page, 0)})
+        temp_button.append(temp_row_button)
+
+        return temp_button
+
+    @classmethod
+    def __indent_array_table(cls, array, start, lent, key_index, by_enum=False):
         # subscri[0] -> social
         # subscri[1] -> title
         # subscri[2] -> internal_id
@@ -736,15 +703,18 @@ class Processinput:
         else:
             is_subscribed, _ = self.__db.check_if_subscribed(user_id, sub["social"], internal_id=sub["internal_id"])
 
-        if exp_time[-1:] == "d":
-            exp_time = int(exp_time[:-1])
-            exp_time = int(time.time()) + exp_time * 86400
-        elif exp_time[-1:] == "h":
-            exp_time = int(exp_time[:-1])
-            exp_time = int(time.time()) + exp_time * 3600
+        if int(exp_time[:-1]) != 0:
+            if exp_time[-1:] == "d":
+                exp_time = int(exp_time[:-1])
+                exp_time = int(time.time()) + exp_time * 86400
+            elif exp_time[-1:] == "h":
+                exp_time = int(exp_time[:-1])
+                exp_time = int(time.time()) + exp_time * 3600
+            else:
+                return {"ok": False, "description": "errorOnTimeFormat"}  # Caso impossibile da finirci dato il controllo della regexp ma messo per sicurezza
         else:
-            return {"ok": False, "description": "errorOnTimeFormat"}  # Caso impossibile da finirci dato il controllo della regexp ma messo per sicurezza
-
+            exp_time = -1
+            state = 0
         # If subscribed then unsubscribe, otherwise return error
         if is_subscribed:
             if self.__db.set_state_of_social_account(user_id, sub["social"], sub["internal_id"], state, exp_time):

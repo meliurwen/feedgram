@@ -2,17 +2,16 @@ import os.path
 import sqlite3
 import logging
 import time
+import json
 
 
 class MyDatabase:
 
     def __init__(self, dbPath):
         self.__logger = logging.getLogger('telegram_bot.database')
-        self.__logger.info('Creating an instance of database')
+        self.__logger.info('Class instance for communication with a SQLite3 database initiated.')
 
-        self.__logger.info("################### INIZIALIZAZIONE CONFIGURAZIONE #########################")
-
-        self.__tables = ['admins', 'users', 'registrations', 'socials']
+        self.__tables = ['admins', 'users', 'registrations', 'socials', 'messages']
         self.__dbpath = dbPath
         self.__state = 1
 
@@ -33,16 +32,16 @@ class MyDatabase:
     @property
     def __db_exist(self):
 
-        self.__logger.info("Versione modulo: %s", sqlite3.version)
-        self.__logger.info("Versione libreria SQLite: %s", sqlite3.sqlite_version)
-        self.__logger.info("Nome database SQLite: %s", self.__dbpath)
+        self.__logger.info("Module version: %s", sqlite3.version)
+        self.__logger.info("Library version: %s", sqlite3.sqlite_version)
+        self.__logger.info("Database name: %s", self.__dbpath)
 
-        self.__logger.info("Controllo se esiste già un file chiamato %s ...", self.__dbpath)
+        self.__logger.info("Checking if already a file named '%s' exists...", self.__dbpath)
         if os.path.isfile(self.__dbpath):
-            self.__logger.info("Il file ESISTE")
+            self.__logger.info("The file exists.")
             return True
         else:
-            self.__logger.info("Il file NON esiste")
+            self.__logger.info("The file does not exist.")
             return False
 
     @property
@@ -53,7 +52,7 @@ class MyDatabase:
         return True
 
     def __table_exist(self, table):
-        self.__logger.debug("Controllo se esiste la tabella %s ...", table)
+        self.__logger.debug("Checking if the table '%s' exists...", table)
         counter, _ = self.__query(
             "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = ?;", table)
         if counter[0] == 0:
@@ -63,11 +62,12 @@ class MyDatabase:
             return True
 
     def __db_creation(self):
-        self.__logger.info("Creo il file SQLITE3 e le tabelle...")
+        self.__logger.info("Creating the SQLite3 file and tables...")
         self.__query("CREATE TABLE `admins` (`user_id` INTEGER NOT NULL, `is_creator` INTEGER NOT NULL DEFAULT 0, FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE, PRIMARY KEY(`user_id`));")
         self.__query("CREATE TABLE `users` (`user_id` INTEGER NOT NULL, `username` TEXT, `chat_id` INTEGER NOT NULL, `notifications` INTEGER NOT NULL DEFAULT 1, `max_registrations` INTEGER NOT NULL DEFAULT 10, `subscription_time` INTEGER NOT NULL, PRIMARY KEY(`user_id`));")
         self.__query("CREATE TABLE `registrations` (`user_id` INTEGER NOT NULL, `social_id` INTEGER NOT NULL, `status` INTEGER NOT NULL DEFAULT 0, `expire_date` INTEGER NOT NULL DEFAULT -1, PRIMARY KEY(`user_id`,`social_id`), FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE, FOREIGN KEY(`social_id`) REFERENCES `socials`(`social_id`) ON DELETE CASCADE ON UPDATE CASCADE);")
         self.__query("CREATE TABLE `socials` (`social_id` INTEGER NOT NULL, `social` TEXT NOT NULL, `username` TEXT NOT NULL, `title` TEXT NOT NULL, `internal_id` TEXT NOT NULL, `retreive_time` INTEGER NOT NULL, `status` TEXT NOT NULL DEFAULT 'public', PRIMARY KEY(`social_id`));")
+        self.__query("CREATE TABLE `messages` ( `message_id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,`user_id` INTEGER NOT NULL, `social_id` INTEGER NOT NULL, `update_date` INTEGER NOT NULL, `message` TEXT NOT NULL, FOREIGN KEY(`user_id`,`social_id`) REFERENCES `registrations`(`user_id`,`social_id`) ON DELETE CASCADE ON UPDATE CASCADE );")
         self.__logger.info("Database e tabelle create con successo")
 
     def __query(self, query, *args, foreign=False, fetch=1):
@@ -189,7 +189,7 @@ class MyDatabase:
 
     @property
     def create_dict_of_user_ids_and_socials(self):
-        res, _ = self.__query("SELECT registrations.user_id, socials.social, socials.internal_id, socials.username, socials.title, socials.retreive_time, socials.status, registrations.status, registrations.expire_date FROM registrations, socials WHERE registrations.social_id = socials.social_id;", fetch=0)
+        res, _ = self.__query("SELECT registrations.user_id, socials.social, socials.internal_id, socials.username, socials.title, socials.retreive_time, socials.status, registrations.status, registrations.expire_date, socials.social_id FROM registrations, socials WHERE registrations.social_id = socials.social_id;", fetch=0)
         socials_accounts_dict = {"social_accounts": {}, "subscriptions": {}}
         if res:
             for row in res:
@@ -205,7 +205,7 @@ class MyDatabase:
                     account_temp["retreive_time"] = str(row[5])
                     account_temp["status"] = str(row[6])
                     socials_accounts_dict["social_accounts"][row[1]].append(account_temp)
-                socials_accounts_dict["subscriptions"][row[1]][row[2]].append({'id': row[0], 'state': row[7], 'expire': row[8]})
+                socials_accounts_dict["subscriptions"][row[1]][row[2]].append({'user_id': row[0], 'social_id': row[9], 'state': row[7], 'expire': row[8]})
         return socials_accounts_dict
 
     def user_subscriptions(self, user_id):
@@ -240,7 +240,7 @@ class MyDatabase:
         _, rowcount = self.__query("DELETE FROM registrations \
             WHERE registrations.user_id = ? AND \
             registrations.social_id = (\
-                SELECT socials.social_id FROM socials WHERE socials.social = ? AND socials.internal_id = ?);", user_id, social, internal_id)
+                SELECT socials.social_id FROM socials WHERE socials.social = ? AND socials.internal_id = ?);", user_id, social, internal_id, foreign=True)
 
         # If deletes something return True
         return bool(rowcount)
@@ -286,6 +286,31 @@ class MyDatabase:
                                    "SELECT socials.social_id "
                                    "FROM socials WHERE socials.social = ? AND socials.internal_id = ?);", state, exp_date, user_id, social, internal_id)
         return bool(rowcount)
+
+    def archive_message(self, user_id, social_id, post_date, message):
+        self.__query("INSERT INTO messages (user_id, social_id, update_date, message) VALUES (?, ?, ?, ?);",
+                     user_id, social_id, post_date, json.dumps(message))
+
+    @property
+    def get_pause_expired_or_removed_messages(self):
+        '''
+            Ottengo i messaggi archiviati che hanno la pausa scaduta o non sono più in pausa
+            :return: <List> of <List>
+        '''
+        res, _ = self.__query("SELECT messages.message_id, messages.message, t_reg.status "
+                              "FROM messages "
+                              "INNER JOIN(SELECT  * "
+                              "FROM registrations "
+                              "WHERE registrations.status != 3 OR (registrations.status = 3 AND registrations.expire_date < ?)) t_reg "
+                              "ON messages.user_id = t_reg.user_id AND messages.social_id = t_reg.social_id "
+                              "ORDER BY messages.update_date;",
+                              time.time(), fetch=0)
+        return res
+
+    def remove_messages(self, messages):
+        for mess in messages:
+            self.__query("DELETE FROM messages "
+                         "WHERE messages.message_id = ?;", mess)
 
     def clean_expired_state(self):
         _, rowcount = self.__query("UPDATE registrations "

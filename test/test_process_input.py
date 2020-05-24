@@ -227,7 +227,7 @@ def test_list_command():
     assert result[0]["text"] == msm_list
 
 
-def test_callback_list_base():
+def test_list_callback_base():
     database = MyDatabase(DATABASE_PATH)
     myprocess_input = Processinput(database, [])
     result = myprocess_input.process(cnst.CALLBACK_LIST_PAGE_1)
@@ -242,7 +242,7 @@ def test_callback_list_base():
     assert cnst.CALLBACK_LIST_PAGE_1["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
 
 
-def test_callback_list_page():
+def test_list_callback_page():
     database = MyDatabase(DATABASE_PATH)
     myprocess_input = Processinput(database, [])
     result = myprocess_input.process(cnst.CALLBACK_LIST_PAGE_2)
@@ -254,7 +254,7 @@ def test_callback_list_page():
     assert cnst.CALLBACK_LIST_PAGE_2["result"][0]["callback_query"]["message"]["reply_markup"] == result[0]["reply_markup"]
 
 
-def test_callback_list_old_page():
+def test_list_callback_old_page():
     database = MyDatabase(DATABASE_PATH)
     myprocess_input = Processinput(database, [])
     result = myprocess_input.process(cnst.CALLBACK_LIST_PAGE_3)
@@ -320,7 +320,7 @@ def test_mute_command_set_mute_day():
 def test_mute_command_not_social():
     '''
         Test del comando di mute corettamente formattato ma su di un social
-        non abilitato non ancora implementato nel bot
+        non abilitato o non ancora implementato nel bot (/mute youtube SpaceX)
     '''
     database = MyDatabase(DATABASE_PATH)
     myprocess_input = Processinput(database, [])
@@ -420,6 +420,160 @@ def test_mute_callback_use_unmute():
     assert cnst.CALLBACK_MUTE_USE_UNMUTE["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
 
 
+def test_pause_command_no_args():
+    '''
+    Test del comando di pause mal formattato o senza argomenti
+    Il ritorno sarà un messaggio che informa sul coretto utilizzo del comando
+    '''
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_PAUSE)
+
+    msm_list = ("<b>⚠️Warning</b>\n<code>/pause</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/pause &lt;social&gt; &lt;username&gt; &lt;XXXd&gt;</code>\n<i>OR:</i>\n<code>/pause &lt;social&gt; &lt;username&gt; &lt;XXXh&gt;</code>")
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_PAUSE["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_pause_command_set_mute_hours():
+    '''
+    Test del comando di pause corettamente formattato indicando le ore
+    Il ritorno sarà un messaggio che informa sul coretto pause del profilo social
+    '''
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_PAUSE_WORKING_HOURS)
+
+    msm_list = ('<b>✅⏯️ Paused successfully!</b>\n\nSocial: <i>ig</i>\nUser: <i>testProfile3</i>!')
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_PAUSE_WORKING_HOURS["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_pause_command_set_mute_day():
+    '''
+        Test del comando di pause correttamente formattato indicando i giorni
+        Il ritorno sarà un messaggio che informa sul coretto pause del profilo social
+    '''
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_PAUSE_WORKING_DAY)
+
+    msm_list = ('<b>✅⏯️ Paused successfully!</b>\n\nSocial: <i>ig</i>\nUser: <i>testProfile3</i>!')
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_PAUSE_WORKING_DAY["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_pause_command_not_social():
+    '''
+        Test del comando di pause corettamente formattato ma su di un social
+        non abilitato o non ancora implementato nel bot (/pause youtube SpaceX)
+    '''
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_PAUSE_MISS_SOCIAL)
+
+    msm_list = ('<b>⚠️Warning</b>\nError: <code>socialNotAbilitedOrMisstyped</code>')
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_PAUSE_MISS_SOCIAL["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_pause_command_not_subscribed():
+    '''
+        Test del comando di pause corettamente formattato ma su di un social
+        non a cui non si è sottoscritti
+    '''
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_PAUSE_MISS_SUBSCRIPTION)
+
+    msm_list = ('<b>⚠️Warning</b>\nError: <code>userNotSubscribed</code>')
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_PAUSE_MISS_SUBSCRIPTION["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_pause_callback_base():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_PAUSE)
+
+    assert result[0]["type"] == 'answerCallbackQuery'
+    assert result[0]["text"] == 'Pause list'
+
+    assert result[1]["type"] == "editMessageText"
+    assert cnst.CALLBACK_PAUSE["result"][0]["callback_query"]["message"]["chat"]["id"] == result[1]["chat_id"]
+    assert cnst.CALLBACK_PAUSE["result"][0]["callback_query"]["message"]["message_id"] == result[1]["message_id"]
+    assert cnst.CALLBACK_PAUSE["result"][0]["callback_query"]["message"]["text"] == result[1]["text"]
+    assert cnst.CALLBACK_PAUSE["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
+
+
+def test_pause_callback_page():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_PAUSE_PAGE2)
+
+    assert result[0]["type"] == "editMessageText"
+    assert cnst.CALLBACK_PAUSE_PAGE2["result"][0]["callback_query"]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert cnst.CALLBACK_PAUSE_PAGE2["result"][0]["callback_query"]["message"]["message_id"] == result[0]["message_id"]
+    assert cnst.CALLBACK_PAUSE_PAGE2["result"][0]["callback_query"]["message"]["text"] == result[0]["text"]
+    assert cnst.CALLBACK_PAUSE_PAGE2["result"][0]["callback_query"]["message"]["reply_markup"] == result[0]["reply_markup"]
+
+
+def test_pause_callback_change_date():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_PAUSE_PAGE2_DATE)
+
+    assert result[0]["type"] == "editMessageText"
+    assert cnst.CALLBACK_PAUSE_PAGE2_DATE["result"][0]["callback_query"]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert cnst.CALLBACK_PAUSE_PAGE2_DATE["result"][0]["callback_query"]["message"]["message_id"] == result[0]["message_id"]
+    assert cnst.CALLBACK_PAUSE_PAGE2_DATE["result"][0]["callback_query"]["message"]["text"] == result[0]["text"]
+    assert cnst.CALLBACK_PAUSE_PAGE2_DATE["result"][0]["callback_query"]["message"]["reply_markup"] == result[0]["reply_markup"]
+
+
+def test_pause_callback_use_mute():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_PAUSE_USE)
+
+    assert result[0]["type"] == 'answerCallbackQuery'
+    assert result[0]["text"] == 'Paused'
+
+    assert result[1]["type"] == "editMessageText"
+    assert cnst.CALLBACK_PAUSE_USE["result"][0]["callback_query"]["message"]["chat"]["id"] == result[1]["chat_id"]
+    assert cnst.CALLBACK_PAUSE_USE["result"][0]["callback_query"]["message"]["message_id"] == result[1]["message_id"]
+    assert cnst.CALLBACK_PAUSE_USE["result"][0]["callback_query"]["message"]["text"] == result[1]["text"]
+    assert cnst.CALLBACK_PAUSE_USE["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
+
+
+def test_pause_callback_use_unmute():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_PAUSE_USE_UNMUTE)
+
+    assert result[0]["type"] == 'answerCallbackQuery'
+    assert result[0]["text"] == 'Un-Paused'
+
+    assert result[1]["type"] == "editMessageText"
+    assert cnst.CALLBACK_PAUSE_USE_UNMUTE["result"][0]["callback_query"]["message"]["chat"]["id"] == result[1]["chat_id"]
+    assert cnst.CALLBACK_PAUSE_USE_UNMUTE["result"][0]["callback_query"]["message"]["message_id"] == result[1]["message_id"]
+    assert cnst.CALLBACK_PAUSE_USE_UNMUTE["result"][0]["callback_query"]["message"]["text"] == result[1]["text"]
+    assert cnst.CALLBACK_PAUSE_USE_UNMUTE["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
+
+
 def test_unsub_command():
     database = MyDatabase(DATABASE_PATH)
     igram = Instagram()
@@ -443,7 +597,7 @@ def test_unsub_callback():
     queries = [cnst.CLBK_UNSUB_MODE,
                cnst.CLBK_UNSUB_MODE_PAGE,
                cnst.CLBK_UNSUB_MODE_EXST_WRNG_PAGE,
-               cnst.CLBK_UNSUB_MODE_EXST_wRNG_PAGE_AND_SOCL]
+               cnst.CLBK_UNSUB_MODE_EXST_WRNG_PAGE_AND_SOCL]
 
     for query in queries:
         result = myprocess_input.process(query["query"])
