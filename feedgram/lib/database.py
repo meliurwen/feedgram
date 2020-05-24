@@ -9,9 +9,7 @@ class MyDatabase:
 
     def __init__(self, dbPath):
         self.__logger = logging.getLogger('telegram_bot.database')
-        self.__logger.info('Creating an instance of database')
-
-        self.__logger.info("################### INIZIALIZAZIONE CONFIGURAZIONE #########################")
+        self.__logger.info('Class instance for communication with a SQLite3 database initiated.')
 
         self.__tables = ['admins', 'users', 'registrations', 'socials', 'messages']
         self.__dbpath = dbPath
@@ -34,16 +32,16 @@ class MyDatabase:
     @property
     def __db_exist(self):
 
-        self.__logger.info("Versione modulo: %s", sqlite3.version)
-        self.__logger.info("Versione libreria SQLite: %s", sqlite3.sqlite_version)
-        self.__logger.info("Nome database SQLite: %s", self.__dbpath)
+        self.__logger.info("Module version: %s", sqlite3.version)
+        self.__logger.info("Library version: %s", sqlite3.sqlite_version)
+        self.__logger.info("Database name: %s", self.__dbpath)
 
-        self.__logger.info("Controllo se esiste già un file chiamato %s ...", self.__dbpath)
+        self.__logger.info("Checking if already a file named '%s' exists...", self.__dbpath)
         if os.path.isfile(self.__dbpath):
-            self.__logger.info("Il file ESISTE")
+            self.__logger.info("The file exists.")
             return True
         else:
-            self.__logger.info("Il file NON esiste")
+            self.__logger.info("The file does not exist.")
             return False
 
     @property
@@ -54,7 +52,7 @@ class MyDatabase:
         return True
 
     def __table_exist(self, table):
-        self.__logger.debug("Controllo se esiste la tabella %s ...", table)
+        self.__logger.debug("Checking if the table '%s' exists...", table)
         counter, _ = self.__query(
             "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = ?;", table)
         if counter[0] == 0:
@@ -64,7 +62,7 @@ class MyDatabase:
             return True
 
     def __db_creation(self):
-        self.__logger.info("Creo il file SQLITE3 e le tabelle...")
+        self.__logger.info("Creating the SQLite3 file and tables...")
         self.__query("CREATE TABLE `admins` (`user_id` INTEGER NOT NULL, `is_creator` INTEGER NOT NULL DEFAULT 0, FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE, PRIMARY KEY(`user_id`));")
         self.__query("CREATE TABLE `users` (`user_id` INTEGER NOT NULL, `username` TEXT, `chat_id` INTEGER NOT NULL, `notifications` INTEGER NOT NULL DEFAULT 1, `max_registrations` INTEGER NOT NULL DEFAULT 10, `subscription_time` INTEGER NOT NULL, PRIMARY KEY(`user_id`));")
         self.__query("CREATE TABLE `registrations` (`user_id` INTEGER NOT NULL, `social_id` INTEGER NOT NULL, `status` INTEGER NOT NULL DEFAULT 0, `expire_date` INTEGER NOT NULL DEFAULT -1, PRIMARY KEY(`user_id`,`social_id`), FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE, FOREIGN KEY(`social_id`) REFERENCES `socials`(`social_id`) ON DELETE CASCADE ON UPDATE CASCADE);")

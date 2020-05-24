@@ -343,7 +343,7 @@ class Processinput:
         return messages
 
     @classmethod
-    def __ms_maker(cls, chatid, text, markdown=None, link_preview=None, notification=None, markup=None):
+    def __ms_maker(cls, chatid, text, markdown=None, disable_web_page_preview=None, disable_notification=None, reply_markup=None):
         temp_dict = {}
 
         temp_dict["type"] = "sendMessage"
@@ -354,14 +354,14 @@ class Processinput:
         if markdown:
             temp_dict["markdown"] = markdown
 
-        if link_preview:
-            temp_dict["disable_web_page_preview"] = link_preview
+        if isinstance(disable_web_page_preview, bool):
+            temp_dict["disable_web_page_preview"] = disable_web_page_preview
 
-        if notification:
-            temp_dict["disable_notification"] = not notification
+        if isinstance(disable_notification, bool):
+            temp_dict["disable_notification"] = disable_notification
 
-        if markup:
-            temp_dict["reply_markup"] = markup
+        if reply_markup:
+            temp_dict["reply_markup"] = reply_markup
 
         return temp_dict
 
@@ -382,7 +382,7 @@ class Processinput:
         return temp_dict
 
     @classmethod
-    def __ms_edit(cls, chat_id, message_id, text, markdown=None, markup=None):
+    def __ms_edit(cls, chat_id, message_id, text, markdown=None, reply_markup=None):
         temp_dict = {}
 
         temp_dict["type"] = "editMessageText"
@@ -394,8 +394,8 @@ class Processinput:
         if markdown:
             temp_dict["markdown"] = markdown
 
-        if markup:
-            temp_dict["reply_markup"] = markup
+        if reply_markup:
+            temp_dict["reply_markup"] = reply_markup
 
         return temp_dict
 

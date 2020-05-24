@@ -19,8 +19,8 @@ class Telegram:
 
     # Imposta la url di Telegram col token (fa abbastanza schifo come metodo, fa funziona)
     def __init__(self, token):
-        self.__logger = logging.getLogger('telegram_bot.Send_Recive')
-        self.__logger.info('Creating an instance for telegram comunication')
+        self.__logger = logging.getLogger('telegram_bot.telegram')
+        self.__logger.info('Class instance for communication with Telegram\'s bot APIs initiated.')
         self.__tl_url = "https://api.telegram.org/bot{}/".format(token)
 
     # TODO: Mettere nel config il timeout in modo che possa esse impostato manualmente dall'utente
@@ -40,6 +40,8 @@ class Telegram:
                         url = url + "&parse_mode={}".format(message["markdown"])
                 if "disable_notification" in message:
                     url = url + "&disable_notification={}".format(message["disable_notification"])
+                if "disable_web_page_preview" in message:  # Forse mettere un controllo tipo isbool()? Boh...
+                    url = url + "&disable_web_page_preview={}".format(str(message["disable_web_page_preview"]))
                 if "reply_markup" in message:
                     url = url + "&reply_markup={}".format(quote_plus(json.dumps(message["reply_markup"])))
                 # TODO: Finire di aggiungere le funzionalità della modalità sendMessage

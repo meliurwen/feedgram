@@ -42,14 +42,14 @@ def main():
     # Inizializzo il logger per la stampa dei messaggi
     logger = setup_loger()
 
-    logger.info("Benvenuto nel programma")
+    logger.info("App started")
 
     # Instanzio l'ogetto contentente la configurazione
     config = Config(FILE_CONFIG)
 
     # Verifico che lo stato dell'oggetto sia coretto altrimenti chiudo il programma
     if config.status <= 0:
-        logger.error("Arresto del programma...")
+        logger.error("Shutting down the app...")
         sys.exit(0)
 
     # Instanzio l'ogetto del database data la configurazione caricata
@@ -57,7 +57,7 @@ def main():
 
     # Verifico che lo stato del database sia valido altrimenti chiudo il programma
     if database.status <= 0:
-        logger.error("Arresto del programma...")
+        logger.error("Shutting down the app...")
         sys.exit(0)
 
     still_run = True

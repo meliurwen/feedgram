@@ -35,27 +35,26 @@ class Config:
     def __init__(self, fileConfig):
 
         self.__logger = logging.getLogger('telegram_bot.Config')
-        self.__logger.info('Creating an instance of Config')
-
-        self.__logger.info("################### CONFIGURATION LOADING #########################")
+        self.__logger.info('Class instance for loading the configuration from a file initiated')
 
         self.__file_config = fileConfig
         self.__state = 1
 
-        self.__logger.info("Controllo se esiste già il file di configurazione %s ...", fileConfig)
+        self.__logger.info("Checking if the configuration file '%s' already exists...", fileConfig)
         if os.path.exists(self.__file_config):
-            self.__logger.info("Il file %s esiste.", fileConfig)
+            self.__logger.info("The file '%s' exists.", fileConfig)
             self.load_config()
         else:
-            self.__logger.info("################### CONFIGURATION CREATION #########################")
+            self.__logger.info("The file '%s' does not exist.", fileConfig)
+            self.__logger.info("Creating a new configuration file named '%s'...", fileConfig)
             self.__cofigurazione_dict = DEFAULT_CONFIG
+            self.__logger.info("Configuration file '%s' created.", fileConfig)
+            self.__logger.info("Saving configuration file '%s'...", fileConfig)
             self.save_config()
+            self.__logger.info("Configuration file '%s' saved.", fileConfig)
             self.load_config()
 
-        self.__logger.info("################### CONFIGURATION COMPLETE #########################")
-
     def load_config(self):
-        self.__logger.info("################### CONFIGURATION CONFIGURAZIONE #########################")
         configurazione = configparser.ConfigParser()
         try:
             configurazione.read(self.__file_config)
@@ -76,7 +75,6 @@ class Config:
             # return -4
 
     def save_config(self):
-        self.__logger.info("################### SALVATAGGIO CONFIGURAZIONE #########################")
         self.__write_config(self.__file_config, self.__cofigurazione_dict)
 
     @property
@@ -105,7 +103,6 @@ class Config:
 
     @property
     def __check_config(self):
-        self.__logger.info("################### CONTROLLO CONFIGURAZIONE#########################")
         self.__logger.info("Controllo che ci siano esattamente tutte le sezioni...")
         if not set(self.__cofigurazione_dict.keys()) == set(DEFAULT_CONFIG.keys()):
             self.__logger.warning("NON ci sono ESATTAMENTE tutte le sezioni.")

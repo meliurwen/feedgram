@@ -259,9 +259,9 @@ class Watchdog(threading.Thread):
 
                     self.__db.remove_messages(trash_list)
 
-                    self.__logger.info("Messaggi da inviare: %s ", len(messages_list))
+                    self.__logger.info("Messaggi archiviati da inviare: %s ", len(messages_list))
                     if len(messages_list) > 0:
                         CODA_TEMP.put(messages_list)
-                        self.__logger.info("Messaggi messi in coda di spedizione.")
+                        self.__logger.info("Messaggi archiviati messi in coda di spedizione.")
 
                 time.sleep(self.delay)
