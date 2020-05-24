@@ -2,6 +2,8 @@
 import threading
 import queue
 import logging
+import time
+import json
 # Libs
 from feedgram.lib.process_input import Processinput
 from feedgram.lib.database import MyDatabase
@@ -36,10 +38,13 @@ class Watchdog(threading.Thread):
 
         self.__logger = logging.getLogger("telegram_bot.WD.{}".format(self.name))
 
+        # inizializazione della variabile database solo nei thread necessari
+        if self.mode == "telegram_user_interface" or self.mode == "news_retreiver" or self.mode == "news_compiler" or self.mode == "pause_manger":
+            self.__db = MyDatabase(self.__conf_dict["BOT"]["databasefilepath"])
+
         # Inizializazione dei social da fare solo ne caso del news_retreiver e del telegram_user_interface
         if self.mode == "telegram_user_interface" or self.mode == "news_retreiver":
             self.__instagram_interface = Instagram()
-            self.__db = MyDatabase(self.__conf_dict["BOT"]["databasefilepath"])
 
         if self.mode == "telegram_user_interface" or self.mode == "sender":
             self.__tel_interface = Telegram(self.__conf_dict["API"]["telegramkey"])  # <- cambiare config_dict
@@ -66,7 +71,7 @@ class Watchdog(threading.Thread):
             message_list = []
             # TODO: dare un'occhiata alla logica di questa roba qua sotto, c'è qualquadra che non cosa... :/
             while self.still_run:
-                if CODA_TEMP.empty() and len(delivering_list) == 0:  # Se la coda è vuota aspetto che non diventi più vuota per aggiungere i messaggi in ddelivering_list
+                if CODA_TEMP.empty() and len(delivering_list) == 0:  # Se la coda è vuota aspetto che non diventi più vuota per aggiungere i messaggi in delivering_list
                     message_list = CODA_TEMP.get()
                     delivering_list = delivering_list + message_list
                     # print("Ho appena ricevuto dei messaggini nuovi da spedirez! ^_^")
@@ -82,6 +87,7 @@ class Watchdog(threading.Thread):
         if self.mode == "sender":
             while self.still_run:
                 self.__tel_interface.send_messages(CODA)
+
         if self.mode == "news_compiler":
             while self.still_run:
                 with self.condizione:
@@ -93,7 +99,13 @@ class Watchdog(threading.Thread):
                     for data_social in DATAS_SOCIAL:
                         if data_social["social"] in SUBSCRIPTIONS_DICT["subscriptions"]:
                             if data_social["internal_id"] in SUBSCRIPTIONS_DICT["subscriptions"][data_social["social"]]:
-                                for chat_id in SUBSCRIPTIONS_DICT["subscriptions"][data_social["social"]][data_social["internal_id"]]:
+                                for user in SUBSCRIPTIONS_DICT["subscriptions"][data_social["social"]][data_social["internal_id"]]:
+
+                                    # Controllo la data di scadenza della sottoscrizione
+                                    # Se è scaduta resetto allo stato 0 (di default)
+                                    if user['expire'] <= time.time():
+                                        user['state'] = 0
+
                                     message_title = data_social["title"]
                                     if data_social["type"] == "new_post":
                                         text = "<b>[" + data_social["social"].upper() + "]</b>\nUser: <i>" + message_title + "</i>\nLink: " + data_social["post_url"]
@@ -103,10 +115,19 @@ class Watchdog(threading.Thread):
                                         text = "<b>⚠️ALERT⚠️</b>\n<b>[" + data_social["social"].upper() + "]</b>\nThis account has been <b>deleted</b> and also automatically removed from your <i>Follow List</i>.\nUser: <i>" + message_title + "</i>\nLink: " + data_social["post_url"]
                                     else:
                                         text = "<b>⚠️UNKNOWN MESSAGE⚠️</b>\nPlease report it to the creator of this bot."
-                                    messages_socials.append({'type': 'sendMessage',
-                                                             'text': text,
-                                                             'chat_id': str(chat_id),
-                                                             'markdown': 'HTML'})
+
+                                    # Se l'utente ha impostato lo stato 2 (muted) alla sottoscrizione, allora non riceve nessun messaggio a riguardo
+                                    if user['state'] != 2:
+                                        message = {'type': 'sendMessage',
+                                                   'text': text,
+                                                   'chat_id': str(user['user_id']),
+                                                   'disable_notification': bool(user['state'] == 1),
+                                                   'markdown': 'HTML'}
+                                        if user['state'] != 3:
+                                            messages_socials.append(message)
+                                        else:
+                                            self.__db.archive_message(user['user_id'], user["social_id"], data_social["post_date"], message)
+
                 self.__logger.info("Messaggi da inviare: %s ", len(messages_socials))
                 if len(messages_socials) > 0:
                     CODA_TEMP.put(messages_socials)
@@ -116,6 +137,7 @@ class Watchdog(threading.Thread):
             # global condizione_compiler
             while self.still_run:
 
+                self.__db.clean_expired_state()  # TODO: Estremamente poco efficiente e costosa, assolutamente da migliorare
                 self.__db.clean_dead_subscriptions()  # Pulisco al tabella "socials" rimuovendo gli account ai quali nessuno è più iscritto
                 SUBSCRIPTIONS_DICT = self.__db.create_dict_of_user_ids_and_socials  # Creo un dizionario di tutte le iscrizioni degli utenti
 
@@ -201,3 +223,45 @@ class Watchdog(threading.Thread):
 
                 with self.condizione:
                     self.condizione.wait(self.delay)
+
+        if self.mode == "pause_manger":
+            while self.still_run:
+                messages = self.__db.get_pause_expired_or_removed_messages
+                # for mess in message:
+                # mess[0] -> message_id
+                # mess[1] -> message
+                # mess[2] -> status
+
+                messages_list = []  # lista dei messaggi che dovranno essere inviati
+                trash_list = []  # lista che conterrà gli id dei messaggi da rimuovere
+                if messages:
+                    self.__logger.info("Ho trovato %s messaggi archivati da gestire", len(messages))
+                    for mess in messages:
+                        # Per ogni messaggio andremo ad analizzare lo stato.
+                        # In ogni caso i messaggi selezionati dovranno essere rimossi dal database.
+                        trash_list.append(mess[0])  # aggungo il messaggio nella lista di quelli da rimuovere
+
+                        # Se lo stato è 2 (stop) non verrà inviato nessun messaggio
+                        if mess[2] != 2:
+                            # se lo stato è:
+                            # 0 (normale) -> cambio di stato in 0
+                            # 1 (mute) -> cambio di stato in 1
+                            # 3 (pausa) -> l'expire_date è scaduto
+                            # inviamo normalmente il messaggio
+
+                            temp = json.loads(mess[1])  # oggettizzo il json
+
+                            if mess[2] == 1:
+                                # stato di mute, il messaggio dovrà essere inviato silenziosamente
+                                temp['disable_notification'] = True
+
+                            messages_list.append(temp)  # append del messaggio alla lista
+
+                    self.__db.remove_messages(trash_list)
+
+                    self.__logger.info("Messaggi archiviati da inviare: %s ", len(messages_list))
+                    if len(messages_list) > 0:
+                        CODA_TEMP.put(messages_list)
+                        self.__logger.info("Messaggi archiviati messi in coda di spedizione.")
+
+                time.sleep(self.delay)
