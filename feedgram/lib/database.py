@@ -64,8 +64,8 @@ class MyDatabase:
     def __db_creation(self):
         self.__logger.info("Creating the SQLite3 file and tables...")
         self.__query("CREATE TABLE `admins` (`user_id` INTEGER NOT NULL, `is_creator` INTEGER NOT NULL DEFAULT 0, FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE, PRIMARY KEY(`user_id`));")
-        self.__query("CREATE TABLE `users` (`user_id` INTEGER NOT NULL, `username` TEXT, `chat_id` INTEGER NOT NULL, `notifications` INTEGER NOT NULL DEFAULT 1, `max_registrations` INTEGER NOT NULL DEFAULT 10, `subscription_time` INTEGER NOT NULL, PRIMARY KEY(`user_id`));")
-        self.__query("CREATE TABLE `registrations` (`user_id` INTEGER NOT NULL, `social_id` INTEGER NOT NULL, `status` INTEGER NOT NULL DEFAULT 0, `expire_date` INTEGER NOT NULL DEFAULT -1, PRIMARY KEY(`user_id`,`social_id`), FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE, FOREIGN KEY(`social_id`) REFERENCES `socials`(`social_id`) ON DELETE CASCADE ON UPDATE CASCADE);")
+        self.__query("CREATE TABLE `users` (`user_id` INTEGER NOT NULL, `username` TEXT, `chat_id` INTEGER NOT NULL, `max_registrations` INTEGER NOT NULL DEFAULT 10, `subscription_time` INTEGER NOT NULL, PRIMARY KEY(`user_id`));")
+        self.__query("CREATE TABLE `registrations` (`user_id` INTEGER NOT NULL, `social_id` INTEGER NOT NULL, `status` INTEGER NOT NULL DEFAULT 0, `expire_date` INTEGER NOT NULL DEFAULT -1, `category` TEXT NOT NULL DEFAULT 'default', PRIMARY KEY(`user_id`,`social_id`), FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE, FOREIGN KEY(`social_id`) REFERENCES `socials`(`social_id`) ON DELETE CASCADE ON UPDATE CASCADE);")
         self.__query("CREATE TABLE `socials` (`social_id` INTEGER NOT NULL, `social` TEXT NOT NULL, `username` TEXT NOT NULL, `title` TEXT NOT NULL, `internal_id` TEXT NOT NULL, `retreive_time` INTEGER NOT NULL, `status` TEXT NOT NULL DEFAULT 'public', PRIMARY KEY(`social_id`));")
         self.__query("CREATE TABLE `messages` ( `message_id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,`user_id` INTEGER NOT NULL, `social_id` INTEGER NOT NULL, `update_date` INTEGER NOT NULL, `message` TEXT NOT NULL, FOREIGN KEY(`user_id`,`social_id`) REFERENCES `registrations`(`user_id`,`social_id`) ON DELETE CASCADE ON UPDATE CASCADE );")
         self.__logger.info("Database e tabelle create con successo")
@@ -113,9 +113,9 @@ class MyDatabase:
         self.__query("DELETE FROM users WHERE user_id = ?;",
                      user_id, foreign=True)
 
-    def subscribe_user(self, user_id, username, chat_id, notifications, max_registrations):
-        self.__query("INSERT INTO users (user_id, username, chat_id, notifications, max_registrations, subscription_time) VALUES (?, ?, ?, ?, ?, ?);",
-                     user_id, username, chat_id, notifications, max_registrations, int(time.time()))
+    def subscribe_user(self, user_id, username, chat_id, max_registrations):
+        self.__query("INSERT INTO users (user_id, username, chat_id, max_registrations, subscription_time) VALUES (?, ?, ?, ?, ?);",
+                     user_id, username, chat_id, max_registrations, int(time.time()))
 
     def check_number_subscribtions(self, user_id):
         res, _ = self.__query(
@@ -208,11 +208,17 @@ class MyDatabase:
                 socials_accounts_dict["subscriptions"][row[1]][row[2]].append({'user_id': row[0], 'social_id': row[9], 'state': row[7], 'expire': row[8]})
         return socials_accounts_dict
 
-    def user_subscriptions(self, user_id):
-        res, _ = self.__query("SELECT socials.social, socials.title, socials.internal_id, registrations.status, registrations.expire_date "
-                              "FROM registrations, socials "
-                              "WHERE  registrations.user_id = ? AND "
-                              "registrations.social_id = socials.social_id ORDER BY socials.social;", user_id, fetch=0)
+    def user_subscriptions(self, user_id, by_category=False):
+        if by_category:
+            res, _ = self.__query("SELECT socials.social, socials.title, socials.internal_id, registrations.status, registrations.expire_date , registrations.category "
+                                  "FROM registrations, socials "
+                                  "WHERE  registrations.user_id = ? AND  registrations.social_id = socials.social_id "
+                                  "ORDER BY registrations.category, socials.social;", user_id, fetch=0)
+        else:
+            res, _ = self.__query("SELECT socials.social, socials.title, socials.internal_id, registrations.status, registrations.expire_date "
+                                  "FROM registrations, socials "
+                                  "WHERE  registrations.user_id = ? AND "
+                                  "registrations.social_id = socials.social_id ORDER BY socials.social;", user_id, fetch=0)
         return res
 
     def clean_dead_subscriptions(self):
@@ -280,7 +286,7 @@ class MyDatabase:
 
     def set_state_of_social_account(self, user_id, social, internal_id, state, exp_date):
         _, rowcount = self.__query("UPDATE registrations "
-                                   "SET status = ? , expire_date = ?"
+                                   "SET status = ? , expire_date = ? "
                                    "WHERE registrations.user_id = ? AND "
                                    "registrations.social_id = ("
                                    "SELECT socials.social_id "
@@ -311,6 +317,29 @@ class MyDatabase:
         for mess in messages:
             self.__query("DELETE FROM messages "
                          "WHERE messages.message_id = ?;", mess)
+
+    def set_category_of_social_account(self, user_id, social, internal_id, category):
+        _, rowcount = self.__query("UPDATE registrations "
+                                   "SET category = ? "
+                                   "WHERE registrations.user_id = ? AND "
+                                   "registrations.social_id = ("
+                                   "SELECT socials.social_id "
+                                   "FROM socials WHERE socials.social = ? AND socials.internal_id = ?);", category, user_id, social, internal_id)
+        return bool(rowcount)
+
+    def rename_category(self, user_id, category_old, category_new='default'):
+        _, rowcount = self.__query("UPDATE registrations "
+                                   "SET category = ? "
+                                   "WHERE registrations.user_id = ? AND "
+                                   "registrations.category = ?;", category_new, user_id, category_old)
+        return bool(rowcount)
+
+    def set_state_of_category(self, user_id, category, state, exp_date):
+        _, rowcount = self.__query("UPDATE registrations "
+                                   "SET status = ? , expire_date = ? "
+                                   "WHERE registrations.user_id = ? AND "
+                                   "registrations.category = ?;", state, exp_date, user_id, category)
+        return bool(rowcount)
 
     def clean_expired_state(self):
         _, rowcount = self.__query("UPDATE registrations "

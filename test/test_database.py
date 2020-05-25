@@ -116,13 +116,13 @@ def test_user_id_not_exist():
 def test_subscribe():
 
     database = MyDatabase(DATABASE_PATH)
-    database.subscribe_user(6551474276, "username", 75692378, 1, 10)
+    database.subscribe_user(6551474276, "username", 75692378, 10)
     us_exist, _ = myquery(DATABASE_PATH, "SELECT 1 FROM users WHERE user_id = ?;", 6551474276)
     assert bool(us_exist)
-    database.subscribe_user(1597534565, "foo", 456789132, 1, 10)
+    database.subscribe_user(1597534565, "foo", 456789132, 10)
     us_exist, _ = myquery(DATABASE_PATH, "SELECT 1 FROM users WHERE user_id = ?;", 6551474276)
     assert bool(us_exist)
-    database.subscribe_user(9638527416, "bar", 456789132, 1, 10)
+    database.subscribe_user(9638527416, "bar", 456789132, 10)
     us_exist, _ = myquery(DATABASE_PATH, "SELECT 1 FROM users WHERE user_id = ?;", 6551474276)
     assert bool(us_exist)
 

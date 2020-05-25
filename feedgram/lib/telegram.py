@@ -52,9 +52,6 @@ class Telegram:
         get_url(url)
         # [{'command': 'start', 'description': 'Start the bot'}, {'command': 'stop', 'description': 'Stop the bot'}]
 
-
-
-
     # TODO: Mettere nel config il timeout in modo che possa esse impostato manualmente dall'utente
     def get_updates(self, offset=None):
         url = self.__tl_url + "getUpdates?timeout=60"
