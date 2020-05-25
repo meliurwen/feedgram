@@ -48,6 +48,7 @@ class Watchdog(threading.Thread):
 
         if self.mode == "telegram_user_interface" or self.mode == "sender":
             self.__tel_interface = Telegram(self.__conf_dict["API"]["telegramkey"])  # <- cambiare config_dict
+            self.__tel_interface.check_comand_info()
 
         if self.mode == "telegram_user_interface":
             self.__process_input = Processinput(self.__db, [self.__instagram_interface])  # da dare in input i social
