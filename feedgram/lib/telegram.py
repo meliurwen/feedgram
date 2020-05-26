@@ -23,6 +23,21 @@ class Telegram:
         self.__logger.info('Class instance for communication with Telegram\'s bot APIs initiated.')
         self.__tl_url = "https://api.telegram.org/bot{}/".format(token)
 
+    def update_command_info(self, commands):
+        actual_command = self.get_my_commands()["result"]
+        if commands != actual_command:
+            self.set_my_commands(commands)
+
+    def get_my_commands(self):
+        url = self.__tl_url + "getMyCommands"
+        return self.__get_json_from_url(url)
+
+    def set_my_commands(self, commands):
+        url = self.__tl_url + "setMyCommands"
+        url = url + "?commands={}".format(quote_plus(json.dumps(commands)))
+        get_url(url)
+        # [{'command': 'start', 'description': 'Start the bot'}, {'command': 'stop', 'description': 'Stop the bot'}]
+
     # TODO: Mettere nel config il timeout in modo che possa esse impostato manualmente dall'utente
     def get_updates(self, offset=None):
         url = self.__tl_url + "getUpdates?timeout=60"

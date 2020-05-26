@@ -116,13 +116,13 @@ def test_user_id_not_exist():
 def test_subscribe():
 
     database = MyDatabase(DATABASE_PATH)
-    database.subscribe_user(6551474276, "username", 75692378, 1, 10)
+    database.subscribe_user(6551474276, "username", 75692378, 10)
     us_exist, _ = myquery(DATABASE_PATH, "SELECT 1 FROM users WHERE user_id = ?;", 6551474276)
     assert bool(us_exist)
-    database.subscribe_user(1597534565, "foo", 456789132, 1, 10)
+    database.subscribe_user(1597534565, "foo", 456789132, 10)
     us_exist, _ = myquery(DATABASE_PATH, "SELECT 1 FROM users WHERE user_id = ?;", 6551474276)
     assert bool(us_exist)
-    database.subscribe_user(9638527416, "bar", 456789132, 1, 10)
+    database.subscribe_user(9638527416, "bar", 456789132, 10)
     us_exist, _ = myquery(DATABASE_PATH, "SELECT 1 FROM users WHERE user_id = ?;", 6551474276)
     assert bool(us_exist)
 
@@ -282,11 +282,7 @@ def test_user_subscriptions():
 
     res = database.user_subscriptions(6551474276)
 
-    assert res[0][0] == "instagram"
-    assert res[0][1] == "il_post"
-    assert res[0][2] == "1769583068"
-    assert res[0][3] == 0
-    assert res[0][4] == -1
+    assert res[0] == ("instagram", "il_post", "1769583068", 0, -1)
 
 
 def test_set_state_of_social_account():
@@ -367,6 +363,66 @@ def test_remove_messages():
     res, _ = myquery(DATABASE_PATH, "SELECT count() FROM messages WHERE messages.message_id = 1")
 
     assert res[0] == 0
+
+
+def test_user_subscriptions_category():
+    '''
+        Verifica le sottoscrizioni dell'utente compresa la categoria
+    '''
+    assert path.exists(DATABASE_PATH)
+    database = MyDatabase(DATABASE_PATH)
+
+    res = database.user_subscriptions(6551474276, True)
+
+    assert res[0] == ("instagram", "il_post", "1769583068", 0, -1, 'default')
+
+
+def test_set_category_of_social_account():
+    '''
+        Testo il setaggio di una categoria ad una registrazione
+    '''
+    assert path.exists(DATABASE_PATH)
+    database = MyDatabase(DATABASE_PATH)
+
+    res = database.set_category_of_social_account(6551474276, 'instagram', 1769583068, 'Test')
+
+    assert res
+
+    res = database.user_subscriptions(6551474276, True)
+
+    assert res[0] == ("instagram", "il_post", "1769583068", 0, -1, 'Test')
+
+
+def test_rename_category():
+    '''
+        Testo il setaggio di una categoria ad una registrazione
+    '''
+    assert path.exists(DATABASE_PATH)
+    database = MyDatabase(DATABASE_PATH)
+
+    res = database.rename_category(6551474276, 'Test', 'New_test')
+
+    assert res
+
+    res = database.user_subscriptions(6551474276, True)
+
+    assert res[0] == ("instagram", "il_post", "1769583068", 0, -1, 'New_test')
+
+
+def test_set_state_of_category():
+    '''
+        Testo il setaggio di una categoria ad una registrazione
+    '''
+    assert path.exists(DATABASE_PATH)
+    database = MyDatabase(DATABASE_PATH)
+
+    res = database.set_state_of_category(6551474276, 'New_test', 1, 17867577819)
+
+    assert res
+
+    res = database.user_subscriptions(6551474276, True)
+
+    assert res[0] == ("instagram", "il_post", "1769583068", 1, 17867577819, 'New_test')
 
 
 def test_process_messages_queries1():

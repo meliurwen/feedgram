@@ -574,6 +574,602 @@ def test_pause_callback_use_unmute():
     assert cnst.CALLBACK_PAUSE_USE_UNMUTE["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
 
 
+def test_cmute_command_no_args():
+    '''
+    Test del comando di mute mal formattato o senza argomenti
+    Il ritorno sarà un messaggio che informa sul coretto utilizzo del comando
+    '''
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_CMUTE)
+
+    msm_list = ("<b>⚠️Warning</b>\n<code>/cmute</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/cmute &lt;category&gt; &lt;XXXd&gt;</code>\n<i>OR:</i>\n<code>/cmute &lt;category&gt; &lt;XXXh&gt;</code>")
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_CMUTE["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_cmute_command_set_cmute_hours():
+    '''
+    Test del comando di mute mal formattato o senza argomenti
+    Il ritorno sarà un messaggio che informa sul coretto utilizzo del comando
+    '''
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_CMUTE_WORKING_HOURS)
+
+    msm_list = ("<b>✅🔕 Muted successfully!</b>\n\nCategory: <i>default</i>")
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_CMUTE_WORKING_HOURS["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_cmute_command_set_cmute_day():
+    '''
+    Test del comando di mute mal formattato o senza argomenti
+    Il ritorno sarà un messaggio che informa sul coretto utilizzo del comando
+    '''
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_CMUTE_WORKING_DAY)
+
+    msm_list = ("<b>✅🔕 Muted successfully!</b>\n\nCategory: <i>default</i>")
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_CMUTE_WORKING_DAY["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_cmute_command_not_social():
+    '''
+    Test del comando di mute mal formattato o senza argomenti
+    Il ritorno sarà un messaggio che informa sul coretto utilizzo del comando
+    '''
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_CMUTE_MISS_SOCIAL)
+
+    msm_list = ('<b>⚠️Warning</b>\nError: <code>userMissCategory</code>')
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_CMUTE_MISS_SOCIAL["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_chalt_command_no_args():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_CHALT)
+
+    msm_list = ("<b>⚠️Warning</b>\n<code>/chalt</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/chalt &lt;category&gt; &lt;XXXd&gt;</code>\n<i>OR:</i>\n<code>/chalt &lt;category&gt; &lt;XXXh&gt;</code>")
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_CHALT["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_chalt_command_set_cmute_hours():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_CHALT_WORKING_HOURS)
+
+    msm_list = ("<b>✅⏹ Stopped successfully!</b>\n\nCategory: <i>default</i>")
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_CHALT_WORKING_HOURS["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_chalt_command_set_cmute_day():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_CHALT_WORKING_DAY)
+
+    msm_list = ("<b>✅⏹ Stopped successfully!</b>\n\nCategory: <i>default</i>")
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_CHALT_WORKING_DAY["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_chalt_command_not_social():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_CHALT_MISS_SOCIAL)
+
+    msm_list = ('<b>⚠️Warning</b>\nError: <code>userMissCategory</code>')
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_CHALT_MISS_SOCIAL["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_cpause_command_no_args():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_CPAUSE)
+
+    msm_list = ("<b>⚠️Warning</b>\n<code>/cpause</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/cpause &lt;category&gt; &lt;XXXd&gt;</code>\n<i>OR:</i>\n<code>/cpause &lt;category&gt; &lt;XXXh&gt;</code>")
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_CPAUSE["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_cpause_command_set_cmute_hours():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_CPAUSE_WORKING_HOURS)
+
+    msm_list = ("<b>✅⏯️ Paused successfully!</b>\n\nCategory: <i>default</i>")
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_CPAUSE_WORKING_HOURS["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_cpause_command_set_cmute_day():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_CPAUSE_WORKING_DAY)
+
+    msm_list = ("<b>✅⏯️ Paused successfully!</b>\n\nCategory: <i>default</i>")
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_CPAUSE_WORKING_DAY["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_cpause_command_not_social():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_CPAUSE_MISS_SOCIAL)
+
+    msm_list = ('<b>⚠️Warning</b>\nError: <code>userMissCategory</code>')
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_CPAUSE_MISS_SOCIAL["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_category_command_no_args():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_CATEGORY)
+
+    msm_list = ("<b>⚠️Warning</b>\n<code>/category</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/category &lt;social&gt; &lt;username&gt; &lt;category&gt;</code>")
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_CATEGORY["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_category_command_set_category():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_CATEGORY_WORKING)
+
+    msm_list = ("<b>✅Successfully moved!</b>\n\nSocial: <i>ig</i>\nUser: <i>testProfile3</i>\nTo category: <i>test</i>!")
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_CATEGORY_WORKING["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_category_command_not_social():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_CATEGORY_MISS_SOCIAL)
+
+    msm_list = ('<b>⚠️Warning</b>\nError: <code>socialNotAbilitedOrMisstyped</code>')
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_CATEGORY_MISS_SOCIAL["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_category_command_not_subscribed():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_CATEGORY_MISS_SUBSCRIPTION)
+
+    msm_list = ('<b>⚠️Warning</b>\nError: <code>userNotSubscribed</code>')
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_CATEGORY_MISS_SUBSCRIPTION["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_rename_command_no_args():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_RENAME)
+
+    msm_list = ("<b>⚠️Warning</b>\n<code>/rename</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/rename &lt;category&gt; &lt;category&gt;</code>")
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_RENAME["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_rename_command_miss_category():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_RENAME_MISS_CATEGORY)
+
+    msm_list = ("<b>⚠️Warning</b>\nError: <code>categoryDontExist</code>")
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_RENAME_MISS_CATEGORY["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_rename_command_working():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_RENAME_WORKING)
+
+    msm_list = ("<b>✅Successfully renamed!</b>\n\nCategory: <i>test</i>\nInto: <i>newcategory</i>")
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_RENAME_WORKING["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_remove_command_no_args():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_REMOVE)
+
+    msm_list = ("<b>⚠️Warning</b>\n<code>/remove</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/remove &lt;category&gt;</code>")
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_REMOVE["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_remove_command_miss_category():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_REMOVE_MISS_CATEGORY)
+
+    msm_list = ("<b>⚠️Warning</b>\nError: <code>categoryDontExist</code>")
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_REMOVE_MISS_CATEGORY["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_remove_command_working():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+
+    result = myprocess_input.process(cnst.COMMAND_REMOVE_WORKING)
+
+    msm_list = ("<b>✅Successfully removed!</b>\n\nCategory: <i>newcategory</i>")
+
+    assert result[0]["type"] == "sendMessage"
+    assert cnst.COMMAND_REMOVE_WORKING["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert result[0]["text"] == msm_list
+
+
+def test_category_mode_callback_base():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_CATEGORY_MODE)
+
+    assert result[0]["type"] == 'answerCallbackQuery'
+    assert result[0]["text"] == "Category list"
+
+    assert result[1]["type"] == "editMessageText"
+    assert cnst.CALLBACK_CATEGORY_MODE["result"][0]["callback_query"]["message"]["chat"]["id"] == result[1]["chat_id"]
+    assert cnst.CALLBACK_CATEGORY_MODE["result"][0]["callback_query"]["message"]["message_id"] == result[1]["message_id"]
+    assert cnst.CALLBACK_CATEGORY_MODE["result"][0]["callback_query"]["message"]["text"] == result[1]["text"]
+    assert cnst.CALLBACK_CATEGORY_MODE["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
+
+
+def test_category_mode_callback_page():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_CATEGORY_MODE_PAGE2)
+
+    assert result[0]["type"] == "editMessageText"
+    assert cnst.CALLBACK_CATEGORY_MODE_PAGE2["result"][0]["callback_query"]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert cnst.CALLBACK_CATEGORY_MODE_PAGE2["result"][0]["callback_query"]["message"]["message_id"] == result[0]["message_id"]
+    assert cnst.CALLBACK_CATEGORY_MODE_PAGE2["result"][0]["callback_query"]["message"]["text"] == result[0]["text"]
+    assert cnst.CALLBACK_CATEGORY_MODE_PAGE2["result"][0]["callback_query"]["message"]["reply_markup"] == result[0]["reply_markup"]
+
+
+def test_category_remove_callback_base():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_CATEGORY_REMVOE)
+
+    assert result[0]["type"] == 'answerCallbackQuery'
+    assert result[0]["text"] == "Only the category will be removed, the subscriptions will be moved to 'default' category"
+
+    assert result[1]["type"] == "editMessageText"
+    assert cnst.CALLBACK_CATEGORY_REMVOE["result"][0]["callback_query"]["message"]["chat"]["id"] == result[1]["chat_id"]
+    assert cnst.CALLBACK_CATEGORY_REMVOE["result"][0]["callback_query"]["message"]["message_id"] == result[1]["message_id"]
+    assert cnst.CALLBACK_CATEGORY_REMVOE["result"][0]["callback_query"]["message"]["text"] == result[1]["text"]
+    assert cnst.CALLBACK_CATEGORY_REMVOE["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
+
+
+def test_category_remove_callback_page():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_CATEGORY_REMVOE_PAGE2)
+
+    assert result[0]["type"] == "editMessageText"
+    assert cnst.CALLBACK_CATEGORY_REMVOE_PAGE2["result"][0]["callback_query"]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert cnst.CALLBACK_CATEGORY_REMVOE_PAGE2["result"][0]["callback_query"]["message"]["message_id"] == result[0]["message_id"]
+    assert cnst.CALLBACK_CATEGORY_REMVOE_PAGE2["result"][0]["callback_query"]["message"]["text"] == result[0]["text"]
+    assert cnst.CALLBACK_CATEGORY_REMVOE_PAGE2["result"][0]["callback_query"]["message"]["reply_markup"] == result[0]["reply_markup"]
+
+
+def test_category_remove_callback_use():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_CATEGORY_REMVOE_USE)
+
+    assert result[0]["type"] == 'answerCallbackQuery'
+    assert result[0]["text"] == 'Category removed'
+
+    assert result[1]["type"] == "editMessageText"
+    assert cnst.CALLBACK_CATEGORY_REMVOE_USE["result"][0]["callback_query"]["message"]["chat"]["id"] == result[1]["chat_id"]
+    assert cnst.CALLBACK_CATEGORY_REMVOE_USE["result"][0]["callback_query"]["message"]["message_id"] == result[1]["message_id"]
+    assert cnst.CALLBACK_CATEGORY_REMVOE_USE["result"][0]["callback_query"]["message"]["text"] == result[1]["text"]
+    assert cnst.CALLBACK_CATEGORY_REMVOE_USE["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
+
+
+def test_category_mute_callback_base():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_CATEGORY_MUTE)
+
+    assert result[0]["type"] == 'answerCallbackQuery'
+    assert result[0]["text"] == 'Category Mute'
+
+    assert result[1]["type"] == "editMessageText"
+    assert cnst.CALLBACK_CATEGORY_MUTE["result"][0]["callback_query"]["message"]["chat"]["id"] == result[1]["chat_id"]
+    assert cnst.CALLBACK_CATEGORY_MUTE["result"][0]["callback_query"]["message"]["message_id"] == result[1]["message_id"]
+    assert cnst.CALLBACK_CATEGORY_MUTE["result"][0]["callback_query"]["message"]["text"] == result[1]["text"]
+    assert cnst.CALLBACK_CATEGORY_MUTE["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
+
+
+def test_category_mute_callback_page():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_CATEGORY_MUTE_PAGE2)
+
+    assert result[0]["type"] == "editMessageText"
+    assert cnst.CALLBACK_CATEGORY_MUTE_PAGE2["result"][0]["callback_query"]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert cnst.CALLBACK_CATEGORY_MUTE_PAGE2["result"][0]["callback_query"]["message"]["message_id"] == result[0]["message_id"]
+    assert cnst.CALLBACK_CATEGORY_MUTE_PAGE2["result"][0]["callback_query"]["message"]["text"] == result[0]["text"]
+    assert cnst.CALLBACK_CATEGORY_MUTE_PAGE2["result"][0]["callback_query"]["message"]["reply_markup"] == result[0]["reply_markup"]
+
+
+def test_category_mute_callback_change_date():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_CATEGORY_MUTE_PAGE2_DATE)
+
+    assert result[0]["type"] == "editMessageText"
+    assert cnst.CALLBACK_CATEGORY_MUTE_PAGE2_DATE["result"][0]["callback_query"]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert cnst.CALLBACK_CATEGORY_MUTE_PAGE2_DATE["result"][0]["callback_query"]["message"]["message_id"] == result[0]["message_id"]
+    assert cnst.CALLBACK_CATEGORY_MUTE_PAGE2_DATE["result"][0]["callback_query"]["message"]["text"] == result[0]["text"]
+    assert cnst.CALLBACK_CATEGORY_MUTE_PAGE2_DATE["result"][0]["callback_query"]["message"]["reply_markup"] == result[0]["reply_markup"]
+
+
+def test_category_mute_callback_use_mute():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_CATEGORY_MUTE_USE)
+
+    assert result[0]["type"] == 'answerCallbackQuery'
+    assert result[0]["text"] == 'Category Muted'
+
+    assert result[1]["type"] == "editMessageText"
+    assert cnst.CALLBACK_CATEGORY_MUTE_USE["result"][0]["callback_query"]["message"]["chat"]["id"] == result[1]["chat_id"]
+    assert cnst.CALLBACK_CATEGORY_MUTE_USE["result"][0]["callback_query"]["message"]["message_id"] == result[1]["message_id"]
+    assert cnst.CALLBACK_CATEGORY_MUTE_USE["result"][0]["callback_query"]["message"]["text"] == result[1]["text"]
+    assert cnst.CALLBACK_CATEGORY_MUTE_USE["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
+
+
+def test_category_mute_callback_use_unmute():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_CATEGORY_MUTE_UNMUTE)
+
+    assert result[0]["type"] == 'answerCallbackQuery'
+    assert result[0]["text"] == 'Category Un-Muted'
+
+    assert result[1]["type"] == "editMessageText"
+    assert cnst.CALLBACK_CATEGORY_MUTE_UNMUTE["result"][0]["callback_query"]["message"]["chat"]["id"] == result[1]["chat_id"]
+    assert cnst.CALLBACK_CATEGORY_MUTE_UNMUTE["result"][0]["callback_query"]["message"]["message_id"] == result[1]["message_id"]
+    assert cnst.CALLBACK_CATEGORY_MUTE_UNMUTE["result"][0]["callback_query"]["message"]["text"] == result[1]["text"]
+    assert cnst.CALLBACK_CATEGORY_MUTE_UNMUTE["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
+
+
+def test_category_halt_callback_base():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_CATEGORY_HALT)
+
+    assert result[0]["type"] == 'answerCallbackQuery'
+    assert result[0]["text"] == 'Category Stop'
+
+    assert result[1]["type"] == "editMessageText"
+    assert cnst.CALLBACK_CATEGORY_HALT["result"][0]["callback_query"]["message"]["chat"]["id"] == result[1]["chat_id"]
+    assert cnst.CALLBACK_CATEGORY_HALT["result"][0]["callback_query"]["message"]["message_id"] == result[1]["message_id"]
+    assert cnst.CALLBACK_CATEGORY_HALT["result"][0]["callback_query"]["message"]["text"] == result[1]["text"]
+    assert cnst.CALLBACK_CATEGORY_HALT["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
+
+
+def test_category_halt_callback_page():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_CATEGORY_HALT_PAGE2)
+
+    assert result[0]["type"] == "editMessageText"
+    assert cnst.CALLBACK_CATEGORY_HALT_PAGE2["result"][0]["callback_query"]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert cnst.CALLBACK_CATEGORY_HALT_PAGE2["result"][0]["callback_query"]["message"]["message_id"] == result[0]["message_id"]
+    assert cnst.CALLBACK_CATEGORY_HALT_PAGE2["result"][0]["callback_query"]["message"]["text"] == result[0]["text"]
+    assert cnst.CALLBACK_CATEGORY_HALT_PAGE2["result"][0]["callback_query"]["message"]["reply_markup"] == result[0]["reply_markup"]
+
+
+def test_category_halt_callback_change_date():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_CATEGORY_HALT_PAGE2_DATE)
+
+    assert result[0]["type"] == "editMessageText"
+    assert cnst.CALLBACK_CATEGORY_HALT_PAGE2_DATE["result"][0]["callback_query"]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert cnst.CALLBACK_CATEGORY_HALT_PAGE2_DATE["result"][0]["callback_query"]["message"]["message_id"] == result[0]["message_id"]
+    assert cnst.CALLBACK_CATEGORY_HALT_PAGE2_DATE["result"][0]["callback_query"]["message"]["text"] == result[0]["text"]
+    assert cnst.CALLBACK_CATEGORY_HALT_PAGE2_DATE["result"][0]["callback_query"]["message"]["reply_markup"] == result[0]["reply_markup"]
+
+
+def test_category_halt_callback_use_stop():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_CATEGORY_HALT_USE)
+
+    assert result[0]["type"] == 'answerCallbackQuery'
+    assert result[0]["text"] == 'Category Stopped'
+
+    assert result[1]["type"] == "editMessageText"
+    assert cnst.CALLBACK_CATEGORY_HALT_USE["result"][0]["callback_query"]["message"]["chat"]["id"] == result[1]["chat_id"]
+    assert cnst.CALLBACK_CATEGORY_HALT_USE["result"][0]["callback_query"]["message"]["message_id"] == result[1]["message_id"]
+    assert cnst.CALLBACK_CATEGORY_HALT_USE["result"][0]["callback_query"]["message"]["text"] == result[1]["text"]
+    assert cnst.CALLBACK_CATEGORY_HALT_USE["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
+
+
+def test_category_halt_callback_use_unstop():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_CATEGORY_HALT_UNMUTE)
+
+    assert result[0]["type"] == 'answerCallbackQuery'
+    assert result[0]["text"] == 'Category Un-Stopped'
+
+    assert result[1]["type"] == "editMessageText"
+    assert cnst.CALLBACK_CATEGORY_HALT_UNMUTE["result"][0]["callback_query"]["message"]["chat"]["id"] == result[1]["chat_id"]
+    assert cnst.CALLBACK_CATEGORY_HALT_UNMUTE["result"][0]["callback_query"]["message"]["message_id"] == result[1]["message_id"]
+    assert cnst.CALLBACK_CATEGORY_HALT_UNMUTE["result"][0]["callback_query"]["message"]["text"] == result[1]["text"]
+    assert cnst.CALLBACK_CATEGORY_HALT_UNMUTE["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
+
+
+def test_category_pause_callback_base():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_CATEGORY_PAUSE)
+
+    assert result[0]["type"] == 'answerCallbackQuery'
+    assert result[0]["text"] == 'Category Pause'
+
+    assert result[1]["type"] == "editMessageText"
+    assert cnst.CALLBACK_CATEGORY_PAUSE["result"][0]["callback_query"]["message"]["chat"]["id"] == result[1]["chat_id"]
+    assert cnst.CALLBACK_CATEGORY_PAUSE["result"][0]["callback_query"]["message"]["message_id"] == result[1]["message_id"]
+    assert cnst.CALLBACK_CATEGORY_PAUSE["result"][0]["callback_query"]["message"]["text"] == result[1]["text"]
+    assert cnst.CALLBACK_CATEGORY_PAUSE["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
+
+
+def test_category_pause_callback_page():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_CATEGORY_PAUSE_PAGE2)
+
+    assert result[0]["type"] == "editMessageText"
+    assert cnst.CALLBACK_CATEGORY_PAUSE_PAGE2["result"][0]["callback_query"]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert cnst.CALLBACK_CATEGORY_PAUSE_PAGE2["result"][0]["callback_query"]["message"]["message_id"] == result[0]["message_id"]
+    assert cnst.CALLBACK_CATEGORY_PAUSE_PAGE2["result"][0]["callback_query"]["message"]["text"] == result[0]["text"]
+    assert cnst.CALLBACK_CATEGORY_PAUSE_PAGE2["result"][0]["callback_query"]["message"]["reply_markup"] == result[0]["reply_markup"]
+
+
+def test_category_pause_callback_change_date():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_CATEGORY_PAUSE_PAGE2_DATE)
+
+    assert result[0]["type"] == "editMessageText"
+    assert cnst.CALLBACK_CATEGORY_PAUSE_PAGE2_DATE["result"][0]["callback_query"]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert cnst.CALLBACK_CATEGORY_PAUSE_PAGE2_DATE["result"][0]["callback_query"]["message"]["message_id"] == result[0]["message_id"]
+    assert cnst.CALLBACK_CATEGORY_PAUSE_PAGE2_DATE["result"][0]["callback_query"]["message"]["text"] == result[0]["text"]
+    assert cnst.CALLBACK_CATEGORY_PAUSE_PAGE2_DATE["result"][0]["callback_query"]["message"]["reply_markup"] == result[0]["reply_markup"]
+
+
+def test_category_pause_callback_use_stop():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_CATEGORY_PAUSE_USE)
+
+    assert result[0]["type"] == 'answerCallbackQuery'
+    assert result[0]["text"] == 'Category Paused'
+
+    assert result[1]["type"] == "editMessageText"
+    assert cnst.CALLBACK_CATEGORY_PAUSE_USE["result"][0]["callback_query"]["message"]["chat"]["id"] == result[1]["chat_id"]
+    assert cnst.CALLBACK_CATEGORY_PAUSE_USE["result"][0]["callback_query"]["message"]["message_id"] == result[1]["message_id"]
+    assert cnst.CALLBACK_CATEGORY_PAUSE_USE["result"][0]["callback_query"]["message"]["text"] == result[1]["text"]
+    assert cnst.CALLBACK_CATEGORY_PAUSE_USE["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
+
+
+def test_category_pause_callback_use_unstop():
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [])
+    result = myprocess_input.process(cnst.CALLBACK_CATEGORY_PAUSE_UNPAUSE)
+
+    assert result[0]["type"] == 'answerCallbackQuery'
+    assert result[0]["text"] == 'Category Un-Paused'
+
+    assert result[1]["type"] == "editMessageText"
+    assert cnst.CALLBACK_CATEGORY_PAUSE_UNPAUSE["result"][0]["callback_query"]["message"]["chat"]["id"] == result[1]["chat_id"]
+    assert cnst.CALLBACK_CATEGORY_PAUSE_UNPAUSE["result"][0]["callback_query"]["message"]["message_id"] == result[1]["message_id"]
+    assert cnst.CALLBACK_CATEGORY_PAUSE_UNPAUSE["result"][0]["callback_query"]["message"]["text"] == result[1]["text"]
+    assert cnst.CALLBACK_CATEGORY_PAUSE_UNPAUSE["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
+
+
 def test_unsub_command():
     database = MyDatabase(DATABASE_PATH)
     igram = Instagram()
