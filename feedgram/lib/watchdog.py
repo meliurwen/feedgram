@@ -56,15 +56,12 @@ class Watchdog(threading.Thread):
                         {'command': 'mute', 'description': 'Receive news without sound'},
                         {'command': 'halt', 'description': 'Stop to receive news'},
                         {'command': 'pause', 'description': 'Pause the news for retrieve later'},
-                        
                         {'command': 'cmute', 'description': 'Receive news of category without sound'},
                         {'command': 'chalt', 'description': 'Stop to receive news'},
                         {'command': 'cpause', 'description': 'Pause the news for retrieve later'},
-                        
                         {'command': 'category', 'description': 'Set a category'},
                         {'command': 'rename', 'description': 'Stop to receive news'},
                         {'command': 'remove', 'description': 'Pause the news for retrieve later'},
-                        
                         {'command': 'stop', 'description': 'Stop the bot and unsubscribe'}
                         ]
             self.__tel_interface.update_command_info(commands)
