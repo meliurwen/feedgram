@@ -920,6 +920,7 @@ def test_category_mode_callback_page():
     assert cnst.CALLBACK_CATEGORY_MODE_PAGE2["result"][0]["callback_query"]["message"]["text"] == result[0]["text"]
     assert cnst.CALLBACK_CATEGORY_MODE_PAGE2["result"][0]["callback_query"]["message"]["reply_markup"] == result[0]["reply_markup"]
 
+
 def test_category_remove_callback_base():
     database = MyDatabase(DATABASE_PATH)
     myprocess_input = Processinput(database, [])
@@ -960,8 +961,6 @@ def test_category_remove_callback_use():
     assert cnst.CALLBACK_CATEGORY_REMVOE_USE["result"][0]["callback_query"]["message"]["message_id"] == result[1]["message_id"]
     assert cnst.CALLBACK_CATEGORY_REMVOE_USE["result"][0]["callback_query"]["message"]["text"] == result[1]["text"]
     assert cnst.CALLBACK_CATEGORY_REMVOE_USE["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
-
-
 
 
 def test_category_mute_callback_base():
@@ -1033,11 +1032,6 @@ def test_category_mute_callback_use_unmute():
     assert cnst.CALLBACK_CATEGORY_MUTE_UNMUTE["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
 
 
-
-
-
-
-
 def test_category_halt_callback_base():
     database = MyDatabase(DATABASE_PATH)
     myprocess_input = Processinput(database, [])
@@ -1107,9 +1101,6 @@ def test_category_halt_callback_use_unstop():
     assert cnst.CALLBACK_CATEGORY_HALT_UNMUTE["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
 
 
-
-
-
 def test_category_pause_callback_base():
     database = MyDatabase(DATABASE_PATH)
     myprocess_input = Processinput(database, [])
@@ -1177,14 +1168,6 @@ def test_category_pause_callback_use_unstop():
     assert cnst.CALLBACK_CATEGORY_PAUSE_UNPAUSE["result"][0]["callback_query"]["message"]["message_id"] == result[1]["message_id"]
     assert cnst.CALLBACK_CATEGORY_PAUSE_UNPAUSE["result"][0]["callback_query"]["message"]["text"] == result[1]["text"]
     assert cnst.CALLBACK_CATEGORY_PAUSE_UNPAUSE["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
-
-
-
-
-
-
-
-
 
 
 def test_unsub_command():

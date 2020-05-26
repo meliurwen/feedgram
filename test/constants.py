@@ -1213,10 +1213,6 @@ CALLBACK_CATEGORY_REMVOE_USE["result"][0]["callback_query"]["message"]["reply_ma
 }
 CALLBACK_CATEGORY_REMVOE_USE["result"][0]["callback_query"]["data"] = "cat_remove 6 default"
 
-
-
-
-
 CALLBACK_CATEGORY_MUTE = copy.deepcopy(CLBK_MODE_HELP["query"])
 CALLBACK_CATEGORY_MUTE["result"][0]["callback_query"]["message"]["text"] = '🔕Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • ⏯️ testProfile\n    • ⏯️ testProfilePrivate\n    • ⏯️ testProfileStrangeStatus\n    • ⏯️ testIgProfileLinkHome\n    • ⏯️ testProfile2\n    • ⏯️ testProfile3\n\nPage 1 of 2'
 CALLBACK_CATEGORY_MUTE["result"][0]["callback_query"]["message"]["reply_markup"] = {
@@ -1282,10 +1278,6 @@ CALLBACK_CATEGORY_MUTE_UNMUTE["result"][0]["callback_query"]["message"]["reply_m
 }
 CALLBACK_CATEGORY_MUTE_UNMUTE["result"][0]["callback_query"]["data"] = "cat_mute 6 0 default"
 
-
-
-
-
 CALLBACK_CATEGORY_HALT = copy.deepcopy(CLBK_MODE_HELP["query"])
 CALLBACK_CATEGORY_HALT["result"][0]["callback_query"]["message"]["text"] = '⏹Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • testProfile\n    • testProfilePrivate\n    • testProfileStrangeStatus\n    • testIgProfileLinkHome\n    • testProfile2\n    • testProfile3\n\nPage 1 of 2'
 CALLBACK_CATEGORY_HALT["result"][0]["callback_query"]["message"]["reply_markup"] = {
@@ -1350,12 +1342,6 @@ CALLBACK_CATEGORY_HALT_UNMUTE["result"][0]["callback_query"]["message"]["reply_m
     ]
 }
 CALLBACK_CATEGORY_HALT_UNMUTE["result"][0]["callback_query"]["data"] = "cat_halt 6 0 default"
-
-
-
-
-
-
 
 CALLBACK_CATEGORY_PAUSE = copy.deepcopy(CLBK_MODE_HELP["query"])
 CALLBACK_CATEGORY_PAUSE["result"][0]["callback_query"]["message"]["text"] = '⏯️Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • testProfile\n    • testProfilePrivate\n    • testProfileStrangeStatus\n    • testIgProfileLinkHome\n    • testProfile2\n    • testProfile3\n\nPage 1 of 2'
