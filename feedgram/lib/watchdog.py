@@ -48,7 +48,26 @@ class Watchdog(threading.Thread):
 
         if self.mode == "telegram_user_interface" or self.mode == "sender":
             self.__tel_interface = Telegram(self.__conf_dict["API"]["telegramkey"])  # <- cambiare config_dict
-            self.__tel_interface.check_comand_info()
+            commands = [{'command': 'start', 'description': 'Start the bot and subscribe'},
+                        {'command': 'help', 'description': 'Get information abouth the Bot'},
+                        {'command': 'sub', 'description': 'Follow social account'},
+                        {'command': 'unsub', 'description': 'Stop to follow social account'},
+                        {'command': 'list', 'description': 'List your subscrition'},
+                        {'command': 'mute', 'description': 'Receive news without sound'},
+                        {'command': 'halt', 'description': 'Stop to receive news'},
+                        {'command': 'pause', 'description': 'Pause the news for retrieve later'},
+                        
+                        {'command': 'cmute', 'description': 'Receive news of category without sound'},
+                        {'command': 'chalt', 'description': 'Stop to receive news'},
+                        {'command': 'cpause', 'description': 'Pause the news for retrieve later'},
+                        
+                        {'command': 'category', 'description': 'Set a category'},
+                        {'command': 'rename', 'description': 'Stop to receive news'},
+                        {'command': 'remove', 'description': 'Pause the news for retrieve later'},
+                        
+                        {'command': 'stop', 'description': 'Stop the bot and unsubscribe'}
+                        ]
+            self.__tel_interface.update_command_info(commands)
 
         if self.mode == "telegram_user_interface":
             self.__process_input = Processinput(self.__db, [self.__instagram_interface])  # da dare in input i social

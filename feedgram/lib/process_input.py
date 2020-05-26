@@ -157,9 +157,9 @@ class Processinput:
                                     if match:
                                         status = self.__set_cat_state(user_id, match.group(1), 1, match.group(2))
                                         if status["ok"]:
-                                            msg_subs = "<b>✅🔕 Muted successfully!</b>\n\nSocial: <i>{}</i>\nUser: <i>{}</i>!".format(match.group(1), match.group(2))
+                                            msg_subs = "<b>✅🔕 Muted successfully!</b>\n\nCategory: <i>{}</i>".format(match.group(1))
                                         else:
-                                            msg_subs = "<b>⚠️Warning</b>\nError: <code>{}</code>".format(unsub_status["description"])
+                                            msg_subs = "<b>⚠️Warning</b>\nError: <code>{}</code>".format(status["description"])
                                     else:
                                         msg_subs = "<b>⚠️Warning</b>\n<code>/cmute</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/cmute &lt;category&gt; &lt;XXXd&gt;</code>\n<i>OR:</i>\n<code>/cmute &lt;category&gt; &lt;XXXh&gt;</code>"
                                     messages.append(self.__ms_maker(chat_id, msg_subs, "HTML"))
@@ -169,9 +169,9 @@ class Processinput:
                                     if match:
                                         status = self.__set_cat_state(user_id, match.group(1), 2, match.group(2))
                                         if status["ok"]:
-                                            msg_subs = "<b>✅⏹ Stopped successfully!</b>\n\nSocial: <i>{}</i>\nUser: <i>{}</i>!".format(match.group(1), match.group(2))
+                                            msg_subs = "<b>✅⏹ Stopped successfully!</b>\n\nCategory: <i>{}</i>".format(match.group(1))
                                         else:
-                                            msg_subs = "<b>⚠️Warning</b>\nError: <code>{}</code>".format(unsub_status["description"])
+                                            msg_subs = "<b>⚠️Warning</b>\nError: <code>{}</code>".format(status["description"])
                                     else:
                                         msg_subs = "<b>⚠️Warning</b>\n<code>/chalt</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/chalt &lt;category&gt; &lt;XXXd&gt;</code>\n<i>OR:</i>\n<code>/chalt &lt;category&gt; &lt;XXXh&gt;</code>"
                                     messages.append(self.__ms_maker(chat_id, msg_subs, "HTML"))
@@ -181,9 +181,9 @@ class Processinput:
                                     if match:
                                         status = self.__set_cat_state(user_id, match.group(1), 3, match.group(2))
                                         if status["ok"]:
-                                            msg_subs = "<b>✅⏯️ Paused successfully!</b>\n\nSocial: <i>{}</i>\nUser: <i>{}</i>!".format(match.group(1), match.group(2))
+                                            msg_subs = "<b>✅⏯️ Paused successfully!</b>\n\nCategory: <i>{}</i>".format(match.group(1))
                                         else:
-                                            msg_subs = "<b>⚠️Warning</b>\nError: <code>{}</code>".format(unsub_status["description"])
+                                            msg_subs = "<b>⚠️Warning</b>\nError: <code>{}</code>".format(status["description"])
                                     else:
                                         msg_subs = "<b>⚠️Warning</b>\n<code>/cpause</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/cpause &lt;category&gt; &lt;XXXd&gt;</code>\n<i>OR:</i>\n<code>/cpause &lt;category&gt; &lt;XXXh&gt;</code>"
                                     messages.append(self.__ms_maker(chat_id, msg_subs, "HTML"))
@@ -195,7 +195,7 @@ class Processinput:
                                         if status["ok"]:
                                             msg_subs = "<b>✅Successfully moved!</b>\n\nSocial: <i>{}</i>\nUser: <i>{}</i>\nTo category: <i>{}</i>!".format(match.group(1), match.group(2), match.group(3))
                                         else:
-                                            msg_subs = "<b>⚠️Warning</b>\nError: <code>{}</code>".format(unsub_status["description"])
+                                            msg_subs = "<b>⚠️Warning</b>\nError: <code>{}</code>".format(status["description"])
                                     else:
                                         msg_subs = "<b>⚠️Warning</b>\n<code>/category</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/category &lt;social&gt; &lt;username&gt; &lt;category&gt;</code>"
                                     messages.append(self.__ms_maker(chat_id, msg_subs, "HTML"))
@@ -204,10 +204,10 @@ class Processinput:
                                     match = re.search(r"^(\S{1,32}) (\S{1,32})$", text[8:])
                                     if match:
                                         status = self.__db.rename_category(user_id, match.group(1), match.group(2))
-                                        if status["ok"]:
+                                        if status:
                                             msg_subs = "<b>✅Successfully renamed!</b>\n\nCategory: <i>{}</i>\nInto: <i>{}</i>".format(match.group(1), match.group(2))
                                         else:
-                                            msg_subs = "<b>⚠️Warning</b>\nError: <code>{}</code>".format(unsub_status["description"])
+                                            msg_subs = "<b>⚠️Warning</b>\nError: <code>categoryDontExist</code>"
                                     else:
                                         msg_subs = "<b>⚠️Warning</b>\n<code>/rename</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/rename &lt;category&gt; &lt;category&gt;</code>"
                                     messages.append(self.__ms_maker(chat_id, msg_subs, "HTML"))
@@ -216,10 +216,10 @@ class Processinput:
                                     match = re.search(r"^(\S{1,32})$", text[8:])
                                     if match:
                                         status = self.__db.rename_category(user_id, match.group(1))
-                                        if status["ok"]:
+                                        if status:
                                             msg_subs = "<b>✅Successfully removed!</b>\n\nCategory: <i>{}</i>".format(match.group(1))
                                         else:
-                                            msg_subs = "<b>⚠️Warning</b>\nError: <code>{}</code>".format(unsub_status["description"])
+                                            msg_subs = "<b>⚠️Warning</b>\nError: <code>categoryDontExist</code>"
                                     else:
                                         msg_subs = "<b>⚠️Warning</b>\n<code>/remove</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/remove &lt;category&gt;</code>"
                                     messages.append(self.__ms_maker(chat_id, msg_subs, "HTML"))
@@ -1027,7 +1027,7 @@ class Processinput:
         if self.__db.set_state_of_category(user_id, category, state, exp_time):
             return {"ok": True, "description": "changedState"}
         else:
-            return {"ok": False, "description": "userNotSubscribed"}  # It happens only if between the check and the deleted the subscription is deleted by an nother istance/thread (it basically never happens)
+            return {"ok": False, "description": "userMissCategory"}  # It happens only if between the check and the deleted the subscription is deleted by an nother istance/thread (it basically never happens)
 
     def __set_sub_category(self, sub, user_id, category):
         # Spostare fuori questo dizionario

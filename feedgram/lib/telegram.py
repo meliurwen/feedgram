@@ -23,32 +23,18 @@ class Telegram:
         self.__logger.info('Class instance for communication with Telegram\'s bot APIs initiated.')
         self.__tl_url = "https://api.telegram.org/bot{}/".format(token)
 
-    def check_comand_info(self):
-        comands = [{'command': 'start', 'description': 'Start the bot and subscribe'},
+    def update_command_info(self, commands):
+        actual_command = self.get_my_commands()["result"]
+        if commands != actual_command:
+            self.set_my_commands(commands)
 
-                   {'command': 'help', 'description': 'Get information abouth the Bot'},
-                   {'command': 'sub', 'description': 'Follow social account'},
-                   {'command': 'unsub', 'description': 'Stop to follow social account'},
-                   {'command': 'list', 'description': 'List your subscrition'},
-
-                   {'command': 'mute', 'description': 'Receive news without sound'},
-                   {'command': 'halt', 'description': 'Stop to receive news'},
-                   {'command': 'pause', 'description': 'Pause the news for retrieve later'},
-
-                   {'command': 'stop', 'description': 'Stop the bot and unsubscribe'}
-                   ]
-
-        actual_command = self.__get_my_commands()["result"]
-        if comands != actual_command:
-            self.__set_my_comands(comands)
-
-    def __get_my_commands(self):
+    def get_my_commands(self):
         url = self.__tl_url + "getMyCommands"
         return self.__get_json_from_url(url)
 
-    def __set_my_comands(self, comands):
+    def set_my_commands(self, commands):
         url = self.__tl_url + "setMyCommands"
-        url = url + "?commands={}".format(quote_plus(json.dumps(comands)))
+        url = url + "?commands={}".format(quote_plus(json.dumps(commands)))
         get_url(url)
         # [{'command': 'start', 'description': 'Start the bot'}, {'command': 'stop', 'description': 'Stop the bot'}]
 
