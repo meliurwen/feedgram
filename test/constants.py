@@ -963,7 +963,7 @@ CLBK_UNSUB_MODE["result"] = [
         "type": "editMessageText",
         "chat_id": 123456789,
         "message_id": 2120,
-        "text": "♻️Remove\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfilePrivate\n  ② testProfileStrangeStatus\n  ③ testIgProfileLinkHome\n  ④ testProfile2\n  ⑤ ⏯️ testProfile3\n  ⑥ testProfile4\n\nPage 1 of 1",
+        "text": "♻️Remove\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfilePrivate\n  ② testProfileStrangeStatus\n  ③ testIgProfileLinkHome\n  ④ testProfile2\n  ⑤ testProfile3\n  ⑥ testProfile4\n\nPage 1 of 1",
         "markdown": "HTML",
         "reply_markup": {
             "inline_keyboard": [
@@ -995,14 +995,14 @@ CLBK_UNSUB_MODE_EXST_WRNG_PAGE = copy.deepcopy(CLBK_UNSUB_MODE)
 CLBK_UNSUB_MODE_EXST_WRNG_PAGE["query"]["result"][0]["callback_query"]["data"] = "remove 66 instagram 456765579"
 CLBK_UNSUB_MODE_EXST_WRNG_PAGE["result"][0]["text"] = "Unfollowed"
 del CLBK_UNSUB_MODE_EXST_WRNG_PAGE["result"][0]["show_alert"]
-CLBK_UNSUB_MODE_EXST_WRNG_PAGE["result"][1]["text"] = "♻️Remove\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfilePrivate\n  ② testProfileStrangeStatus\n  ③ testIgProfileLinkHome\n  ④ testProfile2\n  ⑤ ⏯️ testProfile3\n\nPage 1 of 1"
+CLBK_UNSUB_MODE_EXST_WRNG_PAGE["result"][1]["text"] = "♻️Remove\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfilePrivate\n  ② testProfileStrangeStatus\n  ③ testIgProfileLinkHome\n  ④ testProfile2\n  ⑤ testProfile3\n\nPage 1 of 1"
 del CLBK_UNSUB_MODE_EXST_WRNG_PAGE["result"][1]["reply_markup"]["inline_keyboard"][1][2]
 
 CLBK_UNSUB_MODE_EXST_WRNG_PAGE_AND_SOCL = copy.deepcopy(CLBK_UNSUB_MODE_EXST_WRNG_PAGE)
 CLBK_UNSUB_MODE_EXST_WRNG_PAGE_AND_SOCL["query"]["result"][0]["callback_query"]["data"] = "remove 66 banana 1546448"
 CLBK_UNSUB_MODE_EXST_WRNG_PAGE_AND_SOCL["result"][0]["text"] = "Error: socialNotAbilitedOrMisstyped"
 CLBK_UNSUB_MODE_EXST_WRNG_PAGE_AND_SOCL["result"][0]["show_alert"] = True
-CLBK_UNSUB_MODE_EXST_WRNG_PAGE_AND_SOCL["result"][1]["text"] = "♻️Remove\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfilePrivate\n  ② testProfileStrangeStatus\n  ③ testIgProfileLinkHome\n  ④ testProfile2\n  ⑤ ⏯️ testProfile3\n\nPage 1 of 1"
+CLBK_UNSUB_MODE_EXST_WRNG_PAGE_AND_SOCL["result"][1]["text"] = "♻️Remove\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfilePrivate\n  ② testProfileStrangeStatus\n  ③ testIgProfileLinkHome\n  ④ testProfile2\n  ⑤ testProfile3\n\nPage 1 of 1"
 
 COMMAND_PAUSE = copy.deepcopy(GENERAL_COMMAND)
 COMMAND_PAUSE['result'][0]['message']['text'] = "/pause"
@@ -1158,9 +1158,27 @@ COMMAND_REMOVE_MISS_CATEGORY['result'][0]['message']['text'] = "/remove missingc
 COMMAND_REMOVE_WORKING = copy.deepcopy(GENERAL_COMMAND)
 COMMAND_REMOVE_WORKING['result'][0]['message']['text'] = "/remove newcategory"
 
+CALLBACK_CATEGORY_MODE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_MODE["result"][0]["callback_query"]["message"]["text"] = '👥Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • ⏯️ testProfile\n    • ⏯️ testProfilePrivate\n    • ⏯️ testProfileStrangeStatus\n    • ⏯️ testIgProfileLinkHome\n    • ⏯️ testProfile2\n    • ⏯️ testProfile3\n\nPage 1 of 2'
+CALLBACK_CATEGORY_MODE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'category_mode 6', 'text': '»'}],
+        [{'callback_data': 'cat_pause', 'text': '⏯️'}, {'callback_data': 'cat_mute', 'text': '🔕'}, {'callback_data': 'cat_halt', 'text': '⏹'}, {'callback_data': 'cat_remove', 'text': '🗑'}],
+        [{'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_MODE["result"][0]["callback_query"]["data"] = "category_mode"
 
-
-
+CALLBACK_CATEGORY_MODE_PAGE2 = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_MODE_PAGE2["result"][0]["callback_query"]["message"]["text"] = '👥Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • ⏯️ testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_MODE_PAGE2["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'category_mode 0', 'text': '«'}],
+        [{'callback_data': 'cat_pause', 'text': '⏯️'}, {'callback_data': 'cat_mute', 'text': '🔕'}, {'callback_data': 'cat_halt', 'text': '⏹'}, {'callback_data': 'cat_remove', 'text': '🗑'}],
+        [{'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_MODE_PAGE2["result"][0]["callback_query"]["data"] = "category_mode 6"
 
 CALLBACK_CATEGORY_REMVOE = copy.deepcopy(CLBK_MODE_HELP["query"])
 CALLBACK_CATEGORY_REMVOE["result"][0]["callback_query"]["message"]["text"] = '🗑Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • ⏯️ testProfile\n    • ⏯️ testProfilePrivate\n    • ⏯️ testProfileStrangeStatus\n    • ⏯️ testIgProfileLinkHome\n    • ⏯️ testProfile2\n    • ⏯️ testProfile3\n\nPage 1 of 2'
@@ -1195,3 +1213,211 @@ CALLBACK_CATEGORY_REMVOE_USE["result"][0]["callback_query"]["message"]["reply_ma
 }
 CALLBACK_CATEGORY_REMVOE_USE["result"][0]["callback_query"]["data"] = "cat_remove 6 default"
 
+
+
+
+
+CALLBACK_CATEGORY_MUTE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_MUTE["result"][0]["callback_query"]["message"]["text"] = '🔕Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • ⏯️ testProfile\n    • ⏯️ testProfilePrivate\n    • ⏯️ testProfileStrangeStatus\n    • ⏯️ testIgProfileLinkHome\n    • ⏯️ testProfile2\n    • ⏯️ testProfile3\n\nPage 1 of 2'
+CALLBACK_CATEGORY_MUTE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_mute 0 3 default', 'text': '1'}],
+        [{'callback_data': 'cat_mute 6 3', 'text': '»'}],
+        [{'callback_data': 'cat_mute 0 1', 'text': '1 Day'}, {'callback_data': 'cat_mute 0 3', 'text': '✔ 3 Days'}],
+        [{'callback_data': 'cat_mute 0 7', 'text': '7 Days'}, {'callback_data': 'cat_mute 0 0', 'text': 'Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_MUTE["result"][0]["callback_query"]["data"] = "cat_mute"
+
+CALLBACK_CATEGORY_MUTE_PAGE2 = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_MUTE_PAGE2["result"][0]["callback_query"]["message"]["text"] = '🔕Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • ⏯️ testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_MUTE_PAGE2["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_mute 6 3 default', 'text': '1'}],
+        [{'callback_data': 'cat_mute 0 3', 'text': '«'}],
+        [{'callback_data': 'cat_mute 6 1', 'text': '1 Day'}, {'callback_data': 'cat_mute 6 3', 'text': '✔ 3 Days'}],
+        [{'callback_data': 'cat_mute 6 7', 'text': '7 Days'}, {'callback_data': 'cat_mute 6 0', 'text': 'Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_MUTE_PAGE2["result"][0]["callback_query"]["data"] = "cat_mute 6 3"
+
+CALLBACK_CATEGORY_MUTE_PAGE2_DATE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_MUTE_PAGE2_DATE["result"][0]["callback_query"]["message"]["text"] = '🔕Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • ⏯️ testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_MUTE_PAGE2_DATE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_mute 6 7 default', 'text': '1'}],
+        [{'callback_data': 'cat_mute 0 7', 'text': '«'}],
+        [{'callback_data': 'cat_mute 6 1', 'text': '1 Day'}, {'callback_data': 'cat_mute 6 3', 'text': '3 Days'}],
+        [{'callback_data': 'cat_mute 6 7', 'text': '✔ 7 Days'}, {'callback_data': 'cat_mute 6 0', 'text': 'Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_MUTE_PAGE2_DATE["result"][0]["callback_query"]["data"] = "cat_mute 6 7"
+
+CALLBACK_CATEGORY_MUTE_USE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_MUTE_USE["result"][0]["callback_query"]["message"]["text"] = '🔕Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • 🔕 testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_MUTE_USE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_mute 6 3 default', 'text': '1'}],
+        [{'callback_data': 'cat_mute 0 3', 'text': '«'}],
+        [{'callback_data': 'cat_mute 6 1', 'text': '1 Day'}, {'callback_data': 'cat_mute 6 3', 'text': '✔ 3 Days'}],
+        [{'callback_data': 'cat_mute 6 7', 'text': '7 Days'}, {'callback_data': 'cat_mute 6 0', 'text': 'Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_MUTE_USE["result"][0]["callback_query"]["data"] = "cat_mute 6 3 default"
+
+CALLBACK_CATEGORY_MUTE_UNMUTE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_MUTE_UNMUTE["result"][0]["callback_query"]["message"]["text"] = '🔕Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_MUTE_UNMUTE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_mute 6 0 default', 'text': '1'}],
+        [{'callback_data': 'cat_mute 0 0', 'text': '«'}],
+        [{'callback_data': 'cat_mute 6 1', 'text': '1 Day'}, {'callback_data': 'cat_mute 6 3', 'text': '3 Days'}],
+        [{'callback_data': 'cat_mute 6 7', 'text': '7 Days'}, {'callback_data': 'cat_mute 6 0', 'text': '✔ Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_MUTE_UNMUTE["result"][0]["callback_query"]["data"] = "cat_mute 6 0 default"
+
+
+
+
+
+CALLBACK_CATEGORY_HALT = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_HALT["result"][0]["callback_query"]["message"]["text"] = '⏹Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • testProfile\n    • testProfilePrivate\n    • testProfileStrangeStatus\n    • testIgProfileLinkHome\n    • testProfile2\n    • testProfile3\n\nPage 1 of 2'
+CALLBACK_CATEGORY_HALT["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_halt 0 3 default', 'text': '1'}],
+        [{'callback_data': 'cat_halt 6 3', 'text': '»'}],
+        [{'callback_data': 'cat_halt 0 1', 'text': '1 Day'}, {'callback_data': 'cat_halt 0 3', 'text': '✔ 3 Days'}],
+        [{'callback_data': 'cat_halt 0 7', 'text': '7 Days'}, {'callback_data': 'cat_halt 0 0', 'text': 'Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_HALT["result"][0]["callback_query"]["data"] = "cat_halt"
+
+CALLBACK_CATEGORY_HALT_PAGE2 = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_HALT_PAGE2["result"][0]["callback_query"]["message"]["text"] = '⏹Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_HALT_PAGE2["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_halt 6 3 default', 'text': '1'}],
+        [{'callback_data': 'cat_halt 0 3', 'text': '«'}],
+        [{'callback_data': 'cat_halt 6 1', 'text': '1 Day'}, {'callback_data': 'cat_halt 6 3', 'text': '✔ 3 Days'}],
+        [{'callback_data': 'cat_halt 6 7', 'text': '7 Days'}, {'callback_data': 'cat_halt 6 0', 'text': 'Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_HALT_PAGE2["result"][0]["callback_query"]["data"] = "cat_halt 6 3"
+
+CALLBACK_CATEGORY_HALT_PAGE2_DATE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_HALT_PAGE2_DATE["result"][0]["callback_query"]["message"]["text"] = '⏹Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_HALT_PAGE2_DATE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_halt 6 7 default', 'text': '1'}],
+        [{'callback_data': 'cat_halt 0 7', 'text': '«'}],
+        [{'callback_data': 'cat_halt 6 1', 'text': '1 Day'}, {'callback_data': 'cat_halt 6 3', 'text': '3 Days'}],
+        [{'callback_data': 'cat_halt 6 7', 'text': '✔ 7 Days'}, {'callback_data': 'cat_halt 6 0', 'text': 'Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_HALT_PAGE2_DATE["result"][0]["callback_query"]["data"] = "cat_halt 6 7"
+
+CALLBACK_CATEGORY_HALT_USE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_HALT_USE["result"][0]["callback_query"]["message"]["text"] = '⏹Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • ⏹ testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_HALT_USE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_halt 6 3 default', 'text': '1'}],
+        [{'callback_data': 'cat_halt 0 3', 'text': '«'}],
+        [{'callback_data': 'cat_halt 6 1', 'text': '1 Day'}, {'callback_data': 'cat_halt 6 3', 'text': '✔ 3 Days'}],
+        [{'callback_data': 'cat_halt 6 7', 'text': '7 Days'}, {'callback_data': 'cat_halt 6 0', 'text': 'Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_HALT_USE["result"][0]["callback_query"]["data"] = "cat_halt 6 3 default"
+
+CALLBACK_CATEGORY_HALT_UNMUTE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_HALT_UNMUTE["result"][0]["callback_query"]["message"]["text"] = '⏹Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_HALT_UNMUTE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_halt 6 0 default', 'text': '1'}],
+        [{'callback_data': 'cat_halt 0 0', 'text': '«'}],
+        [{'callback_data': 'cat_halt 6 1', 'text': '1 Day'}, {'callback_data': 'cat_halt 6 3', 'text': '3 Days'}],
+        [{'callback_data': 'cat_halt 6 7', 'text': '7 Days'}, {'callback_data': 'cat_halt 6 0', 'text': '✔ Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_HALT_UNMUTE["result"][0]["callback_query"]["data"] = "cat_halt 6 0 default"
+
+
+
+
+
+
+
+CALLBACK_CATEGORY_PAUSE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_PAUSE["result"][0]["callback_query"]["message"]["text"] = '⏯️Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • testProfile\n    • testProfilePrivate\n    • testProfileStrangeStatus\n    • testIgProfileLinkHome\n    • testProfile2\n    • testProfile3\n\nPage 1 of 2'
+CALLBACK_CATEGORY_PAUSE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_pause 0 3 default', 'text': '1'}],
+        [{'callback_data': 'cat_pause 6 3', 'text': '»'}],
+        [{'callback_data': 'cat_pause 0 1', 'text': '1 Day'}, {'callback_data': 'cat_pause 0 3', 'text': '✔ 3 Days'}],
+        [{'callback_data': 'cat_pause 0 7', 'text': '7 Days'}, {'callback_data': 'cat_pause 0 0', 'text': 'Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_PAUSE["result"][0]["callback_query"]["data"] = "cat_pause"
+
+CALLBACK_CATEGORY_PAUSE_PAGE2 = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_PAUSE_PAGE2["result"][0]["callback_query"]["message"]["text"] = '⏯️Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_PAUSE_PAGE2["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_pause 6 3 default', 'text': '1'}],
+        [{'callback_data': 'cat_pause 0 3', 'text': '«'}],
+        [{'callback_data': 'cat_pause 6 1', 'text': '1 Day'}, {'callback_data': 'cat_pause 6 3', 'text': '✔ 3 Days'}],
+        [{'callback_data': 'cat_pause 6 7', 'text': '7 Days'}, {'callback_data': 'cat_pause 6 0', 'text': 'Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_PAUSE_PAGE2["result"][0]["callback_query"]["data"] = "cat_pause 6 3"
+
+CALLBACK_CATEGORY_PAUSE_PAGE2_DATE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_PAUSE_PAGE2_DATE["result"][0]["callback_query"]["message"]["text"] = '⏯️Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_PAUSE_PAGE2_DATE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_pause 6 7 default', 'text': '1'}],
+        [{'callback_data': 'cat_pause 0 7', 'text': '«'}],
+        [{'callback_data': 'cat_pause 6 1', 'text': '1 Day'}, {'callback_data': 'cat_pause 6 3', 'text': '3 Days'}],
+        [{'callback_data': 'cat_pause 6 7', 'text': '✔ 7 Days'}, {'callback_data': 'cat_pause 6 0', 'text': 'Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_PAUSE_PAGE2_DATE["result"][0]["callback_query"]["data"] = "cat_pause 6 7"
+
+CALLBACK_CATEGORY_PAUSE_USE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_PAUSE_USE["result"][0]["callback_query"]["message"]["text"] = '⏯️Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • ⏯️ testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_PAUSE_USE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_pause 6 3 default', 'text': '1'}],
+        [{'callback_data': 'cat_pause 0 3', 'text': '«'}],
+        [{'callback_data': 'cat_pause 6 1', 'text': '1 Day'}, {'callback_data': 'cat_pause 6 3', 'text': '✔ 3 Days'}],
+        [{'callback_data': 'cat_pause 6 7', 'text': '7 Days'}, {'callback_data': 'cat_pause 6 0', 'text': 'Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_PAUSE_USE["result"][0]["callback_query"]["data"] = "cat_pause 6 3 default"
+
+CALLBACK_CATEGORY_PAUSE_UNPAUSE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_PAUSE_UNPAUSE["result"][0]["callback_query"]["message"]["text"] = '⏯️Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_PAUSE_UNPAUSE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_pause 6 0 default', 'text': '1'}],
+        [{'callback_data': 'cat_pause 0 0', 'text': '«'}],
+        [{'callback_data': 'cat_pause 6 1', 'text': '1 Day'}, {'callback_data': 'cat_pause 6 3', 'text': '3 Days'}],
+        [{'callback_data': 'cat_pause 6 7', 'text': '7 Days'}, {'callback_data': 'cat_pause 6 0', 'text': '✔ Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_PAUSE_UNPAUSE["result"][0]["callback_query"]["data"] = "cat_pause 6 0 default"

@@ -486,7 +486,7 @@ class Processinput:
                                     message, button = self.__category_halt(user_id, int(match[1]), int(match[2]))
                                 else:
                                     # Se il numero non è presente siamo nel caso base della remvoe a pagina 0
-                                    messages.append(self.__callback_maker(chat_id, callback_query_id, "Category Mute", False))
+                                    messages.append(self.__callback_maker(chat_id, callback_query_id, "Category Stop", False))
                                     message, button = self.__category_halt(user_id, 0, 3)
 
                                 messages.append(self.__ms_edit(chat_id, message_id, message, "HTML", {"inline_keyboard": button}))
@@ -514,7 +514,7 @@ class Processinput:
                                     message, button = self.__category_pause(user_id, int(match[1]), int(match[2]))
                                 else:
                                     # Se il numero non è presente siamo nel caso base della remvoe a pagina 0
-                                    messages.append(self.__callback_maker(chat_id, callback_query_id, "Category Mute", False))
+                                    messages.append(self.__callback_maker(chat_id, callback_query_id, "Category Pause", False))
                                     message, button = self.__category_pause(user_id, 0, 3)
 
                                 messages.append(self.__ms_edit(chat_id, message_id, message, "HTML", {"inline_keyboard": button}))
@@ -664,7 +664,6 @@ class Processinput:
         txt_prepend, page_idx = self.__textmessage(index, user_subscriptions, [5, 0], "👥Category List\n" + ' ' * 50 + "\nYou are following: \n", True, True)
 
         buttons_list = []
-        buttons_list = self.__make_numeric_button_category('category_mode {}'.format(page_idx), user_subscriptions, page_idx, self.SUB_X_PAGE, self.BUTN_X_ROW)
         buttons_list.append(self.__make_navigation_button("category_mode", page_idx, len(user_subscriptions)))
         buttons_list.append([self.__ilk_pause_c, self.__ilk_notoff_c, self.__ilk_halt_c, self.__ilk_rem_c])
         buttons_list.append([self.__ilk_help])
