@@ -37,12 +37,12 @@ class MyDatabase:
         self.__logger.info("Database name: %s", self.__dbpath)
 
         self.__logger.info("Checking if already a file named '%s' exists...", self.__dbpath)
-        if os.path.isfile(self.__dbpath):
+        is_file = os.path.isfile(self.__dbpath)
+        if is_file:
             self.__logger.info("The file exists.")
-            return True
         else:
             self.__logger.info("The file does not exist.")
-            return False
+        return is_file
 
     @property
     def __tables_exist(self):
@@ -55,15 +55,14 @@ class MyDatabase:
         self.__logger.debug("Checking if the table '%s' exists...", table)
         counter, _ = self.__query(
             "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = ?;", table)
-        if counter[0] == 0:
-            print("Tabella " + str(table) + " assente!")
-            return False
-        else:
-            return True
+        is_tab = bool(counter[0])
+        if not is_tab:
+            self.__logger.error("Tabella %s assente!", table)
+        return is_tab
 
     def __db_creation(self):
         self.__logger.info("Creating the SQLite3 file and tables...")
-        self.__query("CREATE TABLE `admins` (`user_id` INTEGER NOT NULL, `is_creator` INTEGER NOT NULL DEFAULT 0, FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE, PRIMARY KEY(`user_id`));")
+        self.__query("CREATE TABLE `admins` (`user_id` INTEGER NOT NULL, `role` INTEGER NOT NULL DEFAULT 0, FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE, PRIMARY KEY(`user_id`));")
         self.__query("CREATE TABLE `users` (`user_id` INTEGER NOT NULL, `username` TEXT, `chat_id` INTEGER NOT NULL, `max_registrations` INTEGER NOT NULL DEFAULT 10, `subscription_time` INTEGER NOT NULL, PRIMARY KEY(`user_id`));")
         self.__query("CREATE TABLE `registrations` (`user_id` INTEGER NOT NULL, `social_id` INTEGER NOT NULL, `status` INTEGER NOT NULL DEFAULT 0, `expire_date` INTEGER NOT NULL DEFAULT -1, `category` TEXT NOT NULL DEFAULT 'default', PRIMARY KEY(`user_id`,`social_id`), FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE, FOREIGN KEY(`social_id`) REFERENCES `socials`(`social_id`) ON DELETE CASCADE ON UPDATE CASCADE);")
         self.__query("CREATE TABLE `socials` (`social_id` INTEGER NOT NULL, `social` TEXT NOT NULL, `username` TEXT NOT NULL, `title` TEXT NOT NULL, `internal_id` TEXT NOT NULL, `retreive_time` INTEGER NOT NULL, `status` TEXT NOT NULL DEFAULT 'public', PRIMARY KEY(`social_id`));")
@@ -166,10 +165,9 @@ class MyDatabase:
                 self.__query(
                     "INSERT INTO registrations (user_id, social_id) VALUES (?, ?);", user_id, sub["social_id"])
                 sub["subStatus"] = "CreatedSocialAccAndSubscribed"
-                return sub
             else:
                 sub["subStatus"] = "notInDatabase"
-                return sub
+            return sub
 
         # Se si è arrivati a questo punto significa che è presente nel database, ora bisogna controllare se l'utente è iscritto
         res, _ = self.__query(
@@ -280,9 +278,10 @@ class MyDatabase:
 
         # If exists return True with the internal_id
         if res:
-            return True, res[0]
+            is_sub, internal_id = True, res[0]
         else:
-            return False, None
+            is_sub, internal_id = False, None
+        return is_sub, internal_id
 
     def set_state_of_social_account(self, user_id, social, internal_id, state, exp_date):
         _, rowcount = self.__query("UPDATE registrations "
@@ -347,3 +346,19 @@ class MyDatabase:
                                    "WHERE registrations.expire_date < ? AND registrations.expire_date != -1;", time.time())
 
         self.__logger.info("Sottoscrizioni con lo stato scaduto: %s ", rowcount)
+
+    def promote_to_creator(self, user_id):
+        _, rowcount = self.__query("INSERT INTO admins (user_id, role) VALUES (?, 0) "
+                                   "ON CONFLICT(user_id) DO UPDATE SET role = 0 WHERE role != 0;", user_id)
+        return bool(rowcount)
+
+    def list_operators(self):
+        op_tuples, _ = self.__query("SELECT admins.user_id, admins.role, users.username "
+                                    "FROM admins LEFT JOIN users ON admins.user_id= users.user_id "
+                                    "ORDER BY role ASC;", fetch=0)
+        return op_tuples
+
+    def has_permissions(self, user_id, role):
+        has_perm, _ = self.__query("SELECT COUNT(user_id) FROM admins "
+                                   "WHERE user_id = ? AND role <= ?;", user_id, role)
+        return bool(has_perm[0])

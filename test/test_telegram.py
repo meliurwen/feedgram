@@ -46,10 +46,11 @@ def custom_matcher_no_json(request):
     # print(request.path_url)
     if GLOBAL_COUNTER == 0:
         GLOBAL_COUNTER += 1
-        return requests_mock.create_response(request, status_code=200, text="THIS IS A TEST")
+        text = "THIS IS A TEST"
     else:
         GLOBAL_COUNTER = 0
-        return requests_mock.create_response(request, status_code=200, text=json.dumps(cnst.JSON_GENERIC))
+        text = json.dumps(cnst.JSON_GENERIC)
+    return requests_mock.create_response(request, status_code=200, text=text)
 
 
 def test_get_updates_no_json_error():

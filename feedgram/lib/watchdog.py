@@ -67,7 +67,7 @@ class Watchdog(threading.Thread):
             self.__tel_interface.update_command_info(commands)
 
         if self.mode == "telegram_user_interface":
-            self.__process_input = Processinput(self.__db, [self.__instagram_interface])  # da dare in input i social
+            self.__process_input = Processinput(self.__db, [self.__instagram_interface], self.__conf_dict["BOT"]["privilegekey"])  # da dare in input i social
 
     def run(self):
         global CODA

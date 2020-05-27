@@ -26,11 +26,11 @@ def test_stop_not_registered():
     assert not path.exists(DATABASE_PATH)
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.COMMAND_STOP)
 
     assert result[0]["type"] == "sendMessage"
-    assert cnst.COMMAND_START["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert cnst.COMMAND_START_USR1["query"]["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
 
     # Verifico che il messaggio di risposta sia coretto
     assert result[0]["text"] == "You're not registered, type /start to subscribe!"
@@ -39,29 +39,60 @@ def test_stop_not_registered():
 def test_start_not_registered():
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
-    result = myprocess_input.process(cnst.COMMAND_START)
+    igram = Instagram()
+    myprocess_input = Processinput(database, [igram], 'vKcg86E3AoR3SRg2')
 
-    assert result[0]["type"] == "sendMessage"
-    assert cnst.COMMAND_START["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
-    assert result[0]["text"] == "Congratulations, you're now registered!\nType /help to learn the commands available!"
+    queries = [cnst.COMMAND_START_USR1,
+               cnst.COMMAND_START_USR2,
+               cnst.COMMAND_START_USR3]
+
+    for query in queries:
+        result = myprocess_input.process(query["query"])
+        assert result == query["result"]
+
+
+def test_privkey_command():
+
+    database = MyDatabase(DATABASE_PATH)
+    igram = Instagram()
+    myprocess_input = Processinput(database, [igram], 'vKcg86E3AoR3SRg2')
+
+    queries = [cnst.COMMAND_PRIVKEY_USR1,
+               cnst.COMMAND_PRIVKEY_USR1_AGAIN]
+
+    for query in queries:
+        result = myprocess_input.process(query["query"])
+        assert result == query["result"]
+
+
+def test_listop_command():
+
+    database = MyDatabase(DATABASE_PATH)
+    igram = Instagram()
+    myprocess_input = Processinput(database, [igram], 'vKcg86E3AoR3SRg2')
+
+    queries = [cnst.COMMAND_LISTOP_USR1]
+
+    for query in queries:
+        result = myprocess_input.process(query["query"])
+        assert result == query["result"]
 
 
 def test_start_registered():
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
-    result = myprocess_input.process(cnst.COMMAND_START)
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
+    result = myprocess_input.process(cnst.COMMAND_START_USR1["query"])
 
     assert result[0]["type"] == "sendMessage"
-    assert cnst.COMMAND_START["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert cnst.COMMAND_START_USR1["query"]["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
     assert result[0]["text"] == "You're alredy registered.\nType /help to learn the commands available!"
 
 
 def test_wrong_command():
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.WRONG_COMMAND)
 
     assert result[0]["type"] == "sendMessage"
@@ -87,7 +118,7 @@ def test_help_command():
                 " • /stop to stop and unsubscribe from the bot.")
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.COMMAND_HELP)
 
     assert result[0]["type"] == "sendMessage"
@@ -98,7 +129,7 @@ def test_help_command():
 def test_not_command_registered():
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.NOT_COMMAND)
 
     assert result[0]["type"] == "sendMessage"
@@ -109,7 +140,7 @@ def test_not_command_registered():
 def test_help_callback():
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CLBK_MODE_HELP["query"])
 
     assert result[0]["type"] == "answerCallbackQuery"
@@ -147,7 +178,7 @@ def test_sub_command_social_username():
     with patch('feedgram.social.instagram.Instagram.extract_data', side_effect=dummy_instagram_extract_data):
         database = MyDatabase(DATABASE_PATH)
         igram = Instagram()
-        myprocess_input = Processinput(database, [igram])
+        myprocess_input = Processinput(database, [igram], 'vKcg86E3AoR3SRg2')
 
         queries = [cnst.MSG_CMD_SUB_STANDARD,
                    cnst.MSG_CMD_SUB_AGAIN,
@@ -175,7 +206,7 @@ def test_sub_command_url():
     with patch('feedgram.social.instagram.Instagram.extract_data', side_effect=dummy_instagram_extract_data):
         database = MyDatabase(DATABASE_PATH)
         igram = Instagram()
-        myprocess_input = Processinput(database, [igram])
+        myprocess_input = Processinput(database, [igram], 'vKcg86E3AoR3SRg2')
 
         queries = [cnst.MSG_CMD_SUB_IG_HOME,
                    cnst.MSG_CMD_SUB_IG_P_NO_EXST_OR_PRIV,
@@ -195,7 +226,7 @@ def test_list_command():
     with patch('feedgram.social.instagram.Instagram.extract_data', side_effect=dummy_instagram_extract_data):
         database = MyDatabase(DATABASE_PATH)
         igram = Instagram()
-        myprocess_input = Processinput(database, [igram])
+        myprocess_input = Processinput(database, [igram], 'vKcg86E3AoR3SRg2')
 
         queries = [cnst.MSG_CMD_SUB_IG_TEST2,
                    cnst.MSG_CMD_SUB_IG_TEST3,
@@ -206,7 +237,7 @@ def test_list_command():
             result = myprocess_input.process(query["query"])
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_LIST)
 
@@ -229,7 +260,7 @@ def test_list_command():
 
 def test_list_callback_base():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_LIST_PAGE_1)
 
     assert result[0]["type"] == "answerCallbackQuery"
@@ -244,7 +275,7 @@ def test_list_callback_base():
 
 def test_list_callback_page():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_LIST_PAGE_2)
 
     assert result[0]["type"] == "editMessageText"
@@ -256,7 +287,7 @@ def test_list_callback_page():
 
 def test_list_callback_old_page():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_LIST_PAGE_3)
 
     assert result[0]["type"] == "editMessageText"
@@ -272,7 +303,7 @@ def test_mute_command_no_args():
     Il ritorno sarà un messaggio che informa sul coretto utilizzo del comando
     '''
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_MUTE)
 
@@ -289,7 +320,7 @@ def test_mute_command_set_mute_hours():
     Il ritorno sarà un messaggio che informa sul coretto mute del profilo social
     '''
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_MUTE_WORKING_HOURS)
 
@@ -306,7 +337,7 @@ def test_mute_command_set_mute_day():
         Il ritorno sarà un messaggio che informa sul coretto mute del profilo social
     '''
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_MUTE_WORKING_DAY)
 
@@ -323,7 +354,7 @@ def test_mute_command_not_social():
         non abilitato o non ancora implementato nel bot (/mute youtube SpaceX)
     '''
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_MUTE_MISS_SOCIAL)
 
@@ -340,7 +371,7 @@ def test_mute_command_not_subscribed():
         non a cui non si è sottoscritti
     '''
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_MUTE_MISS_SUBSCRIPTION)
 
@@ -353,7 +384,7 @@ def test_mute_command_not_subscribed():
 
 def test_mute_callback_base():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_MUTE)
 
     assert result[0]["type"] == 'answerCallbackQuery'
@@ -368,7 +399,7 @@ def test_mute_callback_base():
 
 def test_mute_callback_page():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_MUTE_PAGE2)
 
     assert result[0]["type"] == "editMessageText"
@@ -380,7 +411,7 @@ def test_mute_callback_page():
 
 def test_mute_callback_change_date():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_MUTE_PAGE2_DATE)
 
     assert result[0]["type"] == "editMessageText"
@@ -392,7 +423,7 @@ def test_mute_callback_change_date():
 
 def test_mute_callback_use_mute():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_MUTE_USE)
 
     assert result[0]["type"] == 'answerCallbackQuery'
@@ -407,7 +438,7 @@ def test_mute_callback_use_mute():
 
 def test_mute_callback_use_unmute():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_MUTE_USE_UNMUTE)
 
     assert result[0]["type"] == 'answerCallbackQuery'
@@ -426,7 +457,7 @@ def test_pause_command_no_args():
     Il ritorno sarà un messaggio che informa sul coretto utilizzo del comando
     '''
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_PAUSE)
 
@@ -443,7 +474,7 @@ def test_pause_command_set_mute_hours():
     Il ritorno sarà un messaggio che informa sul coretto pause del profilo social
     '''
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_PAUSE_WORKING_HOURS)
 
@@ -460,7 +491,7 @@ def test_pause_command_set_mute_day():
         Il ritorno sarà un messaggio che informa sul coretto pause del profilo social
     '''
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_PAUSE_WORKING_DAY)
 
@@ -477,7 +508,7 @@ def test_pause_command_not_social():
         non abilitato o non ancora implementato nel bot (/pause youtube SpaceX)
     '''
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_PAUSE_MISS_SOCIAL)
 
@@ -494,7 +525,7 @@ def test_pause_command_not_subscribed():
         non a cui non si è sottoscritti
     '''
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_PAUSE_MISS_SUBSCRIPTION)
 
@@ -507,7 +538,7 @@ def test_pause_command_not_subscribed():
 
 def test_pause_callback_base():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_PAUSE)
 
     assert result[0]["type"] == 'answerCallbackQuery'
@@ -522,7 +553,7 @@ def test_pause_callback_base():
 
 def test_pause_callback_page():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_PAUSE_PAGE2)
 
     assert result[0]["type"] == "editMessageText"
@@ -534,7 +565,7 @@ def test_pause_callback_page():
 
 def test_pause_callback_change_date():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_PAUSE_PAGE2_DATE)
 
     assert result[0]["type"] == "editMessageText"
@@ -546,7 +577,7 @@ def test_pause_callback_change_date():
 
 def test_pause_callback_use_mute():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_PAUSE_USE)
 
     assert result[0]["type"] == 'answerCallbackQuery'
@@ -561,7 +592,7 @@ def test_pause_callback_use_mute():
 
 def test_pause_callback_use_unmute():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_PAUSE_USE_UNMUTE)
 
     assert result[0]["type"] == 'answerCallbackQuery'
@@ -574,13 +605,43 @@ def test_pause_callback_use_unmute():
     assert cnst.CALLBACK_PAUSE_USE_UNMUTE["result"][0]["callback_query"]["message"]["reply_markup"] == result[1]["reply_markup"]
 
 
+def test_halt_command():
+    database = MyDatabase(DATABASE_PATH)
+    igram = Instagram()
+    myprocess_input = Processinput(database, [igram], 'vKcg86E3AoR3SRg2')
+
+    queries = [cnst.MSG_CMD_HALT_USR1,
+               cnst.MSG_CMD_HALT_USR1_NO_EXST_SCL,
+               cnst.MSG_CMD_HALT_USR1_WRNG]
+
+    for query in queries:
+        result = myprocess_input.process(query["query"])
+        assert result == query["result"]
+
+
+def test_halt_callback():
+    database = MyDatabase(DATABASE_PATH)
+    igram = Instagram()
+    myprocess_input = Processinput(database, [igram], 'vKcg86E3AoR3SRg2')
+
+    queries = [cnst.CLBK_HALT_MODE,
+               cnst.CLBK_HALT_MODE_PAGE_DAY,
+               cnst.CLBK_HALT_MODE_EXST,
+               cnst.CLBK_HALT_MODE_RST,
+               cnst.CLBK_HALT_MODE_RST_WRNG_SCL]
+
+    for query in queries:
+        result = myprocess_input.process(query["query"])
+        assert result == query["result"]
+
+
 def test_cmute_command_no_args():
     '''
     Test del comando di mute mal formattato o senza argomenti
     Il ritorno sarà un messaggio che informa sul coretto utilizzo del comando
     '''
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_CMUTE)
 
@@ -597,7 +658,7 @@ def test_cmute_command_set_cmute_hours():
     Il ritorno sarà un messaggio che informa sul coretto utilizzo del comando
     '''
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_CMUTE_WORKING_HOURS)
 
@@ -614,7 +675,7 @@ def test_cmute_command_set_cmute_day():
     Il ritorno sarà un messaggio che informa sul coretto utilizzo del comando
     '''
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_CMUTE_WORKING_DAY)
 
@@ -631,7 +692,7 @@ def test_cmute_command_not_social():
     Il ritorno sarà un messaggio che informa sul coretto utilizzo del comando
     '''
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_CMUTE_MISS_SOCIAL)
 
@@ -645,7 +706,7 @@ def test_cmute_command_not_social():
 def test_chalt_command_no_args():
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_CHALT)
 
@@ -659,7 +720,7 @@ def test_chalt_command_no_args():
 def test_chalt_command_set_cmute_hours():
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_CHALT_WORKING_HOURS)
 
@@ -673,7 +734,7 @@ def test_chalt_command_set_cmute_hours():
 def test_chalt_command_set_cmute_day():
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_CHALT_WORKING_DAY)
 
@@ -687,7 +748,7 @@ def test_chalt_command_set_cmute_day():
 def test_chalt_command_not_social():
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_CHALT_MISS_SOCIAL)
 
@@ -701,7 +762,7 @@ def test_chalt_command_not_social():
 def test_cpause_command_no_args():
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_CPAUSE)
 
@@ -715,7 +776,7 @@ def test_cpause_command_no_args():
 def test_cpause_command_set_cmute_hours():
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_CPAUSE_WORKING_HOURS)
 
@@ -729,7 +790,7 @@ def test_cpause_command_set_cmute_hours():
 def test_cpause_command_set_cmute_day():
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_CPAUSE_WORKING_DAY)
 
@@ -743,7 +804,7 @@ def test_cpause_command_set_cmute_day():
 def test_cpause_command_not_social():
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_CPAUSE_MISS_SOCIAL)
 
@@ -757,7 +818,7 @@ def test_cpause_command_not_social():
 def test_category_command_no_args():
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_CATEGORY)
 
@@ -771,7 +832,7 @@ def test_category_command_no_args():
 def test_category_command_set_category():
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_CATEGORY_WORKING)
 
@@ -785,7 +846,7 @@ def test_category_command_set_category():
 def test_category_command_not_social():
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_CATEGORY_MISS_SOCIAL)
 
@@ -799,7 +860,7 @@ def test_category_command_not_social():
 def test_category_command_not_subscribed():
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_CATEGORY_MISS_SUBSCRIPTION)
 
@@ -813,7 +874,7 @@ def test_category_command_not_subscribed():
 def test_rename_command_no_args():
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_RENAME)
 
@@ -827,7 +888,7 @@ def test_rename_command_no_args():
 def test_rename_command_miss_category():
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_RENAME_MISS_CATEGORY)
 
@@ -841,7 +902,7 @@ def test_rename_command_miss_category():
 def test_rename_command_working():
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_RENAME_WORKING)
 
@@ -855,7 +916,7 @@ def test_rename_command_working():
 def test_remove_command_no_args():
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_REMOVE)
 
@@ -869,7 +930,7 @@ def test_remove_command_no_args():
 def test_remove_command_miss_category():
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_REMOVE_MISS_CATEGORY)
 
@@ -883,7 +944,7 @@ def test_remove_command_miss_category():
 def test_remove_command_working():
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     result = myprocess_input.process(cnst.COMMAND_REMOVE_WORKING)
 
@@ -896,7 +957,7 @@ def test_remove_command_working():
 
 def test_category_mode_callback_base():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_CATEGORY_MODE)
 
     assert result[0]["type"] == 'answerCallbackQuery'
@@ -911,7 +972,7 @@ def test_category_mode_callback_base():
 
 def test_category_mode_callback_page():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_CATEGORY_MODE_PAGE2)
 
     assert result[0]["type"] == "editMessageText"
@@ -923,7 +984,7 @@ def test_category_mode_callback_page():
 
 def test_category_remove_callback_base():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_CATEGORY_REMVOE)
 
     assert result[0]["type"] == 'answerCallbackQuery'
@@ -938,7 +999,7 @@ def test_category_remove_callback_base():
 
 def test_category_remove_callback_page():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_CATEGORY_REMVOE_PAGE2)
 
     assert result[0]["type"] == "editMessageText"
@@ -950,7 +1011,7 @@ def test_category_remove_callback_page():
 
 def test_category_remove_callback_use():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_CATEGORY_REMVOE_USE)
 
     assert result[0]["type"] == 'answerCallbackQuery'
@@ -965,7 +1026,7 @@ def test_category_remove_callback_use():
 
 def test_category_mute_callback_base():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_CATEGORY_MUTE)
 
     assert result[0]["type"] == 'answerCallbackQuery'
@@ -980,7 +1041,7 @@ def test_category_mute_callback_base():
 
 def test_category_mute_callback_page():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_CATEGORY_MUTE_PAGE2)
 
     assert result[0]["type"] == "editMessageText"
@@ -992,7 +1053,7 @@ def test_category_mute_callback_page():
 
 def test_category_mute_callback_change_date():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_CATEGORY_MUTE_PAGE2_DATE)
 
     assert result[0]["type"] == "editMessageText"
@@ -1004,7 +1065,7 @@ def test_category_mute_callback_change_date():
 
 def test_category_mute_callback_use_mute():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_CATEGORY_MUTE_USE)
 
     assert result[0]["type"] == 'answerCallbackQuery'
@@ -1019,7 +1080,7 @@ def test_category_mute_callback_use_mute():
 
 def test_category_mute_callback_use_unmute():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_CATEGORY_MUTE_UNMUTE)
 
     assert result[0]["type"] == 'answerCallbackQuery'
@@ -1034,7 +1095,7 @@ def test_category_mute_callback_use_unmute():
 
 def test_category_halt_callback_base():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_CATEGORY_HALT)
 
     assert result[0]["type"] == 'answerCallbackQuery'
@@ -1049,7 +1110,7 @@ def test_category_halt_callback_base():
 
 def test_category_halt_callback_page():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_CATEGORY_HALT_PAGE2)
 
     assert result[0]["type"] == "editMessageText"
@@ -1061,7 +1122,7 @@ def test_category_halt_callback_page():
 
 def test_category_halt_callback_change_date():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_CATEGORY_HALT_PAGE2_DATE)
 
     assert result[0]["type"] == "editMessageText"
@@ -1073,7 +1134,7 @@ def test_category_halt_callback_change_date():
 
 def test_category_halt_callback_use_stop():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_CATEGORY_HALT_USE)
 
     assert result[0]["type"] == 'answerCallbackQuery'
@@ -1088,7 +1149,7 @@ def test_category_halt_callback_use_stop():
 
 def test_category_halt_callback_use_unstop():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_CATEGORY_HALT_UNMUTE)
 
     assert result[0]["type"] == 'answerCallbackQuery'
@@ -1103,7 +1164,7 @@ def test_category_halt_callback_use_unstop():
 
 def test_category_pause_callback_base():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_CATEGORY_PAUSE)
 
     assert result[0]["type"] == 'answerCallbackQuery'
@@ -1118,7 +1179,7 @@ def test_category_pause_callback_base():
 
 def test_category_pause_callback_page():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_CATEGORY_PAUSE_PAGE2)
 
     assert result[0]["type"] == "editMessageText"
@@ -1130,7 +1191,7 @@ def test_category_pause_callback_page():
 
 def test_category_pause_callback_change_date():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_CATEGORY_PAUSE_PAGE2_DATE)
 
     assert result[0]["type"] == "editMessageText"
@@ -1142,7 +1203,7 @@ def test_category_pause_callback_change_date():
 
 def test_category_pause_callback_use_stop():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_CATEGORY_PAUSE_USE)
 
     assert result[0]["type"] == 'answerCallbackQuery'
@@ -1157,7 +1218,7 @@ def test_category_pause_callback_use_stop():
 
 def test_category_pause_callback_use_unstop():
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.CALLBACK_CATEGORY_PAUSE_UNPAUSE)
 
     assert result[0]["type"] == 'answerCallbackQuery'
@@ -1173,7 +1234,7 @@ def test_category_pause_callback_use_unstop():
 def test_unsub_command():
     database = MyDatabase(DATABASE_PATH)
     igram = Instagram()
-    myprocess_input = Processinput(database, [igram])
+    myprocess_input = Processinput(database, [igram], 'vKcg86E3AoR3SRg2')
 
     queries = [cnst.MSG_CMD_UNSUB_STANDARD,
                cnst.MSG_CMD_UNSUB_AGAIN,
@@ -1188,7 +1249,7 @@ def test_unsub_command():
 def test_unsub_callback():
     database = MyDatabase(DATABASE_PATH)
     igram = Instagram()
-    myprocess_input = Processinput(database, [igram])
+    myprocess_input = Processinput(database, [igram], 'vKcg86E3AoR3SRg2')
 
     queries = [cnst.CLBK_UNSUB_MODE,
                cnst.CLBK_UNSUB_MODE_PAGE,
@@ -1203,9 +1264,9 @@ def test_unsub_callback():
 def test_stop_registered():
 
     database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [])
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.COMMAND_STOP)
 
     assert result[0]["type"] == "sendMessage"
-    assert cnst.COMMAND_START["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert cnst.COMMAND_START_USR1["query"]["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
     assert result[0]["text"] == "You're no longer subscribed!\nWe already <i>miss</i> you, please come back soon! 😢\nTip: In order to re-joyn type /start *wink* *wink*"

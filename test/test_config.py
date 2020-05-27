@@ -18,11 +18,8 @@ def test_config_creation():
             print("Error: %s - %s." % (err.filename, err.strerror))
 
     assert not path.exists(config_path)
-
     config = Config(config_path)
-
     assert path.exists(config_path)
-
     assert config.status == -7
 
 # manca una chiave
@@ -30,11 +27,7 @@ def test_config_creation():
 
 def test_config_miss_key():
     config_path = "./test/config/config_miss_key.ini"
-
-    assert path.exists(config_path)
-
     config = Config(config_path)
-
     assert config.status == -6
 
 # manca una sezione
@@ -42,11 +35,7 @@ def test_config_miss_key():
 
 def test_config_miss_section():
     config_path = "./test/config/config_miss_section.ini"
-
-    assert path.exists(config_path)
-
     config = Config(config_path)
-
     assert config.status == -5
 
 # sezioni duplicate
@@ -54,11 +43,7 @@ def test_config_miss_section():
 
 def test_duplicate_section():
     config_path = "./test/config/config_duplicate_section.ini"
-
-    assert path.exists(config_path)
-
     config = Config(config_path)
-
     assert config.status == -3
 
 # chiavi duplicate
@@ -66,11 +51,8 @@ def test_duplicate_section():
 
 def test_config_duplicate_key():
     config_path = "./test/config/config_duplicate_key.ini"
-
     assert path.exists(config_path)
-
     config = Config(config_path)
-
     assert config.status == -2
 
 # File caricato ed coretto
@@ -78,15 +60,12 @@ def test_config_duplicate_key():
 
 def test_config_work():
     config_path = "./test/config/config_work.ini"
-
     assert path.exists(config_path)
-
     config = Config(config_path)
-
     assert config.status == 1
     assert config.dictionary["BOT"]["databasefilepath"] == "socialFeedgram.sqlite3"
     assert config.dictionary["API"]["telegramkey"] == "5616486161:aslihfawlhrki2u4hbvlWAYgv"
-    assert config.dictionary["API"]["youtubev3key"] == "ka3iorq237byfrva4wiymhvtlih4awyhnal"
+    assert config.dictionary["BOT"]["privilegekey"] == "mZmUG9fD2njrkyJ7"
 
 
 def test_oserror():
