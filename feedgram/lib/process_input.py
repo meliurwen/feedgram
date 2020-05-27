@@ -6,11 +6,12 @@ import time
 
 class Processinput:
 
-    def __init__(self, database, social_list):
+    def __init__(self, database, social_list, privilege_key):
         self.__logger = logging.getLogger('telegram_bot.process_input')
         self.__db = database
         self.__re_compiler()
         self.__socials = social_list
+        self.__privilege_key = privilege_key
 
     # Big message
     __msm_stop = ("You're no longer subscribed!\n"
@@ -226,6 +227,24 @@ class Processinput:
 
                                 elif text == "/start":
                                     messages.append(self.__ms_maker(chat_id, "You're alredy registered.\nType /help to learn the commands available!"))
+
+                                elif text[:8] == "/privkey":
+                                    match = re.match(r"^\s+([A-Za-z0-9-]+)", text[8:])
+                                    if match:
+                                        if match.group(1) == self.__privilege_key:
+                                            if self.__db.promote_to_creator(user_id):
+                                                msg = "You have now creator privileges!"
+                                            else:
+                                                msg = "You already have the role of creator"
+                                            messages.append(self.__ms_maker(chat_id, msg))
+
+                                elif text[:7] == "/listop":
+                                    if self.__db.has_permissions(user_id, 1):
+                                        op_tuples = self.__db.list_operators()
+                                        op_list = self.__mk_list_op_json(op_tuples)
+                                        op_list = self.__mk_list_op_decorate(op_list)
+                                        msg = "{}{}".format("<b>⚖️ Operators list</b>\n\n", self.__mk_list(op_list))
+                                        messages.append(self.__ms_maker(chat_id, msg, "HTML"))
                                 else:
                                     messages.append(self.__ms_maker(chat_id, "Unrecognized command"))
                         # "chat_id":chat_id non è prevista dalle API di Telegram per answerCallbackQuery, serve solo alla funzione Telegram.send_messages(coda, condizione)
@@ -272,6 +291,7 @@ class Processinput:
                             # ( \d+)?       <- Può avere un numero
                             # ( \S+ \S+)?   <- Può esserci una sequenza di due str
                             elif bool(re.findall(r"^(remove)( \d+)?( \S+ \S+)?", callback_data)):
+                                # avremo 4 match:
                                 # 0: remove
                                 # 1: <page_index>
                                 # 2: <social>
@@ -296,7 +316,7 @@ class Processinput:
                                     message, button = self.__list_remove_mss(user_id, int(match[1]))
 
                                 else:
-                                    # Se il numero non è presente siamo nel caso base della remvoe a pagina 0
+                                    # Se il numero non è presente siamo nel caso base della remove a pagina 0
                                     messages.append(self.__callback_maker(chat_id, callback_query_id, "Be careful, you'll not receive confirmation alert upon removing!", True))
                                     message, button = self.__list_remove_mss(user_id, 0)
 
@@ -326,8 +346,7 @@ class Processinput:
                                             else:
                                                 messages.append(self.__callback_maker(chat_id, callback_query_id, "Un-Muted", False))
                                         else:
-                                            alert_msg = "Alert: {}".format(unsub_status["description"])
-                                            messages.append(self.__callback_maker(chat_id, callback_query_id, alert_msg, True))
+                                            messages.append(self.__callback_maker(chat_id, callback_query_id, "Alert: {}".format(unsub_status["description"]), True))
 
                                     # In ogni caso genereremo il messaggio data la pagina e il day indicati
                                     message, button = self.__list_mute_mss(user_id, int(match[1]), int(match[2]))
@@ -360,10 +379,9 @@ class Processinput:
                                             if int(match[2]) != 0:
                                                 messages.append(self.__callback_maker(chat_id, callback_query_id, "Stopped", False))
                                             else:
-                                                messages.append(self.__callback_maker(chat_id, callback_query_id, "Un-Stopped", False))
+                                                messages.append(self.__callback_maker(chat_id, callback_query_id, "Resetted", False))
                                         else:
-                                            alert_msg = "Alert: {}".format(unsub_status["description"])
-                                            messages.append(self.__callback_maker(chat_id, callback_query_id, alert_msg, True))
+                                            messages.append(self.__callback_maker(chat_id, callback_query_id, "Error: {}".format(unsub_status["description"]), True))
 
                                     # In ogni caso genereremo il messaggio data la pagina e il day indicati
                                     message, button = self.__list_halt_mss(user_id, int(match[1]), int(match[2]))
@@ -599,6 +617,7 @@ class Processinput:
     NUMBER_DICT = {"0": "⓪", "1": "①", "2": "②", "3": "③", "4": "④", "5": "⑤", "6": "⑥", "7": "⑦", "8": "⑧", "9": "⑨"}
     STATUS_DICT = {"0": "", "1": "🔕", "2": "⏹", "3": "⏯️"}
     LINE_LIMIT = 24
+    ROLES = {"0": "Creators", "1": "Moderators"}
 
     def __list_mss(self, user_id, index):
         user_subscriptions = self.__db.user_subscriptions(user_id)
@@ -872,6 +891,39 @@ class Processinput:
             text = "{}...".format(text[:cls.LINE_LIMIT - 3])
         return text
 
+    @classmethod
+    def __mk_list_op_json(cls, op_tuples):
+        op_list = []
+        tmp_role_pos_in_list = {}
+        for operator in op_tuples:
+            if operator[1] not in tmp_role_pos_in_list:
+                tmp_role_pos_in_list[operator[1]] = len(op_list)
+                op_list.append({"name": operator[1], "nodes": []})
+            op_list[tmp_role_pos_in_list[operator[1]]]["nodes"].append({"name": operator[0], "data": {"username": operator[2]}})
+        return op_list
+
+    @classmethod
+    def __mk_list_op_decorate(cls, op_list):
+        for role in op_list:
+            role["name"] = cls.__replace_all(str(role["name"]), cls.ROLES)
+            i = 0
+            for node in role["nodes"]:
+                role["nodes"][i]["name"] = "<a href='tg://user?id={0}'>{1}</a>".format(node["name"], node["data"]["username"] if node["data"]["username"] else node["name"])
+                i += 1
+        return op_list
+
+    # List structure:
+    # v1.0 [{"nodes": ["a", "b"], "name": "Operator"}, {"nodes": ["c", "d"], "name": "Moderator"}]
+    # v2.0 [{"nodes": [{"name": "0123456789", data: {"username": "testUser1"}}], "name": "Operator"}, {"nodes": [{"name": "9876543210", data: {"username": "testUser2"}}], "name": "Moderator"}]
+    @classmethod
+    def __mk_list(cls, op_list):
+        txt = ""
+        for role in op_list:
+            txt += "<b>{}</b>\n".format(role["name"])
+            for node in role["nodes"]:
+                txt += "{}• {}\n".format(" " * 2, node["name"])
+        return txt
+
     def __unsubscription(self, sub, user_id):
         # Spostare fuori questo dizionario
         social_abilited = {"instagram": "instagram", "ig": "instagram"}
@@ -896,11 +948,12 @@ class Processinput:
         # If subscribed then unsubscribe, otherwise return error
         if is_subscribed:
             if self.__db.unfollow_social_account(user_id, sub["social"], sub["internal_id"]):
-                return {"ok": True, "description": "unsubscribed"}
+                response = {"ok": True, "description": "unsubscribed"}
             else:
-                return {"ok": False, "description": "userNotSubscribed"}  # It happens only if between the check and the deleted the subscription is deleted by an nother istance/thread (it basically never happens)
+                response = {"ok": False, "description": "userNotSubscribed"}  # It happens only if between the check and the deleted the subscription is deleted by an nother istance/thread (it basically never happens)
         else:
-            return {"ok": False, "description": "userNotSubscribed"}
+            response = {"ok": False, "description": "userNotSubscribed"}
+        return response
 
     def __iscrizione(self, sub, user_id):
         # Spostare fuori questo dizionario
@@ -950,21 +1003,22 @@ class Processinput:
 
         if sub["subStatus"] == "JustSubscribed" or sub["subStatus"] == "CreatedSocialAccAndSubscribed":
             if sub["status"] == "public":
-                return "Social: " + sub["social"] + "\nUser: " + sub["title"] + "\nYou've been successfully subscribed!\nFrom now on, you'll start to receive feeds from this account!"
+                text = "Social: " + sub["social"] + "\nUser: " + sub["title"] + "\nYou've been successfully subscribed!\nFrom now on, you'll start to receive feeds from this account!"
             elif sub["status"] == "private":
-                return "Social: " + sub["social"] + "\nUser: " + sub["title"] + "\nYou've been subscribed to a social account that is private!\nYou'll not receive feeds until it switches to public!"
+                text = "Social: " + sub["social"] + "\nUser: " + sub["title"] + "\nYou've been subscribed to a social account that is private!\nYou'll not receive feeds until it switches to public!"
             else:
-                return "Social: " + str(sub["social"]) + "\nUser: " + str(sub["title"]) + "\nMmmh, something went really wrong, the status is unknown :/\nYou should get in touch with the admin!"
+                text = "Social: " + str(sub["social"]) + "\nUser: " + str(sub["title"]) + "\nMmmh, something went really wrong, the status is unknown :/\nYou should get in touch with the admin!"
         elif sub["subStatus"] == "AlreadySubscribed":
-            return "Social: " + sub["social"] + "\nUser: " + sub["title"] + "\nYou're already subscribed to this account!"
+            text = "Social: " + sub["social"] + "\nUser: " + sub["title"] + "\nYou're already subscribed to this account!"
         elif sub["subStatus"] == "NotExists":
-            return "Social: " + sub["social"] + "\nThis account doesn't exists!"
+            text = "Social: " + sub["social"] + "\nThis account doesn't exists!"
         elif sub["subStatus"] == "NotExistsOrPrivate":
-            return "Social: " + sub["social"] + "\nThis account doesn't exists or is private!"
+            text = "Social: " + sub["social"] + "\nThis account doesn't exists or is private!"
         elif sub["subStatus"] == "noSpecificMethodToExtractData" or sub["subStatus"] == "noMethodToExtractData":
-            return "Social: " + str(sub["social"]) + "\nMmmh, this shouldn't happen, no method (or specific method) to extract data."
+            text = "Social: " + str(sub["social"]) + "\nMmmh, this shouldn't happen, no method (or specific method) to extract data."
         else:
-            return "Social: " + str(sub["social"]) + "\nI don't know what happened! O_o\""
+            text = "Social: " + str(sub["social"]) + "\nI don't know what happened! O_o\""
+        return text
 
     def __set_sub_state(self, sub, user_id, state, exp_time):
         # Spostare fuori questo dizionario
@@ -1002,11 +1056,12 @@ class Processinput:
         # If subscribed then unsubscribe, otherwise return error
         if is_subscribed:
             if self.__db.set_state_of_social_account(user_id, sub["social"], sub["internal_id"], state, exp_time):
-                return {"ok": True, "description": "changedState"}
+                response = {"ok": True, "description": "changedState"}
             else:
-                return {"ok": False, "description": "userNotSubscribed"}  # It happens only if between the check and the deleted the subscription is deleted by an nother istance/thread (it basically never happens)
+                response = {"ok": False, "description": "userNotSubscribed"}  # It happens only if between the check and the deleted the subscription is deleted by an nother istance/thread (it basically never happens)
         else:
-            return {"ok": False, "description": "userNotSubscribed"}
+            response = {"ok": False, "description": "userNotSubscribed"}
+        return response
 
     def __set_cat_state(self, user_id, category, state, exp_time):
 
@@ -1024,9 +1079,10 @@ class Processinput:
             state = 0
 
         if self.__db.set_state_of_category(user_id, category, state, exp_time):
-            return {"ok": True, "description": "changedState"}
+            response = {"ok": True, "description": "changedState"}
         else:
-            return {"ok": False, "description": "userMissCategory"}  # It happens only if between the check and the deleted the subscription is deleted by an nother istance/thread (it basically never happens)
+            response = {"ok": False, "description": "userMissCategory"}  # It happens only if between the check and the deleted the subscription is deleted by an nother istance/thread (it basically never happens)
+        return response
 
     def __set_sub_category(self, sub, user_id, category):
         # Spostare fuori questo dizionario
@@ -1052,11 +1108,12 @@ class Processinput:
         # If subscribed then unsubscribe, otherwise return error
         if is_subscribed:
             if self.__db.set_category_of_social_account(user_id, sub["social"], sub["internal_id"], category):
-                return {"ok": True, "description": "changedState"}
+                response = {"ok": True, "description": "changedState"}
             else:
-                return {"ok": False, "description": "userNotSubscribed"}  # It happens only if between the check and the deleted the subscription is deleted by an nother istance/thread (it basically never happens)
+                response = {"ok": False, "description": "userNotSubscribed"}  # It happens only if between the check and the deleted the subscription is deleted by an nother istance/thread (it basically never happens)
         else:
-            return {"ok": False, "description": "userNotSubscribed"}
+            response = {"ok": False, "description": "userNotSubscribed"}
+        return response
 
     def __check_url_validity(self, sub):
         if sub["link"]:

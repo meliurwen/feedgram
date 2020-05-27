@@ -491,3 +491,22 @@ def test_unsubscribe():
     us_exist, _ = myquery(DATABASE_PATH, "SELECT 1 FROM users WHERE user_id = ?;", 6551474276)
 
     assert not bool(us_exist)
+
+
+def test_promote_to_creator():
+
+    database = MyDatabase(DATABASE_PATH)
+    assert database.promote_to_creator(6551474276)
+    assert not database.promote_to_creator(6551474276)
+
+
+def test_list_operators():
+
+    database = MyDatabase(DATABASE_PATH)
+    assert database.list_operators() == [(6551474276, 0, None)]
+
+
+def test_has_permissions():
+
+    database = MyDatabase(DATABASE_PATH)
+    assert database.has_permissions(6551474276, 1)

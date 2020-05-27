@@ -3,13 +3,20 @@
 import os
 import configparser
 import logging
+import string
+import random
 
+
+def get_random_alphanumeric_string(string_len=16):
+    letters_digits = string.ascii_letters + string.digits
+    return ''.join((random.choice(letters_digits) for i in range(string_len)))
 
 # TUTTE le chiavi del dizionario quì sotto DEVONO essere scritte in minuscolo, altrimenti falliscono i controlli più avanti
 # (sì, lo so che potrei mettere un .lower(), ma anche no >:()
-DEFAULT_CONFIG = {"BOT": {"databasefilepath": "socialFeedgram.sqlite3"},
-                  "API": {"telegramkey": "",
-                          "youtubev3key": ""}
+
+
+DEFAULT_CONFIG = {"BOT": {"databasefilepath": "socialFeedgram.sqlite3", "privilegekey": get_random_alphanumeric_string()},
+                  "API": {"telegramkey": ""}
                   }
 
 # module_logger = logging.getLogger('telegram_bot.config')
@@ -18,8 +25,8 @@ DEFAULT_CONFIG = {"BOT": {"databasefilepath": "socialFeedgram.sqlite3"},
 # [BOT]
 # databasefilepath
 # [API]
-# telegramkey": ""
-# "youtubev3key": ""
+# telegramkey: ""
+# privilegeKey: ""
 
 
 class Config:
@@ -109,30 +116,27 @@ class Config:
             self.__state = -5
             return False
         self.__logger.info("Ci sono tutte le sezioni.")
-
         self.__logger.info("Controllo che in ogni sezione ci siano esattamente tutte le chiavi...")
-
+        is_success = True
         for key, _ in DEFAULT_CONFIG.items():
-            if not set(self.__cofigurazione_dict[key].keys()) == set(DEFAULT_CONFIG[key].keys()):
+            if set(self.__cofigurazione_dict[key].keys()) == set(DEFAULT_CONFIG[key].keys()):
+                for key_section, value_section in self.__cofigurazione_dict[key].items():
+                    if str(value_section):
+                        self.__logger.info("Ci sono tutte le chiavi in ogni sezione.")
+                        self.__logger.info("Controllo che tutte le opzioni abbiano valori accettabli...")
+                        # In realtà bisognerebbe controllare se il path del database sia valido, ma vbb, lo farò un'altra volta
+                        # TODO: Implementare controllo per la validità del path del database
+                        self.__logger.info("Tutte le opzioni hanno valori accettabili.")
+                    else:
+                        self.__logger.warning("Nella sezione %s l'opzione %s è VUOTA!", str(key), str(key_section))
+                        self.__state = -7
+                        is_success = False
+            else:
                 self.__logger.warning("Nella sezione %s NON ci sono ESATTAMENTE tutte le chiavi!", str(key))
                 self.__logger.warning("Miss the key(s): %s ", ''.join(list(set(self.__cofigurazione_dict[key].keys()) - set(DEFAULT_CONFIG[key].keys()))))
                 self.__state = -6
-                return False
-            else:
-                for key_section, value_section in self.__cofigurazione_dict[key].items():
-                    if not str(value_section):
-                        self.__logger.warning("Nella sezione %s l'opzione %s è VUOTA!", str(key), str(key_section))
-                        self.__state = -7
-                        return False
-
-        self.__logger.info("Ci sono tutte le chiavi in ogni sezione.")
-
-        self.__logger.info("Controllo che tutte le opzioni abbiano valori accettabli...")
-        # In realtà bisognerebbe controllare se il path del database sia valido, ma vbb, lo farò un'altra volta
-        # TODO: Implementare controllo per la validità del path del database
-        self.__logger.info("Tutte le opzioni hanno valori accettabili.")
-
-        return True
+                is_success = False
+        return is_success
 
     @classmethod
     def __as_dict(cls, dicts):
