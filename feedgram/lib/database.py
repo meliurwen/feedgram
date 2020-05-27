@@ -11,7 +11,7 @@ class MyDatabase:
         self.__logger = logging.getLogger('telegram_bot.database')
         self.__logger.info('Class instance for communication with a SQLite3 database initiated.')
 
-        self.__tables = ['admins', 'users', 'registrations', 'socials', 'messages']
+        self.__tables = ['admins', 'users', 'registrations', 'socials', 'messages', 'jail']
         self.__dbpath = dbPath
         self.__state = 1
         self.__max_role_lvl = 1
@@ -68,6 +68,7 @@ class MyDatabase:
         self.__query("CREATE TABLE `registrations` (`user_id` INTEGER NOT NULL, `social_id` INTEGER NOT NULL, `status` INTEGER NOT NULL DEFAULT 0, `expire_date` INTEGER NOT NULL DEFAULT -1, `category` TEXT NOT NULL DEFAULT 'default', PRIMARY KEY(`user_id`,`social_id`), FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE, FOREIGN KEY(`social_id`) REFERENCES `socials`(`social_id`) ON DELETE CASCADE ON UPDATE CASCADE);")
         self.__query("CREATE TABLE `socials` (`social_id` INTEGER NOT NULL, `social` TEXT NOT NULL, `username` TEXT NOT NULL, `title` TEXT NOT NULL, `internal_id` TEXT NOT NULL, `retreive_time` INTEGER NOT NULL, `status` TEXT NOT NULL DEFAULT 'public', PRIMARY KEY(`social_id`));")
         self.__query("CREATE TABLE `messages` ( `message_id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,`user_id` INTEGER NOT NULL, `social_id` INTEGER NOT NULL, `update_date` INTEGER NOT NULL, `message` TEXT NOT NULL, FOREIGN KEY(`user_id`,`social_id`) REFERENCES `registrations`(`user_id`,`social_id`) ON DELETE CASCADE ON UPDATE CASCADE );")
+        self.__query("CREATE TABLE `jail` (`user_id` INTEGER NOT NULL, `expire_time` INTEGER NOT NULL, PRIMARY KEY(`user_id`));")
         self.__logger.info("Database e tabelle create con successo")
 
     def __query(self, query, *args, foreign=False, fetch=1):
@@ -391,6 +392,28 @@ class MyDatabase:
                                user_id, foreign=True)
         return bool(rows)
 
+    def __set_follow_limit(self, user_id, max_registrations):
+        _, rowcount = self.__query("UPDATE users SET max_registrations = ? "
+                                   "WHERE user_id = ? AND max_registrations != ?;",
+                                   max_registrations, user_id, max_registrations,
+                                   foreign=True)
+        return bool(rowcount)
+
+    def is_banned(self, user_id):
+        is_banned, _ = self.__query("SELECT COUNT(user_id) FROM jail "
+                                    "WHERE user_id = ?;", user_id)
+        return bool(is_banned[0])
+
+    def __ban_user(self, user_id, d_expire_time):
+        _, rowcount = self.__query("INSERT INTO jail (user_id, expire_time) VALUES (?, ?);",
+                                   user_id, int(time.time() + d_expire_time))
+        return bool(rowcount)
+
+    def __unban_user(self, user_id):
+        _, rows = self.__query("DELETE FROM jail WHERE user_id = ?;",
+                               user_id)
+        return bool(rows)
+
     def set_role_auth(self, user_id, recipient_uname_id, role, is_username=False):
         is_success = False
         if role <= self.__max_role_lvl:
@@ -420,4 +443,34 @@ class MyDatabase:
             pass
         elif self.__is_auth_action(user_id, recipient_uname_id):
             is_success = self.__rm_role(recipient_uname_id)
+        return is_success
+
+    def set_follow_limit_auth(self, user_id, recipient_uname_id, max_registrations, is_username=False):
+        is_success = False
+        if is_username:
+            recipient_uname_id = self.__get_user_id(recipient_uname_id)
+        if recipient_uname_id is None:
+            pass
+        elif self.__is_auth_action(user_id, recipient_uname_id):
+            is_success = self.__set_follow_limit(recipient_uname_id, max_registrations)
+        return is_success
+
+    def set_ban_user_auth(self, user_id, recipient_uname_id, d_expire_time=4294967296, is_username=False):
+        is_success = False
+        if is_username:
+            recipient_uname_id = self.__get_user_id(recipient_uname_id)
+        if recipient_uname_id is None:
+            pass
+        elif self.__is_auth_action(user_id, recipient_uname_id):
+            is_success = self.__ban_user(recipient_uname_id, d_expire_time)
+        return is_success
+
+    def set_unban_user_auth(self, user_id, recipient_uname_id, is_username=False):
+        is_success = False
+        if is_username:
+            recipient_uname_id = self.__get_user_id(recipient_uname_id)
+        if recipient_uname_id is None:
+            pass
+        elif self.__is_auth_action(user_id, recipient_uname_id):
+            is_success = self.__unban_user(recipient_uname_id)
         return is_success

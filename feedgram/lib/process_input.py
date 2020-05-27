@@ -268,6 +268,36 @@ class Processinput:
                                             msg = "<b>⚠️ Warning</b>\n<code>/remrole</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/remrole &lt;@username&gt;</code>\n<i>OR:</i>\n<code>/remrole &lt;userId&gt;</code>"
                                         messages.append(self.__ms_maker(chat_id, msg, "HTML"))
 
+                                elif text[:10] == "/setsublim":
+                                    if self.__db.has_permissions(user_id, 1):
+                                        match = re.search(r"^\s+(@[a-zA-Z0-9]{5,32}|\d{5,16})\s+(\d{1,3})$", text[10:])
+                                        if match:
+                                            str_opuser, is_username = (match[1][1:], True) if match[1][:1] == "@" else (match[1], False)
+                                            msg = "<b>✅ Successful action</b>\n\nUser {} now can follow up to <b>{}</b> profiles!".format(match[1], match[2]) if self.__db.set_follow_limit_auth(user_id, str_opuser, match[2], is_username) else "<b>⚠️Warning</b>\n\nAction not performed; the reason could be one or a combination of those:\n • Wrong username/userId issued.\n • Not enough privileges.\n • The action you are trying to perform is not possible!"
+                                        else:
+                                            msg = "<b>⚠️ Warning</b>\n<code>/setsublim</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/setsublim &lt;@username&gt; &lt;sub_lim_number&gt;</code>\n<i>OR:</i>\n<code>/setsublim &lt;userId&gt; &lt;sub_lim_number&gt;</code>"
+                                        messages.append(self.__ms_maker(chat_id, msg, "HTML"))
+
+                                elif text[:4] == "/ban":
+                                    if self.__db.has_permissions(user_id, 1):
+                                        match = re.search(r"^\s+(@[a-zA-Z0-9]{5,32}|\d{5,16})$", text[4:])
+                                        if match:
+                                            str_opuser, is_username = (match[1][1:], True) if match[1][:1] == "@" else (match[1], False)
+                                            msg = "<b>✅ Successful action</b>\n\nUser {} now is <b>banned</b>!".format(match[1]) if self.__db.set_ban_user_auth(user_id, str_opuser, is_username=is_username) else "<b>⚠️Warning</b>\n\nAction not performed; the reason could be one or a combination of those:\n • Wrong username/userId issued.\n • Not enough privileges.\n • The action you are trying to perform is not possible!"
+                                        else:
+                                            msg = "<b>⚠️ Warning</b>\n<code>/ban</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/ban &lt;@username&gt;</code>\n<i>OR:</i>\n<code>/ban &lt;userId&gt;</code>"
+                                        messages.append(self.__ms_maker(chat_id, msg, "HTML"))
+
+                                elif text[:6] == "/unban":
+                                    if self.__db.has_permissions(user_id, 1):
+                                        match = re.search(r"^\s+(@[a-zA-Z0-9]{5,32}|\d{5,16})$", text[6:])
+                                        if match:
+                                            str_opuser, is_username = (match[1][1:], True) if match[1][:1] == "@" else (match[1], False)
+                                            msg = "<b>✅ Successful action</b>\n\nUser {} now is <b>unbanned</b>!".format(match[1]) if self.__db.set_unban_user_auth(user_id, str_opuser, is_username=is_username) else "<b>⚠️Warning</b>\n\nAction not performed; the reason could be one or a combination of those:\n • Wrong username/userId issued.\n • Not enough privileges.\n • The action you are trying to perform is not possible!"
+                                        else:
+                                            msg = "<b>⚠️ Warning</b>\n<code>/unban</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/unban &lt;@username&gt;</code>\n<i>OR:</i>\n<code>/unban &lt;userId&gt;</code>"
+                                        messages.append(self.__ms_maker(chat_id, msg, "HTML"))
+
                                 elif text[:5] == "/kick":
                                     if self.__db.has_permissions(user_id, 1):
                                         match = re.search(r"^\s+(@[a-zA-Z0-9]{5,32}|\d{5,16})$", text[5:])
@@ -574,7 +604,7 @@ class Processinput:
                     else:
                         if 'text' in update[mss_type]:
                             text = update[mss_type]["text"]
-                            if text == "/start":
+                            if text == "/start" and not self.__db.is_banned(user_id):
                                 self.__db.subscribe_user(user_id, username, chat_id, 10)
                                 if self.__db.check_utente(user_id):
                                     messages.append(self.__ms_maker(chat_id, "Congratulations, you're now registered!\nType /help to learn the commands available!"))
