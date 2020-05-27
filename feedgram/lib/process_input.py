@@ -252,9 +252,30 @@ class Processinput:
                                         if match:
                                             int_oprole = 0 if match[2] == "admin" else 1 if match[2] == "mod" else int(match[2])
                                             str_oprole = self.__replace_all(str(int_oprole), self.ROLES_S)
-                                            msg = "<b>✅ Successful action</b>\n\nUser {} is now <b>{}</b>!".format(match[1], str_oprole) if self.__db.set_role_auth(user_id, match[1][1:], int_oprole, match[1][:1] == "@") else "<b>⚠️Warning</b>\n\nAction not performed; the reason could be one or a combination of those:\n • Wrong username/userId issued.\n • Not enough privileges.\n • The recipient already has the level of privileges that you are trying to assign!"
+                                            str_opuser, is_username = (match[1][1:], True) if match[1][:1] == "@" else (match[1], False)
+                                            msg = "<b>✅ Successful action</b>\n\nUser {} is now <b>{}</b>!".format(match[1], str_oprole) if self.__db.set_role_auth(user_id, str_opuser, int_oprole, is_username) else "<b>⚠️Warning</b>\n\nAction not performed; the reason could be one or a combination of those:\n • Wrong username/userId issued.\n • Not enough privileges.\n • The action you are trying to perform is not possible!"
                                         else:
                                             msg = "<b>⚠️ Warning</b>\n<code>/setrole</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/setrole &lt;@username&gt; &lt;rolenumber&gt;</code>\n<i>OR:</i>\n<code>/setrole &lt;userId&gt; &lt;rolenumber&gt;</code>"
+                                        messages.append(self.__ms_maker(chat_id, msg, "HTML"))
+
+                                elif text[:8] == "/remrole":
+                                    if self.__db.has_permissions(user_id, 1):
+                                        match = re.search(r"^\s+(@[a-zA-Z0-9]{5,32}|\d{5,16})$", text[8:])
+                                        if match:
+                                            str_opuser, is_username = (match[1][1:], True) if match[1][:1] == "@" else (match[1], False)
+                                            msg = "<b>✅ Successful action</b>\n\nUser {} now has <b>no role</b>!".format(match[1]) if self.__db.rm_role_auth(user_id, str_opuser, is_username) else "<b>⚠️Warning</b>\n\nAction not performed; the reason could be one or a combination of those:\n • Wrong username/userId issued.\n • Not enough privileges.\n • The action you are trying to perform is not possible!"
+                                        else:
+                                            msg = "<b>⚠️ Warning</b>\n<code>/remrole</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/remrole &lt;@username&gt;</code>\n<i>OR:</i>\n<code>/remrole &lt;userId&gt;</code>"
+                                        messages.append(self.__ms_maker(chat_id, msg, "HTML"))
+
+                                elif text[:5] == "/kick":
+                                    if self.__db.has_permissions(user_id, 1):
+                                        match = re.search(r"^\s+(@[a-zA-Z0-9]{5,32}|\d{5,16})$", text[5:])
+                                        if match:
+                                            str_opuser, is_username = (match[1][1:], True) if match[1][:1] == "@" else (match[1], False)
+                                            msg = "<b>✅ Successful action</b>\n\nUser {} is <b>kicked</b>!".format(match[1]) if self.__db.kick_user_auth(user_id, str_opuser, is_username) else "<b>⚠️Warning</b>\n\nAction not performed; the reason could be one or a combination of those:\n • Wrong username/userId issued.\n • Not enough privileges.\n • The action you are trying to perform is not possible!"
+                                        else:
+                                            msg = "<b>⚠️ Warning</b>\n<code>/kick</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/kick &lt;@username&gt;</code>\n<i>OR:</i>\n<code>/kick &lt;userId&gt;</code>"
                                         messages.append(self.__ms_maker(chat_id, msg, "HTML"))
                                 else:
                                     messages.append(self.__ms_maker(chat_id, "Unrecognized command"))

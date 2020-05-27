@@ -110,8 +110,9 @@ class MyDatabase:
         return bool(res)
 
     def unsubscribe_user(self, user_id):
-        self.__query("DELETE FROM users WHERE user_id = ?;",
-                     user_id, foreign=True)
+        _, rows = self.__query("DELETE FROM users WHERE user_id = ?;",
+                               user_id, foreign=True)
+        return bool(rows)
 
     def subscribe_user(self, user_id, username, chat_id, max_registrations):
         self.__query("INSERT INTO users (user_id, username, chat_id, max_registrations, subscription_time) VALUES (?, ?, ?, ?, ?);",
@@ -385,6 +386,11 @@ class MyDatabase:
             is_success = True
         return is_success
 
+    def __rm_role(self, user_id):
+        _, rows = self.__query("DELETE FROM admins WHERE user_id = ?;",
+                               user_id, foreign=True)
+        return bool(rows)
+
     def set_role_auth(self, user_id, recipient_uname_id, role, is_username=False):
         is_success = False
         if role <= self.__max_role_lvl:
@@ -394,4 +400,24 @@ class MyDatabase:
                 pass
             elif self.__is_auth_action(user_id, recipient_uname_id, role):
                 is_success = self.set_role(recipient_uname_id, role)
+        return is_success
+
+    def kick_user_auth(self, user_id, recipient_uname_id, is_username=False):
+        is_success = False
+        if is_username:
+            recipient_uname_id = self.__get_user_id(recipient_uname_id)
+        if recipient_uname_id is None:
+            pass
+        elif self.__is_auth_action(user_id, recipient_uname_id):
+            is_success = self.unsubscribe_user(recipient_uname_id)
+        return is_success
+
+    def rm_role_auth(self, user_id, recipient_uname_id, is_username=False):
+        is_success = False
+        if is_username:
+            recipient_uname_id = self.__get_user_id(recipient_uname_id)
+        if recipient_uname_id is None:
+            pass
+        elif self.__is_auth_action(user_id, recipient_uname_id):
+            is_success = self.__rm_role(recipient_uname_id)
         return is_success
