@@ -232,7 +232,7 @@ class Processinput:
                                     match = re.match(r"^\s+([A-Za-z0-9-]+)", text[8:])
                                     if match:
                                         if match.group(1) == self.__privilege_key:
-                                            if self.__db.promote_to_creator(user_id):
+                                            if self.__db.set_role(user_id, 0):
                                                 msg = "You have now creator privileges!"
                                             else:
                                                 msg = "You already have the role of creator"
@@ -244,6 +244,17 @@ class Processinput:
                                         op_list = self.__mk_list_op_json(op_tuples)
                                         op_list = self.__mk_list_op_decorate(op_list)
                                         msg = "{}{}".format("<b>⚖️ Operators list</b>\n\n", self.__mk_list(op_list))
+                                        messages.append(self.__ms_maker(chat_id, msg, "HTML"))
+
+                                elif text[:8] == "/setrole":
+                                    if self.__db.has_permissions(user_id, 1):
+                                        match = re.search(r"^\s+(@[a-zA-Z0-9]{5,32}|\d{5,16})\s+(\d{1,3}|admin|mod)$", text[8:])
+                                        if match:
+                                            int_oprole = 0 if match[2] == "admin" else 1 if match[2] == "mod" else int(match[2])
+                                            str_oprole = self.__replace_all(str(int_oprole), self.ROLES_S)
+                                            msg = "<b>✅ Successful action</b>\n\nUser {} is now <b>{}</b>!".format(match[1], str_oprole) if self.__db.set_role_auth(user_id, match[1][1:], int_oprole, match[1][:1] == "@") else "<b>⚠️Warning</b>\n\nAction not performed; the reason could be one or a combination of those:\n • Wrong username/userId issued.\n • Not enough privileges.\n • The recipient already has the level of privileges that you are trying to assign!"
+                                        else:
+                                            msg = "<b>⚠️ Warning</b>\n<code>/setrole</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/setrole &lt;@username&gt; &lt;rolenumber&gt;</code>\n<i>OR:</i>\n<code>/setrole &lt;userId&gt; &lt;rolenumber&gt;</code>"
                                         messages.append(self.__ms_maker(chat_id, msg, "HTML"))
                                 else:
                                     messages.append(self.__ms_maker(chat_id, "Unrecognized command"))
@@ -617,7 +628,8 @@ class Processinput:
     NUMBER_DICT = {"0": "⓪", "1": "①", "2": "②", "3": "③", "4": "④", "5": "⑤", "6": "⑥", "7": "⑦", "8": "⑧", "9": "⑨"}
     STATUS_DICT = {"0": "", "1": "🔕", "2": "⏹", "3": "⏯️"}
     LINE_LIMIT = 24
-    ROLES = {"0": "Creators", "1": "Moderators"}
+    ROLES_P = {"0": "Creators", "1": "Moderators"}
+    ROLES_S = {"0": "Creator", "1": "Moderator"}
 
     def __list_mss(self, user_id, index):
         user_subscriptions = self.__db.user_subscriptions(user_id)
@@ -905,7 +917,7 @@ class Processinput:
     @classmethod
     def __mk_list_op_decorate(cls, op_list):
         for role in op_list:
-            role["name"] = cls.__replace_all(str(role["name"]), cls.ROLES)
+            role["name"] = cls.__replace_all(str(role["name"]), cls.ROLES_P)
             i = 0
             for node in role["nodes"]:
                 role["nodes"][i]["name"] = "<a href='tg://user?id={0}'>{1}</a>".format(node["name"], node["data"]["username"] if node["data"]["username"] else node["name"])

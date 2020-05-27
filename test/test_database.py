@@ -493,20 +493,20 @@ def test_unsubscribe():
     assert not bool(us_exist)
 
 
-def test_promote_to_creator():
+def test_set_role():
 
     database = MyDatabase(DATABASE_PATH)
-    assert database.promote_to_creator(6551474276)
-    assert not database.promote_to_creator(6551474276)
+    assert database.set_role(1597534565, 0)
+    assert not database.set_role(1597534565, 0)
 
 
 def test_list_operators():
 
     database = MyDatabase(DATABASE_PATH)
-    assert database.list_operators() == [(6551474276, 0, None)]
+    assert database.list_operators() == [(1597534565, 0, "foo")]
 
 
 def test_has_permissions():
 
     database = MyDatabase(DATABASE_PATH)
-    assert database.has_permissions(6551474276, 1)
+    assert database.has_permissions(1597534565, 1)

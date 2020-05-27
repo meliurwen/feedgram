@@ -102,28 +102,13 @@ def test_wrong_command():
 
 def test_help_command():
 
-    msm_help = ("📖 Help\n\nYou can follow up to <i>10 social accounts</i>.\n"
-                "Socials currently supported:\n"
-                " • <i>Instagram</i>\n"
-                "You can follow only <b>public</b> accounts.\n"
-                "\n"
-                "<b>Receive Feeds:</b>\n"
-                " • /sub <i>social</i> <i>username</i>\n"
-                " • /sub <i>link</i>\n"
-                " • /unsub <i>social</i> <i>username</i>\n"
-                " • /mute <i>social</i> <i>username</i> <i>time</i>\n"
-                " • /halt <i>social</i> <i>username</i> <i>time</i>\n"
-                " • /pause <i>social</i> <i>username</i> <i>time</i>\n"
-                "<b>Bot:</b>\n"
-                " • /stop to stop and unsubscribe from the bot.")
-
     database = MyDatabase(DATABASE_PATH)
     myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
     result = myprocess_input.process(cnst.COMMAND_HELP)
 
     assert result[0]["type"] == "sendMessage"
     assert cnst.COMMAND_HELP["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
-    assert result[0]["text"] == msm_help
+    assert result[0]["text"] == cnst.HELP_MESSAGE
 
 
 def test_not_command_registered():

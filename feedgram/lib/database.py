@@ -14,6 +14,7 @@ class MyDatabase:
         self.__tables = ['admins', 'users', 'registrations', 'socials', 'messages']
         self.__dbpath = dbPath
         self.__state = 1
+        self.__max_role_lvl = 1
 
         if self.__db_exist:
             if not self.__tables_exist:
@@ -347,9 +348,9 @@ class MyDatabase:
 
         self.__logger.info("Sottoscrizioni con lo stato scaduto: %s ", rowcount)
 
-    def promote_to_creator(self, user_id):
-        _, rowcount = self.__query("INSERT INTO admins (user_id, role) VALUES (?, 0) "
-                                   "ON CONFLICT(user_id) DO UPDATE SET role = 0 WHERE role != 0;", user_id)
+    def set_role(self, user_id, role):
+        _, rowcount = self.__query("INSERT INTO admins (user_id, role) VALUES (?, ?) "
+                                   "ON CONFLICT(user_id) DO UPDATE SET role = ? WHERE role != ?;", user_id, role, role, role, foreign=True)
         return bool(rowcount)
 
     def list_operators(self):
@@ -362,3 +363,35 @@ class MyDatabase:
         has_perm, _ = self.__query("SELECT COUNT(user_id) FROM admins "
                                    "WHERE user_id = ? AND role <= ?;", user_id, role)
         return bool(has_perm[0])
+
+    def __get_role(self, user_id):
+        role, _ = self.__query("SELECT role FROM admins WHERE user_id = ?;", user_id)
+        return None if role is None else role[0]
+
+    def __get_user_id(self, username):
+        username, _ = self.__query("SELECT user_id FROM users WHERE username = ?;", username)
+        return None if username is None else username[0]
+
+    def __is_auth_action(self, user_id, recipient_uname_id, role_lvl_action=None):
+        is_success = False
+        issuer_role, recipient_role = self.__get_role(user_id), self.__get_role(recipient_uname_id)
+        if role_lvl_action is None:
+            role_lvl_action = issuer_role
+        if recipient_role is None:
+            recipient_role = 999  # Is an arbitrary high number
+        if issuer_role is None:
+            pass
+        elif (issuer_role <= recipient_role) and (role_lvl_action >= issuer_role):
+            is_success = True
+        return is_success
+
+    def set_role_auth(self, user_id, recipient_uname_id, role, is_username=False):
+        is_success = False
+        if role <= self.__max_role_lvl:
+            if is_username:
+                recipient_uname_id = self.__get_user_id(recipient_uname_id)
+            if recipient_uname_id is None:
+                pass
+            elif self.__is_auth_action(user_id, recipient_uname_id, role):
+                is_success = self.set_role(recipient_uname_id, role)
+        return is_success
