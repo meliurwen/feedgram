@@ -11,9 +11,10 @@ class MyDatabase:
         self.__logger = logging.getLogger('telegram_bot.database')
         self.__logger.info('Class instance for communication with a SQLite3 database initiated.')
 
-        self.__tables = ['admins', 'users', 'registrations', 'socials', 'messages']
+        self.__tables = ['admins', 'users', 'registrations', 'socials', 'messages', 'jail']
         self.__dbpath = dbPath
         self.__state = 1
+        self.__max_role_lvl = 1
 
         if self.__db_exist:
             if not self.__tables_exist:
@@ -67,7 +68,8 @@ class MyDatabase:
         self.__query("CREATE TABLE `registrations` (`user_id` INTEGER NOT NULL, `social_id` INTEGER NOT NULL, `status` INTEGER NOT NULL DEFAULT 0, `expire_date` INTEGER NOT NULL DEFAULT -1, `category` TEXT NOT NULL DEFAULT 'default', PRIMARY KEY(`user_id`,`social_id`), FOREIGN KEY(`user_id`) REFERENCES `users`(`user_id`) ON DELETE CASCADE ON UPDATE CASCADE, FOREIGN KEY(`social_id`) REFERENCES `socials`(`social_id`) ON DELETE CASCADE ON UPDATE CASCADE);")
         self.__query("CREATE TABLE `socials` (`social_id` INTEGER NOT NULL, `social` TEXT NOT NULL, `username` TEXT NOT NULL, `title` TEXT NOT NULL, `internal_id` TEXT NOT NULL, `retreive_time` INTEGER NOT NULL, `status` TEXT NOT NULL DEFAULT 'public', PRIMARY KEY(`social_id`));")
         self.__query("CREATE TABLE `messages` ( `message_id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,`user_id` INTEGER NOT NULL, `social_id` INTEGER NOT NULL, `update_date` INTEGER NOT NULL, `message` TEXT NOT NULL, FOREIGN KEY(`user_id`,`social_id`) REFERENCES `registrations`(`user_id`,`social_id`) ON DELETE CASCADE ON UPDATE CASCADE );")
-        self.__logger.info("Database e tabelle create con successo")
+        self.__query("CREATE TABLE `jail` (`user_id` INTEGER NOT NULL, `expire_time` INTEGER NOT NULL, PRIMARY KEY(`user_id`));")
+        self.__logger.info("Database and tables created successfully.")
 
     def __query(self, query, *args, foreign=False, fetch=1):
 
@@ -109,8 +111,9 @@ class MyDatabase:
         return bool(res)
 
     def unsubscribe_user(self, user_id):
-        self.__query("DELETE FROM users WHERE user_id = ?;",
-                     user_id, foreign=True)
+        _, rows = self.__query("DELETE FROM users WHERE user_id = ?;",
+                               user_id, foreign=True)
+        return bool(rows)
 
     def subscribe_user(self, user_id, username, chat_id, max_registrations):
         self.__query("INSERT INTO users (user_id, username, chat_id, max_registrations, subscription_time) VALUES (?, ?, ?, ?, ?);",
@@ -347,9 +350,9 @@ class MyDatabase:
 
         self.__logger.info("Sottoscrizioni con lo stato scaduto: %s ", rowcount)
 
-    def promote_to_creator(self, user_id):
-        _, rowcount = self.__query("INSERT INTO admins (user_id, role) VALUES (?, 0) "
-                                   "ON CONFLICT(user_id) DO UPDATE SET role = 0 WHERE role != 0;", user_id)
+    def set_role(self, user_id, role):
+        _, rowcount = self.__query("INSERT INTO admins (user_id, role) VALUES (?, ?) "
+                                   "ON CONFLICT(user_id) DO UPDATE SET role = ? WHERE role != ?;", user_id, role, role, role, foreign=True)
         return bool(rowcount)
 
     def list_operators(self):
@@ -362,3 +365,91 @@ class MyDatabase:
         has_perm, _ = self.__query("SELECT COUNT(user_id) FROM admins "
                                    "WHERE user_id = ? AND role <= ?;", user_id, role)
         return bool(has_perm[0])
+
+    def __get_role(self, user_id):
+        role, _ = self.__query("SELECT role FROM admins WHERE user_id = ?;", user_id)
+        return None if role is None else role[0]
+
+    def __get_user_id(self, username):
+        username, _ = self.__query("SELECT user_id FROM users WHERE username = ?;", username)
+        return None if username is None else username[0]
+
+    def __is_auth_action(self, user_id, recipient_user_id, role_lvl_action=None):
+        is_success = False
+        issuer_role, recipient_role = self.__get_role(user_id), self.__get_role(recipient_user_id)
+        if role_lvl_action is None:
+            role_lvl_action = issuer_role
+        if recipient_role is None:
+            recipient_role = 999  # Is an arbitrary high number
+        if issuer_role is None:
+            pass
+        elif (issuer_role <= recipient_role) and (role_lvl_action >= issuer_role):
+            is_success = True
+        return is_success
+
+    def __is_auth_action_uname(self, user_id, recipient_uname_id, is_username=False, role_lvl_action=None):
+        is_success = False
+        if is_username:
+            recipient_uname_id = self.__get_user_id(recipient_uname_id)
+        if recipient_uname_id is None:
+            pass
+        elif self.__is_auth_action(user_id, recipient_uname_id, role_lvl_action):
+            is_success = True
+        return is_success, recipient_uname_id
+
+    def __rm_role(self, user_id):
+        _, rows = self.__query("DELETE FROM admins WHERE user_id = ?;",
+                               user_id, foreign=True)
+        return bool(rows)
+
+    def __set_follow_limit(self, user_id, max_registrations):
+        _, rowcount = self.__query("UPDATE users SET max_registrations = ? "
+                                   "WHERE user_id = ? AND max_registrations != ?;",
+                                   max_registrations, user_id, max_registrations,
+                                   foreign=True)
+        return bool(rowcount)
+
+    def __ban_user(self, user_id, d_expire_time):
+        _, rowcount = self.__query("INSERT INTO jail (user_id, expire_time) VALUES (?, ?);",
+                                   user_id, int(time.time() + d_expire_time))
+        return bool(rowcount)
+
+    def __unban_user(self, user_id):
+        _, rows = self.__query("DELETE FROM jail WHERE user_id = ?;",
+                               user_id)
+        return bool(rows)
+
+    def is_banned(self, user_id):
+        is_banned, _ = self.__query("SELECT COUNT(user_id) FROM jail "
+                                    "WHERE user_id = ?;", user_id)
+        return bool(is_banned[0])
+
+    def set_role_auth(self, user_id, recipient_uname_id, role, is_username=False):
+        is_success = False
+        if role <= self.__max_role_lvl:
+            is_success, recipient_uname_id = self.__is_auth_action_uname(user_id, recipient_uname_id, is_username, role)
+            is_success = self.set_role(recipient_uname_id, role) if is_success else is_success
+        return is_success
+
+    def kick_user_auth(self, user_id, recipient_uname_id, is_username=False):
+        is_success, recipient_uname_id = self.__is_auth_action_uname(user_id, recipient_uname_id, is_username)
+        return self.unsubscribe_user(recipient_uname_id) if is_success else is_success
+
+    def rm_role_auth(self, user_id, recipient_uname_id, is_username=False):
+        is_success, recipient_uname_id = self.__is_auth_action_uname(user_id, recipient_uname_id, is_username)
+        return self.__rm_role(recipient_uname_id) if is_success else is_success
+
+    def set_follow_limit_auth(self, user_id, recipient_uname_id, max_registrations, is_username=False):
+        is_success, recipient_uname_id = self.__is_auth_action_uname(user_id, recipient_uname_id, is_username)
+        return self.__set_follow_limit(recipient_uname_id, max_registrations) if is_success else is_success
+
+    def set_ban_user_auth(self, user_id, recipient_uname_id, is_username=False, d_expire_time=4294967296):
+        is_success, recipient_uname_id = self.__is_auth_action_uname(user_id, recipient_uname_id, is_username)
+        if is_success:
+            is_success = self.__ban_user(recipient_uname_id, d_expire_time)
+            self.unsubscribe_user(recipient_uname_id)
+        return is_success
+
+    def set_unban_user_auth(self, user_id, recipient_uname_id, is_username=False):
+        is_success, recipient_uname_id = self.__is_auth_action_uname(user_id, recipient_uname_id, is_username)
+        return self.__unban_user(recipient_uname_id) if is_success else is_success

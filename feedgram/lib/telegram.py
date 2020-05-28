@@ -24,15 +24,16 @@ class Telegram:
         self.__tl_url = "https://api.telegram.org/bot{}/".format(token)
 
     def update_command_info(self, commands):
-        actual_command = self.get_my_commands()["result"]
+        actual_command = self.__get_my_commands()["result"]
         if commands != actual_command:
-            self.set_my_commands(commands)
+            self.__set_my_commands(commands)
+        return True
 
-    def get_my_commands(self):
+    def __get_my_commands(self):
         url = self.__tl_url + "getMyCommands"
         return self.__get_json_from_url(url)
 
-    def set_my_commands(self, commands):
+    def __set_my_commands(self, commands):
         url = self.__tl_url + "setMyCommands"
         url = url + "?commands={}".format(quote_plus(json.dumps(commands)))
         get_url(url)

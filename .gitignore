@@ -9,6 +9,7 @@ dist/
 # Tests
 .coverage
 coverage/
+test/config/config_new.ini
 
 # Python
 __pycache__/
