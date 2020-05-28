@@ -69,7 +69,7 @@ class MyDatabase:
         self.__query("CREATE TABLE `socials` (`social_id` INTEGER NOT NULL, `social` TEXT NOT NULL, `username` TEXT NOT NULL, `title` TEXT NOT NULL, `internal_id` TEXT NOT NULL, `retreive_time` INTEGER NOT NULL, `status` TEXT NOT NULL DEFAULT 'public', PRIMARY KEY(`social_id`));")
         self.__query("CREATE TABLE `messages` ( `message_id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,`user_id` INTEGER NOT NULL, `social_id` INTEGER NOT NULL, `update_date` INTEGER NOT NULL, `message` TEXT NOT NULL, FOREIGN KEY(`user_id`,`social_id`) REFERENCES `registrations`(`user_id`,`social_id`) ON DELETE CASCADE ON UPDATE CASCADE );")
         self.__query("CREATE TABLE `jail` (`user_id` INTEGER NOT NULL, `expire_time` INTEGER NOT NULL, PRIMARY KEY(`user_id`));")
-        self.__logger.info("Database e tabelle create con successo")
+        self.__logger.info("Database and tables created successfully.")
 
     def __query(self, query, *args, foreign=False, fetch=1):
 
@@ -374,9 +374,9 @@ class MyDatabase:
         username, _ = self.__query("SELECT user_id FROM users WHERE username = ?;", username)
         return None if username is None else username[0]
 
-    def __is_auth_action(self, user_id, recipient_uname_id, role_lvl_action=None):
+    def __is_auth_action(self, user_id, recipient_user_id, role_lvl_action=None):
         is_success = False
-        issuer_role, recipient_role = self.__get_role(user_id), self.__get_role(recipient_uname_id)
+        issuer_role, recipient_role = self.__get_role(user_id), self.__get_role(recipient_user_id)
         if role_lvl_action is None:
             role_lvl_action = issuer_role
         if recipient_role is None:
@@ -386,6 +386,16 @@ class MyDatabase:
         elif (issuer_role <= recipient_role) and (role_lvl_action >= issuer_role):
             is_success = True
         return is_success
+
+    def __is_auth_action_uname(self, user_id, recipient_uname_id, is_username=False, role_lvl_action=None):
+        is_success = False
+        if is_username:
+            recipient_uname_id = self.__get_user_id(recipient_uname_id)
+        if recipient_uname_id is None:
+            pass
+        elif self.__is_auth_action(user_id, recipient_uname_id, role_lvl_action):
+            is_success = True
+        return is_success, recipient_uname_id
 
     def __rm_role(self, user_id):
         _, rows = self.__query("DELETE FROM admins WHERE user_id = ?;",
@@ -399,11 +409,6 @@ class MyDatabase:
                                    foreign=True)
         return bool(rowcount)
 
-    def is_banned(self, user_id):
-        is_banned, _ = self.__query("SELECT COUNT(user_id) FROM jail "
-                                    "WHERE user_id = ?;", user_id)
-        return bool(is_banned[0])
-
     def __ban_user(self, user_id, d_expire_time):
         _, rowcount = self.__query("INSERT INTO jail (user_id, expire_time) VALUES (?, ?);",
                                    user_id, int(time.time() + d_expire_time))
@@ -414,63 +419,45 @@ class MyDatabase:
                                user_id)
         return bool(rows)
 
+    def is_banned(self, user_id):
+        is_banned, _ = self.__query("SELECT COUNT(user_id) FROM jail "
+                                    "WHERE user_id = ?;", user_id)
+        return bool(is_banned[0])
+
     def set_role_auth(self, user_id, recipient_uname_id, role, is_username=False):
         is_success = False
         if role <= self.__max_role_lvl:
-            if is_username:
-                recipient_uname_id = self.__get_user_id(recipient_uname_id)
-            if recipient_uname_id is None:
-                pass
-            elif self.__is_auth_action(user_id, recipient_uname_id, role):
+            is_success, recipient_uname_id = self.__is_auth_action_uname(user_id, recipient_uname_id, is_username, role)
+            if is_success:
                 is_success = self.set_role(recipient_uname_id, role)
         return is_success
 
     def kick_user_auth(self, user_id, recipient_uname_id, is_username=False):
-        is_success = False
-        if is_username:
-            recipient_uname_id = self.__get_user_id(recipient_uname_id)
-        if recipient_uname_id is None:
-            pass
-        elif self.__is_auth_action(user_id, recipient_uname_id):
+        is_success, recipient_uname_id = self.__is_auth_action_uname(user_id, recipient_uname_id, is_username)
+        if is_success:
             is_success = self.unsubscribe_user(recipient_uname_id)
         return is_success
 
     def rm_role_auth(self, user_id, recipient_uname_id, is_username=False):
-        is_success = False
-        if is_username:
-            recipient_uname_id = self.__get_user_id(recipient_uname_id)
-        if recipient_uname_id is None:
-            pass
-        elif self.__is_auth_action(user_id, recipient_uname_id):
+        is_success, recipient_uname_id = self.__is_auth_action_uname(user_id, recipient_uname_id, is_username)
+        if is_success:
             is_success = self.__rm_role(recipient_uname_id)
         return is_success
 
     def set_follow_limit_auth(self, user_id, recipient_uname_id, max_registrations, is_username=False):
-        is_success = False
-        if is_username:
-            recipient_uname_id = self.__get_user_id(recipient_uname_id)
-        if recipient_uname_id is None:
-            pass
-        elif self.__is_auth_action(user_id, recipient_uname_id):
+        is_success, recipient_uname_id = self.__is_auth_action_uname(user_id, recipient_uname_id, is_username)
+        if is_success:
             is_success = self.__set_follow_limit(recipient_uname_id, max_registrations)
         return is_success
 
-    def set_ban_user_auth(self, user_id, recipient_uname_id, d_expire_time=4294967296, is_username=False):
-        is_success = False
-        if is_username:
-            recipient_uname_id = self.__get_user_id(recipient_uname_id)
-        if recipient_uname_id is None:
-            pass
-        elif self.__is_auth_action(user_id, recipient_uname_id):
+    def set_ban_user_auth(self, user_id, recipient_uname_id, is_username=False, d_expire_time=4294967296):
+        is_success, recipient_uname_id = self.__is_auth_action_uname(user_id, recipient_uname_id, is_username)
+        if is_success:
             is_success = self.__ban_user(recipient_uname_id, d_expire_time)
         return is_success
 
     def set_unban_user_auth(self, user_id, recipient_uname_id, is_username=False):
-        is_success = False
-        if is_username:
-            recipient_uname_id = self.__get_user_id(recipient_uname_id)
-        if recipient_uname_id is None:
-            pass
-        elif self.__is_auth_action(user_id, recipient_uname_id):
+        is_success, recipient_uname_id = self.__is_auth_action_uname(user_id, recipient_uname_id, is_username)
+        if is_success:
             is_success = self.__unban_user(recipient_uname_id)
         return is_success
