@@ -395,35 +395,36 @@ COMMAND_START_USR1["result"] = [
 
 COMMAND_START_USR2 = copy.deepcopy(COMMAND_START_USR1)
 COMMAND_START_USR2["query"]['result'][0]['message']['from']['id'] = 451843278
+COMMAND_START_USR2["query"]['result'][0]['message']['from']['username'] = "TestUsername2"
 COMMAND_START_USR2["query"]['result'][0]['message']['chat']['id'] = 451843278
+COMMAND_START_USR2["query"]['result'][0]['message']['chat']['username'] = "TestUsername2"
 COMMAND_START_USR2["result"][0]["chat_id"] = 451843278
 COMMAND_START_USR2["result"][1]["chat_id"] = 451843278
 
 COMMAND_START_USR3 = copy.deepcopy(COMMAND_START_USR1)
 COMMAND_START_USR3["query"]['result'][0]['message']['from']['id'] = 546848189
+COMMAND_START_USR3["query"]['result'][0]['message']['from']['username'] = "TestUsername3"
 COMMAND_START_USR3["query"]['result'][0]['message']['chat']['id'] = 546848189
+COMMAND_START_USR3["query"]['result'][0]['message']['chat']['username'] = "TestUsername3"
 COMMAND_START_USR3["result"][0]["chat_id"] = 546848189
 COMMAND_START_USR3["result"][1]["chat_id"] = 546848189
 
-COMMAND_PRIVKEY_USR1 = copy.deepcopy(GENERAL_COMMAND)
-COMMAND_PRIVKEY_USR1["query"]['result'][0]['message']['text'] = "/privkey vKcg86E3AoR3SRg2"
-COMMAND_PRIVKEY_USR1["query"]['result'][0]['message']['entities'][0]["length"] = 8
-COMMAND_PRIVKEY_USR1["result"] = [
-    {
-        'chat_id': 123456789,
-        'text': "You have now creator privileges!",
-        'type': 'sendMessage'
-    }
-]
+COMMAND_START_USR4 = copy.deepcopy(COMMAND_START_USR1)
+COMMAND_START_USR4["query"]['result'][0]['message']['from']['id'] = 465654982
+COMMAND_START_USR4["query"]['result'][0]['message']['from']['username'] = "TestUsername4"
+COMMAND_START_USR4["query"]['result'][0]['message']['chat']['id'] = 465654982
+COMMAND_START_USR4["query"]['result'][0]['message']['chat']['username'] = "TestUsername4"
+COMMAND_START_USR4["result"][0]["chat_id"] = 465654982
+COMMAND_START_USR4["result"][1]["chat_id"] = 465654982
 
-COMMAND_PRIVKEY_USR1_AGAIN = copy.deepcopy(COMMAND_PRIVKEY_USR1)
-COMMAND_PRIVKEY_USR1_AGAIN["result"][0]["text"] = "You already have the role of creator"
+COMMAND_START_USR5 = copy.deepcopy(COMMAND_START_USR1)
+COMMAND_START_USR5["query"]['result'][0]['message']['from']['id'] = 974565456
+COMMAND_START_USR5["query"]['result'][0]['message']['from']['username'] = "TestUsername5"
+COMMAND_START_USR5["query"]['result'][0]['message']['chat']['id'] = 974565456
+COMMAND_START_USR5["query"]['result'][0]['message']['chat']['username'] = "TestUsername5"
+COMMAND_START_USR5["result"][0]["chat_id"] = 974565456
+COMMAND_START_USR5["result"][1]["chat_id"] = 974565456
 
-COMMAND_LISTOP_USR1 = copy.deepcopy(COMMAND_PRIVKEY_USR1)
-COMMAND_LISTOP_USR1["query"]['result'][0]['message']['text'] = "/listop"
-COMMAND_LISTOP_USR1["query"]['result'][0]['message']['entities'][0]["length"] = 7
-COMMAND_LISTOP_USR1["result"][0]["markdown"] = "HTML"
-COMMAND_LISTOP_USR1["result"][0]["text"] = "<b>⚖️ Operators list</b>\n\n<b>Creators</b>\n  • <a href='tg://user?id=123456789'>TestUsername</a>\n"
 
 COMMAND_STOP = copy.deepcopy(GENERAL_COMMAND["query"])
 COMMAND_STOP['result'][0]['message']['text'] = "/stop"
@@ -1551,3 +1552,99 @@ CLBK_HALT_MODE_RST_WRNG_SCL = copy.deepcopy(CLBK_HALT_MODE_RST)
 CLBK_HALT_MODE_RST_WRNG_SCL["query"]["result"][0]["callback_query"]["data"] = "halt 0 0 potato 546545337"
 CLBK_HALT_MODE_RST_WRNG_SCL["result"][0]["text"] = "Error: socialNotAbilitedOrMisstyped"
 CLBK_HALT_MODE_RST_WRNG_SCL["result"][0]["show_alert"] = True
+
+
+COMMAND_PRIVKEY_USR2 = copy.deepcopy(COMMAND_START_USR2)
+COMMAND_PRIVKEY_USR2["query"]['result'][0]['message']['text'] = "/privkey vKcg86E3AoR3SRg2"
+COMMAND_PRIVKEY_USR2["query"]['result'][0]['message']['entities'][0]["length"] = 8
+COMMAND_PRIVKEY_USR2["result"] = [
+    {
+        'chat_id': 451843278,
+        'text': "You have now creator privileges!",
+        'type': 'sendMessage'
+    }
+]
+
+COMMAND_PRIVKEY_USR2_AGAIN = copy.deepcopy(COMMAND_PRIVKEY_USR2)
+COMMAND_PRIVKEY_USR2_AGAIN["result"][0]["text"] = "You already have the role of creator"
+
+COMMAND_LISTOP_USR2 = copy.deepcopy(COMMAND_PRIVKEY_USR2)
+COMMAND_LISTOP_USR2["query"]['result'][0]['message']['text'] = "/listop"
+COMMAND_LISTOP_USR2["query"]['result'][0]['message']['entities'][0]["length"] = 7
+COMMAND_LISTOP_USR2["result"][0]["markdown"] = "HTML"
+COMMAND_LISTOP_USR2["result"][0]["text"] = "<b>⚖️ Operators list</b>\n\n<b>Creators</b>\n  • <a href='tg://user?id=451843278'>TestUsername2</a>\n"
+
+
+MSG_CMD_SETROLE_USR2_USR3_MOD = copy.deepcopy(COMMAND_PRIVKEY_USR2)
+MSG_CMD_SETROLE_USR2_USR3_MOD["query"]['result'][0]['message']['text'] = "/setrole @TestUsername3 mod"
+MSG_CMD_SETROLE_USR2_USR3_MOD["query"]['result'][0]['message']['entities'][0]["length"] = 8
+MSG_CMD_SETROLE_USR2_USR3_MOD["result"][0]["markdown"] = "HTML"
+MSG_CMD_SETROLE_USR2_USR3_MOD["result"][0]["text"] = "<b>✅ Successful action</b>\n\nUser @TestUsername3 is now <b>Moderator</b>!"
+
+MSG_CMD_SETROLE_USR2_BAD = copy.deepcopy(MSG_CMD_SETROLE_USR2_USR3_MOD)
+MSG_CMD_SETROLE_USR2_BAD["query"]['result'][0]['message']['text'] = "/setrole"
+MSG_CMD_SETROLE_USR2_BAD["result"][0]["text"] = "<b>⚠️ Warning</b>\n<code>/setrole</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/setrole &lt;@username&gt; &lt;rolenumber&gt;</code>\n<i>OR:</i>\n<code>/setrole &lt;userId&gt; &lt;rolenumber&gt;</code>"
+
+
+MSG_CMD_SETSUBLIM_USR2_USR3_42 = copy.deepcopy(COMMAND_PRIVKEY_USR2)
+MSG_CMD_SETSUBLIM_USR2_USR3_42["query"]['result'][0]['message']['text'] = "/setsublim @TestUsername3 42"
+MSG_CMD_SETSUBLIM_USR2_USR3_42["query"]['result'][0]['message']['entities'][0]["length"] = 10
+MSG_CMD_SETSUBLIM_USR2_USR3_42["result"][0]["markdown"] = "HTML"
+MSG_CMD_SETSUBLIM_USR2_USR3_42["result"][0]["text"] = "<b>✅ Successful action</b>\n\nUser @TestUsername3 now can follow up to <b>42</b> profiles!"
+
+MSG_CMD_SETSUBLIM_USR2_BAD = copy.deepcopy(MSG_CMD_SETSUBLIM_USR2_USR3_42)
+MSG_CMD_SETSUBLIM_USR2_BAD["query"]['result'][0]['message']['text'] = "/setsublim"
+MSG_CMD_SETSUBLIM_USR2_BAD["result"][0]["text"] = "<b>⚠️ Warning</b>\n<code>/setsublim</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/setsublim &lt;@username&gt; &lt;sub_lim_number&gt;</code>\n<i>OR:</i>\n<code>/setsublim &lt;userId&gt; &lt;sub_lim_number&gt;</code>"
+
+
+MSG_CMD_REMROLE_USR2_USR3 = copy.deepcopy(COMMAND_PRIVKEY_USR2)
+MSG_CMD_REMROLE_USR2_USR3["query"]['result'][0]['message']['text'] = "/remrole @TestUsername3"
+MSG_CMD_REMROLE_USR2_USR3["query"]['result'][0]['message']['entities'][0]["length"] = 10
+MSG_CMD_REMROLE_USR2_USR3["result"][0]["markdown"] = "HTML"
+MSG_CMD_REMROLE_USR2_USR3["result"][0]["text"] = "<b>✅ Successful action</b>\n\nUser @TestUsername3 now has <b>no role</b>!"
+
+MSG_CMD_REMROLE_USR2_USR3_BAD = copy.deepcopy(MSG_CMD_REMROLE_USR2_USR3)
+MSG_CMD_REMROLE_USR2_USR3_BAD["query"]['result'][0]['message']['text'] = "/remrole"
+MSG_CMD_REMROLE_USR2_USR3_BAD["result"][0]["text"] = "<b>⚠️ Warning</b>\n<code>/remrole</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/remrole &lt;@username&gt;</code>\n<i>OR:</i>\n<code>/remrole &lt;userId&gt;</code>"
+
+
+MSG_CMD_KICK_USR2_USR4 = copy.deepcopy(COMMAND_PRIVKEY_USR2)
+MSG_CMD_KICK_USR2_USR4["query"]['result'][0]['message']['text'] = "/kick @TestUsername4"
+MSG_CMD_KICK_USR2_USR4["query"]['result'][0]['message']['entities'][0]["length"] = 5
+MSG_CMD_KICK_USR2_USR4["result"][0]["markdown"] = "HTML"
+MSG_CMD_KICK_USR2_USR4["result"][0]["text"] = "<b>✅ Successful action</b>\n\nUser @TestUsername4 is <b>kicked</b>!"
+
+MSG_CMD_KICK_USR2_USR4_BAD = copy.deepcopy(MSG_CMD_KICK_USR2_USR4)
+MSG_CMD_KICK_USR2_USR4_BAD["query"]['result'][0]['message']['text'] = "/kick"
+MSG_CMD_KICK_USR2_USR4_BAD["result"][0]["text"] = "<b>⚠️ Warning</b>\n<code>/kick</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/kick &lt;@username&gt;</code>\n<i>OR:</i>\n<code>/kick &lt;userId&gt;</code>"
+
+
+MSG_CMD_BAN_USR2_USR5 = copy.deepcopy(COMMAND_PRIVKEY_USR2)
+MSG_CMD_BAN_USR2_USR5["query"]['result'][0]['message']['text'] = "/ban @TestUsername5"
+MSG_CMD_BAN_USR2_USR5["query"]['result'][0]['message']['entities'][0]["length"] = 4
+MSG_CMD_BAN_USR2_USR5["result"][0]["markdown"] = "HTML"
+MSG_CMD_BAN_USR2_USR5["result"][0]["text"] = "<b>✅ Successful action</b>\n\nUser @TestUsername5 now is <b>banned</b>!"
+
+MSG_CMD_BAN_USR2_USR5_BAD = copy.deepcopy(MSG_CMD_BAN_USR2_USR5)
+MSG_CMD_BAN_USR2_USR5_BAD["query"]['result'][0]['message']['text'] = "/ban"
+MSG_CMD_BAN_USR2_USR5_BAD["result"][0]["text"] = "<b>⚠️ Warning</b>\n<code>/ban</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/ban &lt;@username&gt;</code>\n<i>OR:</i>\n<code>/ban &lt;userId&gt;</code>"
+
+
+MSG_CMD_UNBAN_USR2_USR5 = copy.deepcopy(COMMAND_PRIVKEY_USR2)
+MSG_CMD_UNBAN_USR2_USR5["query"]['result'][0]['message']['text'] = "/unban 974565456"
+MSG_CMD_UNBAN_USR2_USR5["query"]['result'][0]['message']['entities'][0]["length"] = 6
+MSG_CMD_UNBAN_USR2_USR5["result"][0]["markdown"] = "HTML"
+MSG_CMD_UNBAN_USR2_USR5["result"][0]["text"] = "<b>✅ Successful action</b>\n\nUser 974565456 now is <b>unbanned</b>!"
+
+MSG_CMD_UNBAN_USR2_USR5_BAD = copy.deepcopy(MSG_CMD_UNBAN_USR2_USR5)
+MSG_CMD_UNBAN_USR2_USR5_BAD["query"]['result'][0]['message']['text'] = "/unban"
+MSG_CMD_UNBAN_USR2_USR5_BAD["result"][0]["text"] = "<b>⚠️ Warning</b>\n<code>/unban</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/unban &lt;@username&gt;</code>\n<i>OR:</i>\n<code>/unban &lt;userId&gt;</code>"
+
+TG_API_UPDATE_CMD = {
+    "query": [{'command': 'test', 'description': 'This is a test'}],
+    "response": [
+        {"ok": True, "result": []},
+        {"ok": True, "result": True}
+    ],
+    "result": True
+}

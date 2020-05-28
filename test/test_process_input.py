@@ -39,39 +39,13 @@ def test_stop_not_registered():
 def test_start_not_registered():
 
     database = MyDatabase(DATABASE_PATH)
-    igram = Instagram()
-    myprocess_input = Processinput(database, [igram], 'vKcg86E3AoR3SRg2')
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
 
     queries = [cnst.COMMAND_START_USR1,
                cnst.COMMAND_START_USR2,
-               cnst.COMMAND_START_USR3]
-
-    for query in queries:
-        result = myprocess_input.process(query["query"])
-        assert result == query["result"]
-
-
-def test_privkey_command():
-
-    database = MyDatabase(DATABASE_PATH)
-    igram = Instagram()
-    myprocess_input = Processinput(database, [igram], 'vKcg86E3AoR3SRg2')
-
-    queries = [cnst.COMMAND_PRIVKEY_USR1,
-               cnst.COMMAND_PRIVKEY_USR1_AGAIN]
-
-    for query in queries:
-        result = myprocess_input.process(query["query"])
-        assert result == query["result"]
-
-
-def test_listop_command():
-
-    database = MyDatabase(DATABASE_PATH)
-    igram = Instagram()
-    myprocess_input = Processinput(database, [igram], 'vKcg86E3AoR3SRg2')
-
-    queries = [cnst.COMMAND_LISTOP_USR1]
+               cnst.COMMAND_START_USR3,
+               cnst.COMMAND_START_USR4,
+               cnst.COMMAND_START_USR5]
 
     for query in queries:
         result = myprocess_input.process(query["query"])
@@ -1255,3 +1229,106 @@ def test_stop_registered():
     assert result[0]["type"] == "sendMessage"
     assert cnst.COMMAND_START_USR1["query"]["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
     assert result[0]["text"] == "You're no longer subscribed!\nWe already <i>miss</i> you, please come back soon! 😢\nTip: In order to re-joyn type /start *wink* *wink*"
+
+
+def test_privkey_command():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
+
+    queries = [cnst.COMMAND_PRIVKEY_USR2,
+               cnst.COMMAND_PRIVKEY_USR2_AGAIN]
+
+    for query in queries:
+        result = myprocess_input.process(query["query"])
+        assert result == query["result"]
+
+
+def test_listop_command():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
+
+    queries = [cnst.COMMAND_LISTOP_USR2]
+
+    for query in queries:
+        result = myprocess_input.process(query["query"])
+        assert result == query["result"]
+
+
+def test_setrole_command():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
+
+    queries = [cnst.MSG_CMD_SETROLE_USR2_USR3_MOD,
+               cnst.MSG_CMD_SETROLE_USR2_BAD]
+
+    for query in queries:
+        result = myprocess_input.process(query["query"])
+        assert result == query["result"]
+
+
+def test_setsublim_command():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
+
+    queries = [cnst.MSG_CMD_SETSUBLIM_USR2_USR3_42,
+               cnst.MSG_CMD_SETSUBLIM_USR2_BAD]
+
+    for query in queries:
+        result = myprocess_input.process(query["query"])
+        assert result == query["result"]
+
+
+def test_remrole_command():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
+
+    queries = [cnst.MSG_CMD_REMROLE_USR2_USR3,
+               cnst.MSG_CMD_REMROLE_USR2_USR3_BAD]
+
+    for query in queries:
+        result = myprocess_input.process(query["query"])
+        assert result == query["result"]
+
+
+def test_kick_command():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
+
+    queries = [cnst.MSG_CMD_KICK_USR2_USR4,
+               cnst.MSG_CMD_KICK_USR2_USR4_BAD]
+
+    for query in queries:
+        result = myprocess_input.process(query["query"])
+        assert result == query["result"]
+
+
+def test_ban_command():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
+
+    queries = [cnst.MSG_CMD_BAN_USR2_USR5,
+               cnst.MSG_CMD_BAN_USR2_USR5_BAD]
+
+    for query in queries:
+        result = myprocess_input.process(query["query"])
+        assert result == query["result"]
+
+
+def test_unban_command():
+
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
+
+    queries = [cnst.MSG_CMD_UNBAN_USR2_USR5,
+               cnst.MSG_CMD_UNBAN_USR2_USR5_BAD]
+
+    for query in queries:
+        result = myprocess_input.process(query["query"])
+        assert result == query["result"]
