@@ -433,8 +433,6 @@ class MyDatabase:
 
     def kick_user_auth(self, user_id, recipient_uname_id, is_username=False):
         is_success, recipient_uname_id = self.__is_auth_action_uname(user_id, recipient_uname_id, is_username)
-        if is_success:
-            is_success = self.unsubscribe_user(recipient_uname_id)
         return self.unsubscribe_user(recipient_uname_id) if is_success else is_success
 
     def rm_role_auth(self, user_id, recipient_uname_id, is_username=False):
@@ -447,7 +445,10 @@ class MyDatabase:
 
     def set_ban_user_auth(self, user_id, recipient_uname_id, is_username=False, d_expire_time=4294967296):
         is_success, recipient_uname_id = self.__is_auth_action_uname(user_id, recipient_uname_id, is_username)
-        return self.__ban_user(recipient_uname_id, d_expire_time) if is_success else is_success
+        if is_success:
+            is_success = self.__ban_user(recipient_uname_id, d_expire_time)
+            self.unsubscribe_user(recipient_uname_id)
+        return is_success
 
     def set_unban_user_auth(self, user_id, recipient_uname_id, is_username=False):
         is_success, recipient_uname_id = self.__is_auth_action_uname(user_id, recipient_uname_id, is_username)
