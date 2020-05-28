@@ -428,36 +428,27 @@ class MyDatabase:
         is_success = False
         if role <= self.__max_role_lvl:
             is_success, recipient_uname_id = self.__is_auth_action_uname(user_id, recipient_uname_id, is_username, role)
-            if is_success:
-                is_success = self.set_role(recipient_uname_id, role)
+            is_success = self.set_role(recipient_uname_id, role) if is_success else is_success
         return is_success
 
     def kick_user_auth(self, user_id, recipient_uname_id, is_username=False):
         is_success, recipient_uname_id = self.__is_auth_action_uname(user_id, recipient_uname_id, is_username)
         if is_success:
             is_success = self.unsubscribe_user(recipient_uname_id)
-        return is_success
+        return self.unsubscribe_user(recipient_uname_id) if is_success else is_success
 
     def rm_role_auth(self, user_id, recipient_uname_id, is_username=False):
         is_success, recipient_uname_id = self.__is_auth_action_uname(user_id, recipient_uname_id, is_username)
-        if is_success:
-            is_success = self.__rm_role(recipient_uname_id)
-        return is_success
+        return self.__rm_role(recipient_uname_id) if is_success else is_success
 
     def set_follow_limit_auth(self, user_id, recipient_uname_id, max_registrations, is_username=False):
         is_success, recipient_uname_id = self.__is_auth_action_uname(user_id, recipient_uname_id, is_username)
-        if is_success:
-            is_success = self.__set_follow_limit(recipient_uname_id, max_registrations)
-        return is_success
+        return self.__set_follow_limit(recipient_uname_id, max_registrations) if is_success else is_success
 
     def set_ban_user_auth(self, user_id, recipient_uname_id, is_username=False, d_expire_time=4294967296):
         is_success, recipient_uname_id = self.__is_auth_action_uname(user_id, recipient_uname_id, is_username)
-        if is_success:
-            is_success = self.__ban_user(recipient_uname_id, d_expire_time)
-        return is_success
+        return self.__ban_user(recipient_uname_id, d_expire_time) if is_success else is_success
 
     def set_unban_user_auth(self, user_id, recipient_uname_id, is_username=False):
         is_success, recipient_uname_id = self.__is_auth_action_uname(user_id, recipient_uname_id, is_username)
-        if is_success:
-            is_success = self.__unban_user(recipient_uname_id)
-        return is_success
+        return self.__unban_user(recipient_uname_id) if is_success else is_success
