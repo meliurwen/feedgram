@@ -23,9 +23,7 @@ The app does Y
 
 ## Log tracebacks and/or errors shown
 
-```
-Log here
-```
+`Log here`
 
 ## (Optional) Extra info
 

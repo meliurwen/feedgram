@@ -12,7 +12,7 @@ Before start contributing or asking dummy questions is best practice to consult 
 
 + The [README.md](https://gitlab.com/meliurwen/feedgram/-/blob/develop/README.md) in the repo
 + The project's documentation
-+ The official Telgram's [bot API Doc](https://core.telegram.org/bots/api)
++ The official [Telgram's bot API Docs](https://core.telegram.org/bots/api)
 + Google
 
 ## Bug Reports

@@ -94,6 +94,10 @@ At the _root_ of the project's folder launch:
 pip3 install --upgrade .
 ```
 
+## Contribute
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) to know how to report bugs, propose features, merge requests or other forms of contribution! 😎🚀
+
 ## Develop
 
 **Prerequisites:**
