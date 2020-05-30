@@ -1,5 +1,5 @@
 <div align="center">
-<img src="img/feedgram_logo.png" alt="MelDon Logo" width="200" >
+<img src=".img/feedgram_logo.png" alt="MelDon Logo" width="200" >
 
 # FeedGram
 
@@ -41,14 +41,13 @@ The first platforms supported will be the most popular ones: _Instagram_, _Youtu
 
 The diagram below is the **_high level architecture_** of this project and describes the _interactions_ between the _internal components_ of the app and between the app and the _external ones_:
 
-![High Level Architecture](img/architecture_high_level.png)
+![High Level Architecture](.img/architecture_high_level.png)
 
 As described by the diagram **_the bot does not interact directly with the users_**, but it accomplish this _via the Telegram's stack_ using _APIs expressively provided for the bots_.
 
 The **_interactions with the socials/platforms_** will be done with various methods and techniques that depends on _how_ (and _at which conditions_) each social/platform we interact with exposes the data we need. In most cases _is better use the official APIs_ provided via _HTTP_ methods (GET or POST) or _OAuth_, but in few cases for various reasons the classic _scraping methods are more convenient_.
 
 The **_internal structure_** of the application is mainly composed by a multitude of _specialised python modules_, an _SQLite3_ database and a config file in `ini` format, most of them directly orchestrated by a main module.
-
 
 ## Install
 
@@ -108,20 +107,25 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) to know how to report bugs, propose featu
 + `python3-venv` (_optional_)
 
 _Create_ the **_virtual environment_** in the project's folder:
+
 ```sh
 python3 -m venv venv
 ```
+
 Or if oyu wanna use the `virtualenv` package:
+
 ```sh
 virtualenv -p python3 venv
 ```
 
 _Activate_ the virtual environment:
+
 ```sh
 source venv/bin/activate
 ```
 
 _Prepare_ the development environment:
+
 ```sh
 ./setup.py develop
 ```
@@ -135,21 +139,25 @@ That's all! ☕️
 _Activate_ the **virtual environment** as described in [Develop](##Develop). (optional)
 
 Install the dependencies:
+
 ```sh
 pip3 install -r test-requirements.txt
 ```
 
 To launch **Pytest**:
+
 ```sh
 pytest
 ```
 
 To launch **Pylint**:
+
 ```sh
 pylint --output-format=text --rcfile=setup.cfg app/ test/ *.py
 ```
 
 To launch **Flake8**:
+
 ```sh
 flake8
 ```
