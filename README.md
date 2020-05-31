@@ -1,5 +1,5 @@
 <div align="center">
-<img src=".img/feedgram_logo.png" alt="MelDon Logo" width="200" >
+<img src=".img/feedgram_logo.png" alt="feedgram Logo" width="200" >
 
 # FeedGram
 
@@ -62,17 +62,19 @@ At the moment platforms officially supported are:
 
 Go to the [releases section](https://gitlab.com/meliurwen/feedgram/-/releases) to download the latest installer:
 
-## From Docker
+### From Docker
 
 **Prerequisites:**
 
 + `docker`
 
-**Launch**
+**Launch:**
 
 ```sh
-docker run registry.gitlab.com/meliurwen/feedgram:latest \
-            -d --name feedgram --restart always
+docker run -d --name feedgram --restart unless-stopped \
+            -v config.ini:/app/config.ini \
+            -v socialFeedgram.sqlite3:/app/socialFeedgram.sqlite3 \
+            registry.gitlab.com/meliurwen/feedgram:latest
 ```
 
 ### From Source
