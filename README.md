@@ -55,11 +55,25 @@ The **_internal structure_** of the application is mainly composed by a multitud
 
 At the moment platforms officially supported are:
 
++ Docker
 + Debian 10
 + Ubuntu 18.04
 + Python Wheels
 
 Go to the [releases section](https://gitlab.com/meliurwen/feedgram/-/releases) to download the latest installer:
+
+## From Docker
+
+**Prerequisites:**
+
++ `docker`
+
+**Launch**
+
+```sh
+docker run registry.gitlab.com/meliurwen/feedgram:latest \
+            -d --name feedgram --restart always
+```
 
 ### From Source
 
