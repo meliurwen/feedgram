@@ -5,8 +5,10 @@ import copy
 
 # Module: test.test_database
 
-HELP_MESSAGE = ("📖 Help\n\nYou can follow up to <i>10 social accounts</i>.\n"
-                "Socials currently supported:\n"
+HELP_MESSAGE = ("<b>📖 Help</b>"
+                "\n\n"
+                "You can follow up to <i>10 social accounts</i>.\n"
+                "Socials currently abilited:\n"
                 " • <i>Instagram</i>\n"
                 "You can follow only <b>public</b> accounts.\n"
                 "\n"
@@ -17,8 +19,23 @@ HELP_MESSAGE = ("📖 Help\n\nYou can follow up to <i>10 social accounts</i>.\n"
                 " • /mute <i>social</i> <i>username</i> <i>time</i>\n"
                 " • /halt <i>social</i> <i>username</i> <i>time</i>\n"
                 " • /pause <i>social</i> <i>username</i> <i>time</i>\n"
+                "<b>Categories:</b>\n"
+                " • /category <i>social</i> <i>username</i> <i>catName</i>\n"
+                " • /rename <i>oldCatName</i> <i>newCatName</i>\n"
+                " • /remove <i>catName</i>\n"
+                " • /cmute <i>catName</i> <i>time</i>\n"
+                " • /chalt <i>catName</i> <i>time</i>\n"
+                " • /cpause <i>catName</i> <i>time</i>\n"
                 "<b>Bot:</b>\n"
-                " • /stop to stop and unsubscribe from the bot.")
+                " • /stop to stop and unsubscribe from the bot."
+                "\n\n"
+                "<b>About some above parameters</b>\n"
+                "Below are described which values some parameters accept:\n"
+                " • <b>social:</b>\n"
+                "   ◦ <i>instagram</i>, <i>ig</i>\n"
+                " • <b>time:</b> <i>XXh</i>, <i>XXd</i>\n"
+                "   ◦ <i>Where <b>XX</b> is a number between <b>0</b> and <b>99</b></i>.\n"
+                "   ◦ <i><b>h</b> and <b>d</b> represents respectively <b>hours</b> and <b>days</b></i>.\n")
 
 SUB_BY_POST_LINK = {"social": "instagram",
                     "username": "il_post",
@@ -376,10 +393,10 @@ GENERAL_COMMAND = {
     "result": []
 }
 
-COMMAND_START_USR1 = copy.deepcopy(GENERAL_COMMAND)
-COMMAND_START_USR1["query"]['result'][0]['message']['text'] = "/start"
-COMMAND_START_USR1["query"]['result'][0]['message']['entities'][0]["length"] = 6
-COMMAND_START_USR1["result"] = [
+MSG_CMD_START_USR1 = copy.deepcopy(GENERAL_COMMAND)
+MSG_CMD_START_USR1["query"]['result'][0]['message']['text'] = "/start"
+MSG_CMD_START_USR1["query"]['result'][0]['message']['entities'][0]["length"] = 6
+MSG_CMD_START_USR1["result"] = [
     {
         'chat_id': 123456789,
         'text': "Congratulations, you're now registered!\nType /help to learn the commands available!",
@@ -389,41 +406,49 @@ COMMAND_START_USR1["result"] = [
         'chat_id': 123456789,
         'markdown': 'HTML',
         'text': HELP_MESSAGE,
-        'type': 'sendMessage'
+        'type': 'sendMessage',
+        'reply_markup': {
+            'inline_keyboard': [
+                [
+                    {'text': "📋", 'callback_data': "list_mode"},
+                    {'text': "🏷", 'callback_data': "category_mode"}
+                ]
+            ]
+        }
     }
 ]
 
-COMMAND_START_USR2 = copy.deepcopy(COMMAND_START_USR1)
-COMMAND_START_USR2["query"]['result'][0]['message']['from']['id'] = 451843278
-COMMAND_START_USR2["query"]['result'][0]['message']['from']['username'] = "TestUsername2"
-COMMAND_START_USR2["query"]['result'][0]['message']['chat']['id'] = 451843278
-COMMAND_START_USR2["query"]['result'][0]['message']['chat']['username'] = "TestUsername2"
-COMMAND_START_USR2["result"][0]["chat_id"] = 451843278
-COMMAND_START_USR2["result"][1]["chat_id"] = 451843278
+MSG_CMD_START_USR2 = copy.deepcopy(MSG_CMD_START_USR1)
+MSG_CMD_START_USR2["query"]['result'][0]['message']['from']['id'] = 451843278
+MSG_CMD_START_USR2["query"]['result'][0]['message']['from']['username'] = "TestUsername2"
+MSG_CMD_START_USR2["query"]['result'][0]['message']['chat']['id'] = 451843278
+MSG_CMD_START_USR2["query"]['result'][0]['message']['chat']['username'] = "TestUsername2"
+MSG_CMD_START_USR2["result"][0]["chat_id"] = 451843278
+MSG_CMD_START_USR2["result"][1]["chat_id"] = 451843278
 
-COMMAND_START_USR3 = copy.deepcopy(COMMAND_START_USR1)
-COMMAND_START_USR3["query"]['result'][0]['message']['from']['id'] = 546848189
-COMMAND_START_USR3["query"]['result'][0]['message']['from']['username'] = "TestUsername3"
-COMMAND_START_USR3["query"]['result'][0]['message']['chat']['id'] = 546848189
-COMMAND_START_USR3["query"]['result'][0]['message']['chat']['username'] = "TestUsername3"
-COMMAND_START_USR3["result"][0]["chat_id"] = 546848189
-COMMAND_START_USR3["result"][1]["chat_id"] = 546848189
+MSG_CMD_START_USR3 = copy.deepcopy(MSG_CMD_START_USR1)
+MSG_CMD_START_USR3["query"]['result'][0]['message']['from']['id'] = 546848189
+MSG_CMD_START_USR3["query"]['result'][0]['message']['from']['username'] = "TestUsername3"
+MSG_CMD_START_USR3["query"]['result'][0]['message']['chat']['id'] = 546848189
+MSG_CMD_START_USR3["query"]['result'][0]['message']['chat']['username'] = "TestUsername3"
+MSG_CMD_START_USR3["result"][0]["chat_id"] = 546848189
+MSG_CMD_START_USR3["result"][1]["chat_id"] = 546848189
 
-COMMAND_START_USR4 = copy.deepcopy(COMMAND_START_USR1)
-COMMAND_START_USR4["query"]['result'][0]['message']['from']['id'] = 465654982
-COMMAND_START_USR4["query"]['result'][0]['message']['from']['username'] = "TestUsername4"
-COMMAND_START_USR4["query"]['result'][0]['message']['chat']['id'] = 465654982
-COMMAND_START_USR4["query"]['result'][0]['message']['chat']['username'] = "TestUsername4"
-COMMAND_START_USR4["result"][0]["chat_id"] = 465654982
-COMMAND_START_USR4["result"][1]["chat_id"] = 465654982
+MSG_CMD_START_USR4 = copy.deepcopy(MSG_CMD_START_USR1)
+MSG_CMD_START_USR4["query"]['result'][0]['message']['from']['id'] = 465654982
+MSG_CMD_START_USR4["query"]['result'][0]['message']['from']['username'] = "TestUsername4"
+MSG_CMD_START_USR4["query"]['result'][0]['message']['chat']['id'] = 465654982
+MSG_CMD_START_USR4["query"]['result'][0]['message']['chat']['username'] = "TestUsername4"
+MSG_CMD_START_USR4["result"][0]["chat_id"] = 465654982
+MSG_CMD_START_USR4["result"][1]["chat_id"] = 465654982
 
-COMMAND_START_USR5 = copy.deepcopy(COMMAND_START_USR1)
-COMMAND_START_USR5["query"]['result'][0]['message']['from']['id'] = 974565456
-COMMAND_START_USR5["query"]['result'][0]['message']['from']['username'] = "TestUsername5"
-COMMAND_START_USR5["query"]['result'][0]['message']['chat']['id'] = 974565456
-COMMAND_START_USR5["query"]['result'][0]['message']['chat']['username'] = "TestUsername5"
-COMMAND_START_USR5["result"][0]["chat_id"] = 974565456
-COMMAND_START_USR5["result"][1]["chat_id"] = 974565456
+MSG_CMD_START_USR5 = copy.deepcopy(MSG_CMD_START_USR1)
+MSG_CMD_START_USR5["query"]['result'][0]['message']['from']['id'] = 974565456
+MSG_CMD_START_USR5["query"]['result'][0]['message']['from']['username'] = "TestUsername5"
+MSG_CMD_START_USR5["query"]['result'][0]['message']['chat']['id'] = 974565456
+MSG_CMD_START_USR5["query"]['result'][0]['message']['chat']['username'] = "TestUsername5"
+MSG_CMD_START_USR5["result"][0]["chat_id"] = 974565456
+MSG_CMD_START_USR5["result"][1]["chat_id"] = 974565456
 
 
 COMMAND_STOP = copy.deepcopy(GENERAL_COMMAND["query"])
@@ -1554,10 +1579,10 @@ CLBK_HALT_MODE_RST_WRNG_SCL["result"][0]["text"] = "Error: socialNotAbilitedOrMi
 CLBK_HALT_MODE_RST_WRNG_SCL["result"][0]["show_alert"] = True
 
 
-COMMAND_PRIVKEY_USR2 = copy.deepcopy(COMMAND_START_USR2)
-COMMAND_PRIVKEY_USR2["query"]['result'][0]['message']['text'] = "/privkey vKcg86E3AoR3SRg2"
-COMMAND_PRIVKEY_USR2["query"]['result'][0]['message']['entities'][0]["length"] = 8
-COMMAND_PRIVKEY_USR2["result"] = [
+MSG_CMD_PRIVKEY_USR2 = copy.deepcopy(MSG_CMD_START_USR2)
+MSG_CMD_PRIVKEY_USR2["query"]['result'][0]['message']['text'] = "/privkey vKcg86E3AoR3SRg2"
+MSG_CMD_PRIVKEY_USR2["query"]['result'][0]['message']['entities'][0]["length"] = 8
+MSG_CMD_PRIVKEY_USR2["result"] = [
     {
         'chat_id': 451843278,
         'text': "You have now creator privileges!",
@@ -1565,17 +1590,17 @@ COMMAND_PRIVKEY_USR2["result"] = [
     }
 ]
 
-COMMAND_PRIVKEY_USR2_AGAIN = copy.deepcopy(COMMAND_PRIVKEY_USR2)
-COMMAND_PRIVKEY_USR2_AGAIN["result"][0]["text"] = "You already have the role of creator"
+MSG_CMD_PRIVKEY_USR2_AGAIN = copy.deepcopy(MSG_CMD_PRIVKEY_USR2)
+MSG_CMD_PRIVKEY_USR2_AGAIN["result"][0]["text"] = "You already have the role of creator"
 
-COMMAND_LISTOP_USR2 = copy.deepcopy(COMMAND_PRIVKEY_USR2)
-COMMAND_LISTOP_USR2["query"]['result'][0]['message']['text'] = "/listop"
-COMMAND_LISTOP_USR2["query"]['result'][0]['message']['entities'][0]["length"] = 7
-COMMAND_LISTOP_USR2["result"][0]["markdown"] = "HTML"
-COMMAND_LISTOP_USR2["result"][0]["text"] = "<b>⚖️ Operators list</b>\n\n<b>Creators</b>\n  • <a href='tg://user?id=451843278'>TestUsername2</a>\n"
+MSG_CMD_LISTOP_USR2 = copy.deepcopy(MSG_CMD_PRIVKEY_USR2)
+MSG_CMD_LISTOP_USR2["query"]['result'][0]['message']['text'] = "/listop"
+MSG_CMD_LISTOP_USR2["query"]['result'][0]['message']['entities'][0]["length"] = 7
+MSG_CMD_LISTOP_USR2["result"][0]["markdown"] = "HTML"
+MSG_CMD_LISTOP_USR2["result"][0]["text"] = "<b>⚖️ Operators list</b>\n\n<b>Creators</b>\n  • <a href='tg://user?id=451843278'>TestUsername2</a>\n"
 
 
-MSG_CMD_SETROLE_USR2_USR3_MOD = copy.deepcopy(COMMAND_PRIVKEY_USR2)
+MSG_CMD_SETROLE_USR2_USR3_MOD = copy.deepcopy(MSG_CMD_PRIVKEY_USR2)
 MSG_CMD_SETROLE_USR2_USR3_MOD["query"]['result'][0]['message']['text'] = "/setrole @TestUsername3 mod"
 MSG_CMD_SETROLE_USR2_USR3_MOD["query"]['result'][0]['message']['entities'][0]["length"] = 8
 MSG_CMD_SETROLE_USR2_USR3_MOD["result"][0]["markdown"] = "HTML"
@@ -1586,7 +1611,7 @@ MSG_CMD_SETROLE_USR2_BAD["query"]['result'][0]['message']['text'] = "/setrole"
 MSG_CMD_SETROLE_USR2_BAD["result"][0]["text"] = "<b>⚠️ Warning</b>\n<code>/setrole</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/setrole &lt;@username&gt; &lt;rolenumber&gt;</code>\n<i>OR:</i>\n<code>/setrole &lt;userId&gt; &lt;rolenumber&gt;</code>"
 
 
-MSG_CMD_SETSUBLIM_USR2_USR3_42 = copy.deepcopy(COMMAND_PRIVKEY_USR2)
+MSG_CMD_SETSUBLIM_USR2_USR3_42 = copy.deepcopy(MSG_CMD_PRIVKEY_USR2)
 MSG_CMD_SETSUBLIM_USR2_USR3_42["query"]['result'][0]['message']['text'] = "/setsublim @TestUsername3 42"
 MSG_CMD_SETSUBLIM_USR2_USR3_42["query"]['result'][0]['message']['entities'][0]["length"] = 10
 MSG_CMD_SETSUBLIM_USR2_USR3_42["result"][0]["markdown"] = "HTML"
@@ -1597,7 +1622,7 @@ MSG_CMD_SETSUBLIM_USR2_BAD["query"]['result'][0]['message']['text'] = "/setsubli
 MSG_CMD_SETSUBLIM_USR2_BAD["result"][0]["text"] = "<b>⚠️ Warning</b>\n<code>/setsublim</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/setsublim &lt;@username&gt; &lt;sub_lim_number&gt;</code>\n<i>OR:</i>\n<code>/setsublim &lt;userId&gt; &lt;sub_lim_number&gt;</code>"
 
 
-MSG_CMD_REMROLE_USR2_USR3 = copy.deepcopy(COMMAND_PRIVKEY_USR2)
+MSG_CMD_REMROLE_USR2_USR3 = copy.deepcopy(MSG_CMD_PRIVKEY_USR2)
 MSG_CMD_REMROLE_USR2_USR3["query"]['result'][0]['message']['text'] = "/remrole @TestUsername3"
 MSG_CMD_REMROLE_USR2_USR3["query"]['result'][0]['message']['entities'][0]["length"] = 10
 MSG_CMD_REMROLE_USR2_USR3["result"][0]["markdown"] = "HTML"
@@ -1608,7 +1633,7 @@ MSG_CMD_REMROLE_USR2_USR3_BAD["query"]['result'][0]['message']['text'] = "/remro
 MSG_CMD_REMROLE_USR2_USR3_BAD["result"][0]["text"] = "<b>⚠️ Warning</b>\n<code>/remrole</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/remrole &lt;@username&gt;</code>\n<i>OR:</i>\n<code>/remrole &lt;userId&gt;</code>"
 
 
-MSG_CMD_KICK_USR2_USR4 = copy.deepcopy(COMMAND_PRIVKEY_USR2)
+MSG_CMD_KICK_USR2_USR4 = copy.deepcopy(MSG_CMD_PRIVKEY_USR2)
 MSG_CMD_KICK_USR2_USR4["query"]['result'][0]['message']['text'] = "/kick @TestUsername4"
 MSG_CMD_KICK_USR2_USR4["query"]['result'][0]['message']['entities'][0]["length"] = 5
 MSG_CMD_KICK_USR2_USR4["result"][0]["markdown"] = "HTML"
@@ -1619,7 +1644,7 @@ MSG_CMD_KICK_USR2_USR4_BAD["query"]['result'][0]['message']['text'] = "/kick"
 MSG_CMD_KICK_USR2_USR4_BAD["result"][0]["text"] = "<b>⚠️ Warning</b>\n<code>/kick</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/kick &lt;@username&gt;</code>\n<i>OR:</i>\n<code>/kick &lt;userId&gt;</code>"
 
 
-MSG_CMD_BAN_USR2_USR5 = copy.deepcopy(COMMAND_PRIVKEY_USR2)
+MSG_CMD_BAN_USR2_USR5 = copy.deepcopy(MSG_CMD_PRIVKEY_USR2)
 MSG_CMD_BAN_USR2_USR5["query"]['result'][0]['message']['text'] = "/ban @TestUsername5"
 MSG_CMD_BAN_USR2_USR5["query"]['result'][0]['message']['entities'][0]["length"] = 4
 MSG_CMD_BAN_USR2_USR5["result"][0]["markdown"] = "HTML"
@@ -1630,7 +1655,7 @@ MSG_CMD_BAN_USR2_USR5_BAD["query"]['result'][0]['message']['text'] = "/ban"
 MSG_CMD_BAN_USR2_USR5_BAD["result"][0]["text"] = "<b>⚠️ Warning</b>\n<code>/ban</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/ban &lt;@username&gt;</code>\n<i>OR:</i>\n<code>/ban &lt;userId&gt;</code>"
 
 
-MSG_CMD_UNBAN_USR2_USR5 = copy.deepcopy(COMMAND_PRIVKEY_USR2)
+MSG_CMD_UNBAN_USR2_USR5 = copy.deepcopy(MSG_CMD_PRIVKEY_USR2)
 MSG_CMD_UNBAN_USR2_USR5["query"]['result'][0]['message']['text'] = "/unban 974565456"
 MSG_CMD_UNBAN_USR2_USR5["query"]['result'][0]['message']['entities'][0]["length"] = 6
 MSG_CMD_UNBAN_USR2_USR5["result"][0]["markdown"] = "HTML"

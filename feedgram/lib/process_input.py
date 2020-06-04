@@ -18,8 +18,10 @@ class Processinput:
                   "We already <i>miss</i> you, please come back soon! 😢\n"
                   "Tip: In order to re-joyn type /start *wink* *wink*")
 
-    __msm_help = ("📖 Help\n\nYou can follow up to <i>10 social accounts</i>.\n"
-                  "Socials currently supported:\n"
+    __msm_help = ("<b>📖 Help</b>"
+                  "\n\n"
+                  "You can follow up to <i>10 social accounts</i>.\n"
+                  "Socials currently abilited:\n"
                   " • <i>Instagram</i>\n"
                   "You can follow only <b>public</b> accounts.\n"
                   "\n"
@@ -30,8 +32,23 @@ class Processinput:
                   " • /mute <i>social</i> <i>username</i> <i>time</i>\n"
                   " • /halt <i>social</i> <i>username</i> <i>time</i>\n"
                   " • /pause <i>social</i> <i>username</i> <i>time</i>\n"
+                  "<b>Categories:</b>\n"
+                  " • /category <i>social</i> <i>username</i> <i>catName</i>\n"
+                  " • /rename <i>oldCatName</i> <i>newCatName</i>\n"
+                  " • /remove <i>catName</i>\n"
+                  " • /cmute <i>catName</i> <i>time</i>\n"
+                  " • /chalt <i>catName</i> <i>time</i>\n"
+                  " • /cpause <i>catName</i> <i>time</i>\n"
                   "<b>Bot:</b>\n"
-                  " • /stop to stop and unsubscribe from the bot.")
+                  " • /stop to stop and unsubscribe from the bot."
+                  "\n\n"
+                  "<b>About some above parameters</b>\n"
+                  "Below are described which values some parameters accept:\n"
+                  " • <b>social:</b>\n"
+                  "   ◦ <i>instagram</i>, <i>ig</i>\n"
+                  " • <b>time:</b> <i>XXh</i>, <i>XXd</i>\n"
+                  "   ◦ <i>Where <b>XX</b> is a number between <b>0</b> and <b>99</b></i>.\n"
+                  "   ◦ <i><b>h</b> and <b>d</b> represents respectively <b>hours</b> and <b>days</b></i>.\n")
 
     __msm_wrnng = ("<b>⚠️Warning</b>\n\n"
                    "Action not performed; the reason could be one or a combination of those:\n"
@@ -614,7 +631,7 @@ class Processinput:
                                 self.__db.subscribe_user(user_id, username, chat_id, 10)
                                 if self.__db.check_utente(user_id):
                                     messages.append(self.__ms_maker(chat_id, "Congratulations, you're now registered!\nType /help to learn the commands available!"))
-                                    tets = self.__ms_maker(chat_id, self.__msm_help, "HTML")
+                                    tets = self.__ms_maker(chat_id, self.__msm_help, "HTML", None, None, {"inline_keyboard": [[self.__ilk_list, self.__ilk_category]]})
                                     messages.append(tets)
                                 else:
                                     messages.append(self.__ms_maker(chat_id, "Something bad happened, you're NOT registered!\nTry again later."))

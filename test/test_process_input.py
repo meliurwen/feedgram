@@ -14,6 +14,26 @@ from feedgram.social.instagram import Instagram
 DATABASE_PATH = "./test/processinputTest.sqlite3"
 
 
+def query_process_input(queries):
+    database = MyDatabase(DATABASE_PATH)
+    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
+    for query in queries:
+        result = myprocess_input.process(query["query"])
+        assert result == query["result"]
+
+
+def query_process_input_igram(queries):
+    global GLOBAL_EXTRCT_DATA_RETURN
+    with patch('feedgram.social.instagram.Instagram.extract_data', side_effect=dummy_instagram_extract_data):
+        database = MyDatabase(DATABASE_PATH)
+        igram = Instagram()
+        myprocess_input = Processinput(database, [igram], 'vKcg86E3AoR3SRg2')
+        for query in queries:
+            GLOBAL_EXTRCT_DATA_RETURN = query["response"]
+            result = myprocess_input.process(query["query"])
+            assert result == query["result"]
+
+
 def test_stop_not_registered():
 
     # Verifico se il file esiste. Nel caso eista lo elimino
@@ -30,36 +50,28 @@ def test_stop_not_registered():
     result = myprocess_input.process(cnst.COMMAND_STOP)
 
     assert result[0]["type"] == "sendMessage"
-    assert cnst.COMMAND_START_USR1["query"]["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert cnst.MSG_CMD_START_USR1["query"]["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
 
     # Verifico che il messaggio di risposta sia coretto
     assert result[0]["text"] == "You're not registered, type /start to subscribe!"
 
 
 def test_start_not_registered():
-
-    database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
-
-    queries = [cnst.COMMAND_START_USR1,
-               cnst.COMMAND_START_USR2,
-               cnst.COMMAND_START_USR3,
-               cnst.COMMAND_START_USR4,
-               cnst.COMMAND_START_USR5]
-
-    for query in queries:
-        result = myprocess_input.process(query["query"])
-        assert result == query["result"]
+    query_process_input([cnst.MSG_CMD_START_USR1,
+                         cnst.MSG_CMD_START_USR2,
+                         cnst.MSG_CMD_START_USR3,
+                         cnst.MSG_CMD_START_USR4,
+                         cnst.MSG_CMD_START_USR5])
 
 
 def test_start_registered():
 
     database = MyDatabase(DATABASE_PATH)
     myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
-    result = myprocess_input.process(cnst.COMMAND_START_USR1["query"])
+    result = myprocess_input.process(cnst.MSG_CMD_START_USR1["query"])
 
     assert result[0]["type"] == "sendMessage"
-    assert cnst.COMMAND_START_USR1["query"]["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert cnst.MSG_CMD_START_USR1["query"]["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
     assert result[0]["text"] == "You're alredy registered.\nType /help to learn the commands available!"
 
 
@@ -133,25 +145,14 @@ def dummy_instagram_extract_data(_):
 
 
 def test_sub_command_social_username():
-    global GLOBAL_EXTRCT_DATA_RETURN
-    with patch('feedgram.social.instagram.Instagram.extract_data', side_effect=dummy_instagram_extract_data):
-        database = MyDatabase(DATABASE_PATH)
-        igram = Instagram()
-        myprocess_input = Processinput(database, [igram], 'vKcg86E3AoR3SRg2')
-
-        queries = [cnst.MSG_CMD_SUB_STANDARD,
-                   cnst.MSG_CMD_SUB_AGAIN,
-                   cnst.MSG_CMD_SUB_BAD_FORMAT,
-                   cnst.MSG_CMD_SUB_NO_EXIST,
-                   cnst.MSG_CMD_SUB_UNXPCTD_SUB_STATUS,
-                   cnst.MSG_CMD_SUB_PRIVATE,
-                   cnst.MSG_CMD_SUB_UNXPCTD_STATUS,
-                   cnst.MSG_CMD_SUB_INVALID_SOCIAL]
-
-        for query in queries:
-            GLOBAL_EXTRCT_DATA_RETURN = query["response"]
-            result = myprocess_input.process(query["query"])
-            assert result[0] == query["result"][0]
+    query_process_input_igram([cnst.MSG_CMD_SUB_STANDARD,
+                               cnst.MSG_CMD_SUB_AGAIN,
+                               cnst.MSG_CMD_SUB_BAD_FORMAT,
+                               cnst.MSG_CMD_SUB_NO_EXIST,
+                               cnst.MSG_CMD_SUB_UNXPCTD_SUB_STATUS,
+                               cnst.MSG_CMD_SUB_PRIVATE,
+                               cnst.MSG_CMD_SUB_UNXPCTD_STATUS,
+                               cnst.MSG_CMD_SUB_INVALID_SOCIAL])
 
 
 # `/sub <link>` command
@@ -161,21 +162,10 @@ def test_sub_command_social_username():
 # 3) The link returns a no specific method to retreive the ifo
 # 4) Use a valid link pointing to an unrecognized service
 def test_sub_command_url():
-    global GLOBAL_EXTRCT_DATA_RETURN
-    with patch('feedgram.social.instagram.Instagram.extract_data', side_effect=dummy_instagram_extract_data):
-        database = MyDatabase(DATABASE_PATH)
-        igram = Instagram()
-        myprocess_input = Processinput(database, [igram], 'vKcg86E3AoR3SRg2')
-
-        queries = [cnst.MSG_CMD_SUB_IG_HOME,
-                   cnst.MSG_CMD_SUB_IG_P_NO_EXST_OR_PRIV,
-                   cnst.MSG_CMD_SUB_IG_P_NO_SPEC_MTHD,
-                   cnst.MSG_CMD_SUB_INVALID_URL]
-
-        for query in queries:
-            GLOBAL_EXTRCT_DATA_RETURN = query["response"]
-            result = myprocess_input.process(query["query"])
-            assert result[0] == query["result"][0]
+    query_process_input_igram([cnst.MSG_CMD_SUB_IG_HOME,
+                               cnst.MSG_CMD_SUB_IG_P_NO_EXST_OR_PRIV,
+                               cnst.MSG_CMD_SUB_IG_P_NO_SPEC_MTHD,
+                               cnst.MSG_CMD_SUB_INVALID_URL])
 
 
 def test_list_command():
@@ -579,19 +569,11 @@ def test_halt_command():
 
 
 def test_halt_callback():
-    database = MyDatabase(DATABASE_PATH)
-    igram = Instagram()
-    myprocess_input = Processinput(database, [igram], 'vKcg86E3AoR3SRg2')
-
-    queries = [cnst.CLBK_HALT_MODE,
-               cnst.CLBK_HALT_MODE_PAGE_DAY,
-               cnst.CLBK_HALT_MODE_EXST,
-               cnst.CLBK_HALT_MODE_RST,
-               cnst.CLBK_HALT_MODE_RST_WRNG_SCL]
-
-    for query in queries:
-        result = myprocess_input.process(query["query"])
-        assert result == query["result"]
+    query_process_input([cnst.CLBK_HALT_MODE,
+                         cnst.CLBK_HALT_MODE_PAGE_DAY,
+                         cnst.CLBK_HALT_MODE_EXST,
+                         cnst.CLBK_HALT_MODE_RST,
+                         cnst.CLBK_HALT_MODE_RST_WRNG_SCL])
 
 
 def test_cmute_command_no_args():
@@ -1191,33 +1173,17 @@ def test_category_pause_callback_use_unstop():
 
 
 def test_unsub_command():
-    database = MyDatabase(DATABASE_PATH)
-    igram = Instagram()
-    myprocess_input = Processinput(database, [igram], 'vKcg86E3AoR3SRg2')
-
-    queries = [cnst.MSG_CMD_UNSUB_STANDARD,
-               cnst.MSG_CMD_UNSUB_AGAIN,
-               cnst.MSG_CMD_UNSUB_INVALID_SOCIAL,
-               cnst.MSG_CMD_UNSUB_BAD_FORMAT]
-
-    for query in queries:
-        result = myprocess_input.process(query["query"])
-        assert result[0] == query["result"][0]
+    query_process_input([cnst.MSG_CMD_UNSUB_STANDARD,
+                         cnst.MSG_CMD_UNSUB_AGAIN,
+                         cnst.MSG_CMD_UNSUB_INVALID_SOCIAL,
+                         cnst.MSG_CMD_UNSUB_BAD_FORMAT])
 
 
 def test_unsub_callback():
-    database = MyDatabase(DATABASE_PATH)
-    igram = Instagram()
-    myprocess_input = Processinput(database, [igram], 'vKcg86E3AoR3SRg2')
-
-    queries = [cnst.CLBK_UNSUB_MODE,
-               cnst.CLBK_UNSUB_MODE_PAGE,
-               cnst.CLBK_UNSUB_MODE_EXST_WRNG_PAGE,
-               cnst.CLBK_UNSUB_MODE_EXST_WRNG_PAGE_AND_SOCL]
-
-    for query in queries:
-        result = myprocess_input.process(query["query"])
-        assert result == query["result"]
+    query_process_input([cnst.CLBK_UNSUB_MODE,
+                         cnst.CLBK_UNSUB_MODE_PAGE,
+                         cnst.CLBK_UNSUB_MODE_EXST_WRNG_PAGE,
+                         cnst.CLBK_UNSUB_MODE_EXST_WRNG_PAGE_AND_SOCL])
 
 
 def test_stop_registered():
@@ -1227,108 +1193,44 @@ def test_stop_registered():
     result = myprocess_input.process(cnst.COMMAND_STOP)
 
     assert result[0]["type"] == "sendMessage"
-    assert cnst.COMMAND_START_USR1["query"]["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
+    assert cnst.MSG_CMD_START_USR1["query"]["result"][0]["message"]["chat"]["id"] == result[0]["chat_id"]
     assert result[0]["text"] == "You're no longer subscribed!\nWe already <i>miss</i> you, please come back soon! 😢\nTip: In order to re-joyn type /start *wink* *wink*"
 
 
 def test_privkey_command():
-
-    database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
-
-    queries = [cnst.COMMAND_PRIVKEY_USR2,
-               cnst.COMMAND_PRIVKEY_USR2_AGAIN]
-
-    for query in queries:
-        result = myprocess_input.process(query["query"])
-        assert result == query["result"]
+    query_process_input([cnst.MSG_CMD_PRIVKEY_USR2,
+                         cnst.MSG_CMD_PRIVKEY_USR2_AGAIN])
 
 
 def test_listop_command():
-
-    database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
-
-    queries = [cnst.COMMAND_LISTOP_USR2]
-
-    for query in queries:
-        result = myprocess_input.process(query["query"])
-        assert result == query["result"]
+    query_process_input([cnst.MSG_CMD_LISTOP_USR2])
 
 
 def test_setrole_command():
-
-    database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
-
-    queries = [cnst.MSG_CMD_SETROLE_USR2_USR3_MOD,
-               cnst.MSG_CMD_SETROLE_USR2_BAD]
-
-    for query in queries:
-        result = myprocess_input.process(query["query"])
-        assert result == query["result"]
+    query_process_input([cnst.MSG_CMD_SETROLE_USR2_USR3_MOD,
+                         cnst.MSG_CMD_SETROLE_USR2_BAD])
 
 
 def test_setsublim_command():
-
-    database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
-
-    queries = [cnst.MSG_CMD_SETSUBLIM_USR2_USR3_42,
-               cnst.MSG_CMD_SETSUBLIM_USR2_BAD]
-
-    for query in queries:
-        result = myprocess_input.process(query["query"])
-        assert result == query["result"]
+    query_process_input([cnst.MSG_CMD_SETSUBLIM_USR2_USR3_42,
+                         cnst.MSG_CMD_SETSUBLIM_USR2_BAD])
 
 
 def test_remrole_command():
-
-    database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
-
-    queries = [cnst.MSG_CMD_REMROLE_USR2_USR3,
-               cnst.MSG_CMD_REMROLE_USR2_USR3_BAD]
-
-    for query in queries:
-        result = myprocess_input.process(query["query"])
-        assert result == query["result"]
+    query_process_input([cnst.MSG_CMD_REMROLE_USR2_USR3,
+                         cnst.MSG_CMD_REMROLE_USR2_USR3_BAD])
 
 
 def test_kick_command():
-
-    database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
-
-    queries = [cnst.MSG_CMD_KICK_USR2_USR4,
-               cnst.MSG_CMD_KICK_USR2_USR4_BAD]
-
-    for query in queries:
-        result = myprocess_input.process(query["query"])
-        assert result == query["result"]
+    query_process_input([cnst.MSG_CMD_KICK_USR2_USR4,
+                         cnst.MSG_CMD_KICK_USR2_USR4_BAD])
 
 
 def test_ban_command():
-
-    database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
-
-    queries = [cnst.MSG_CMD_BAN_USR2_USR5,
-               cnst.MSG_CMD_BAN_USR2_USR5_BAD]
-
-    for query in queries:
-        result = myprocess_input.process(query["query"])
-        assert result == query["result"]
+    query_process_input([cnst.MSG_CMD_BAN_USR2_USR5,
+                         cnst.MSG_CMD_BAN_USR2_USR5_BAD])
 
 
 def test_unban_command():
-
-    database = MyDatabase(DATABASE_PATH)
-    myprocess_input = Processinput(database, [], 'vKcg86E3AoR3SRg2')
-
-    queries = [cnst.MSG_CMD_UNBAN_USR2_USR5,
-               cnst.MSG_CMD_UNBAN_USR2_USR5_BAD]
-
-    for query in queries:
-        result = myprocess_input.process(query["query"])
-        assert result == query["result"]
+    query_process_input([cnst.MSG_CMD_UNBAN_USR2_USR5,
+                         cnst.MSG_CMD_UNBAN_USR2_USR5_BAD])
