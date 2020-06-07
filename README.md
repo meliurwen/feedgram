@@ -14,7 +14,7 @@
 > **_Note:_** It's a private repo, use the `LabProgettazioneDISCo` Gitlab's user in order to access it!
 
 + **_Project's Repo:_** [gitlab.com/meliurwen/feedgram](https://gitlab.com/meliurwen/feedgram)
-+ **_Project's Documentation:_** [gitlab.com/meliurwen/feedgram](https://meliurwen.gitlab.io/feedgram/)
++ **_Project's Documentation:_** [meliurwen.gitlab.io/feedgram/](https://meliurwen.gitlab.io/feedgram/)
 + **_Demo Link:_** [t.me/FeedGram_demo_bot](https://t.me/FeedGram_demo_bot)
 
 ## Group Members
