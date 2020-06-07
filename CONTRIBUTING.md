@@ -11,7 +11,7 @@ Please don't use the Gitlab issue tracker for asking support questions. All supp
 Before start contributing or asking dummy questions is best practice to consult first the following sources:
 
 + The [README.md](https://gitlab.com/meliurwen/feedgram/-/blob/develop/README.md) in the repo
-+ The project's documentation
++ [This project Documentation](https://meliurwen.gitlab.io/feedgram/)
 + The official [Telgram's bot API Docs](https://core.telegram.org/bots/api)
 + Google
 

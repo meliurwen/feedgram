@@ -13,7 +13,8 @@
 
 > **_Note:_** It's a private repo, use the `LabProgettazioneDISCo` Gitlab's user in order to access it!
 
-+ **_Project's Link:_** [gitlab.com/meliurwen/feedgram](https://gitlab.com/meliurwen/feedgram)
++ **_Project's Repo:_** [gitlab.com/meliurwen/feedgram](https://gitlab.com/meliurwen/feedgram)
++ **_Project's Documentation:_** [gitlab.com/meliurwen/feedgram](https://meliurwen.gitlab.io/feedgram/)
 + **_Demo Link:_** [t.me/FeedGram_demo_bot](https://t.me/FeedGram_demo_bot)
 
 ## Group Members
@@ -48,6 +49,12 @@ As described by the diagram **_the bot does not interact directly with the users
 The **_interactions with the socials/platforms_** will be done with various methods and techniques that depends on _how_ (and _at which conditions_) each social/platform we interact with exposes the data we need. In most cases _is better use the official APIs_ provided via _HTTP_ methods (GET or POST) or _OAuth_, but in few cases for various reasons the classic _scraping methods are more convenient_.
 
 The **_internal structure_** of the application is mainly composed by a multitude of _specialised python modules_, an _SQLite3_ database and a config file in `ini` format, most of them directly orchestrated by a main module.
+
+## Documentation
+
+You can find the documentation on GitLab Pages [here](https://meliurwen.gitlab.io/feedgram/), or at this link:
+
++ [https://meliurwen.gitlab.io/feedgram/](https://meliurwen.gitlab.io/feedgram/)
 
 ## Install
 
