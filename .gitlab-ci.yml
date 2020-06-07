@@ -14,6 +14,7 @@ cache:
   paths:
     - .cache/pip
     - venv/
+    - public/
 
 variables:
   DSETUPTOOLS_DEB_LAYOUT: "OFF"
@@ -44,6 +45,35 @@ Build:
       pip install -r requirements.txt && \
       pip install -r test-requirements.txt
     - python setup.py install
+
+mkdocstring:
+  image: python:3.8-alpine
+  stage: verify
+  except:
+    - tags
+  before_script:
+    - apk add --no-cache build-base git
+    - pip install setuptools
+    - ./setup.py develop
+    - pip install -r docs-requirements.txt
+  script:
+    - mkdocs build -d public
+
+pages:
+  image: alpine:latest
+  stage: package
+  except:
+    - tags
+  only:
+    - master
+    - develop
+  before_script:
+    - echo "Preparing to deploy..."
+  script:
+    - echo "Deploying Pages..."
+  artifacts:
+    paths:
+    - public
 
 flake8:
   stage: verify
@@ -103,7 +133,7 @@ pipwhl:
   artifacts:
     paths:
       - dist/*.whl
-    expire_in: 1 week
+    expire_in: 4 week
 
 Debian_10:
   stage: package
@@ -130,7 +160,7 @@ Debian_10:
   artifacts:
     paths:
       - dist/deb_dist/
-    expire_in: 1 week
+    expire_in: 4 week
     
 Ubuntu_18.04:
   stage: package
@@ -162,8 +192,7 @@ Ubuntu_18.04:
   artifacts:
       paths:
         - dist/ubuntu_dist/
-      expire_in: 1 week
-
+      expire_in: 4 week
 
 docker-prod:
   image: docker:latest
@@ -182,7 +211,6 @@ docker-prod:
     - docker tag "$CI_REGISTRY_IMAGE" "$CI_REGISTRY_IMAGE:latest"
     - docker tag "$CI_REGISTRY_IMAGE" "$CI_REGISTRY_IMAGE:$VERSION"
     - docker push "$CI_REGISTRY_IMAGE"
-
 
 docker-dev:
   image: docker:latest

@@ -10,6 +10,7 @@ nav:
   - Install: install.md
   - Develop: develop.md
   - Testing & Linting: testing_and_linting.md
+  - Docstring: docstring.md
   - Reference:
     - lib:
       - utils.py: reference/lib/utils.md
@@ -50,6 +51,7 @@ plugins:
   - search
   - git-revision-date-localized:
       type: date
+      fallback_to_build_date: true
   - minify:
       minify_html: true
   - mkdocstrings:

@@ -1,5 +1,5 @@
 <div align="center">
-<img src=".img/feedgram_logo.png" alt="feedgram Logo" width="200" >
+<img src=".gitlab/img/feedgram_logo.png" alt="feedgram Logo" width="200" >
 
 # FeedGram
 
@@ -41,7 +41,7 @@ The first platforms supported will be the most popular ones: _Instagram_, _Youtu
 
 The diagram below is the **_high level architecture_** of this project and describes the _interactions_ between the _internal components_ of the app and between the app and the _external ones_:
 
-![High Level Architecture](.img/architecture_high_level.png)
+![High Level Architecture](.gitlab/img/architecture_high_level.png)
 
 As described by the diagram **_the bot does not interact directly with the users_**, but it accomplish this _via the Telegram's stack_ using _APIs expressively provided for the bots_.
 
