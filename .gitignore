@@ -20,3 +20,6 @@ __pycache__/
 # App
 config.ini
 *.sqlite3
+
+# Mkdocs
+site/

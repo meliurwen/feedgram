@@ -1,0 +1,62 @@
+site_name: "FeedGram"
+site_description: "A simple to use, but yet powerful Telegram bot app living in the cloud with bare bones functionalities!"
+site_author: "Meliurwen"
+site_url: "https://gitlab.com/meliurwen/feedgram"
+repo_url: "https://gitlab.com/meliurwen/feedgram"
+repo_name: "meliurwen/feedgram"
+
+nav:
+  - Overview: index.md
+  - Install: install.md
+  - Develop: develop.md
+  - Testing & Linting: testing_and_linting.md
+  - Reference:
+    - lib:
+      - utils.py: reference/lib/utils.md
+      - config.py: reference/lib/config.md
+      - database.py: reference/lib/database.md
+      - telegram.py: reference/lib/telegram.md
+      - process_input.py: reference/lib/process_input.md
+    - social:
+      - instagram.py: reference/social/instagram.md
+    - app_handler.py: reference/app_handler.md
+  - Contributing: contributing.md
+  - Changelog: changelog.md
+  - License: license.md
+
+theme:
+  name: material
+  custom_dir: docs/overrides
+  palette:
+    primary: blue
+    accent: blue
+  logo: img/feedgram_logo.svg
+  favicon: img/feedgram_logo.svg
+
+extra_css:
+  - css/mkdocstrings.css
+
+markdown_extensions:
+  - admonition
+  - codehilite:
+      guess_lang: false
+  - pymdownx.superfences
+  - pymdownx.tasklist
+  - pymdownx.emoji
+  - toc:
+      permalink: "¤"
+
+plugins:
+  - search
+  - git-revision-date-localized:
+      type: date
+  - minify:
+      minify_html: true
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          rendering:
+            show_source: true
+      watch:
+        - feedgram

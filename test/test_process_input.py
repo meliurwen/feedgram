@@ -555,17 +555,9 @@ def test_pause_callback_use_unmute():
 
 
 def test_halt_command():
-    database = MyDatabase(DATABASE_PATH)
-    igram = Instagram()
-    myprocess_input = Processinput(database, [igram], 'vKcg86E3AoR3SRg2')
-
-    queries = [cnst.MSG_CMD_HALT_USR1,
-               cnst.MSG_CMD_HALT_USR1_NO_EXST_SCL,
-               cnst.MSG_CMD_HALT_USR1_WRNG]
-
-    for query in queries:
-        result = myprocess_input.process(query["query"])
-        assert result == query["result"]
+    query_process_input([cnst.MSG_CMD_HALT_USR1,
+                         cnst.MSG_CMD_HALT_USR1_NO_EXST_SCL,
+                         cnst.MSG_CMD_HALT_USR1_WRNG])
 
 
 def test_halt_callback():

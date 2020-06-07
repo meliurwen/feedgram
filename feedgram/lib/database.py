@@ -302,8 +302,12 @@ class MyDatabase:
     @property
     def get_pause_expired_or_removed_messages(self):
         '''
-            Ottengo i messaggi archiviati che hanno la pausa scaduta o non sono più in pausa
-            :return: <List> of <List>
+            Retrieves the buffered messages which no longer has the "paused" status
+            or it is expired.
+            Return:
+                list[list]: Returns a list of lists. The 1st level list is sorted in chronological ascending order.
+                            The 2nd level list respectively contains: the ``message_id``, the already Telegram-compiled ``payload``
+                            of the messsage and the ``status`` of the subscription related to the message.
         '''
         res, _ = self.__query("SELECT messages.message_id, messages.message, t_reg.status "
                               "FROM messages "
@@ -316,11 +320,26 @@ class MyDatabase:
         return res
 
     def remove_messages(self, messages):
+        '''
+            Remove messages in the buffer given a list `message_id`.
+            Arguments:
+                messages (list): List of `message_id` you want to remove from the buffer.
+        '''
         for mess in messages:
             self.__query("DELETE FROM messages "
                          "WHERE messages.message_id = ?;", mess)
 
-    def set_category_of_social_account(self, user_id, social, internal_id, category):
+    def set_category_of_social_account(self, user_id, social: str, internal_id: str, category: str) -> bool:
+        '''
+            Assigns a *social account* to a **category**.
+            Arguments:
+                user_id (int): User ID of the Telegram user.
+                social: The social network of the social account.
+                internal_id: The social network's ID of the social account.
+                category: Name of the category.
+            Returns:
+                Operation success.
+        '''
         _, rowcount = self.__query("UPDATE registrations "
                                    "SET category = ? "
                                    "WHERE registrations.user_id = ? AND "
@@ -329,7 +348,16 @@ class MyDatabase:
                                    "FROM socials WHERE socials.social = ? AND socials.internal_id = ?);", category, user_id, social, internal_id)
         return bool(rowcount)
 
-    def rename_category(self, user_id, category_old, category_new='default'):
+    def rename_category(self, user_id, category_old: str, category_new: str = 'default') -> bool:
+        '''
+            Rename a **category** of belonging to a specific user.
+            Arguments:
+                user_id (int): User ID of the Telegram user.
+                category_old: Old name of the category.
+                category_new: New name of the category.
+            Returns:
+                Operation success.
+        '''
         _, rowcount = self.__query("UPDATE registrations "
                                    "SET category = ? "
                                    "WHERE registrations.user_id = ? AND "
