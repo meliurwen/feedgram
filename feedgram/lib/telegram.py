@@ -7,6 +7,13 @@ from feedgram.lib.utils import get_url
 
 
 class Telegram:
+    """
+    This class purpose is to act as a layer between the raw HTTP(S) protocol and the main application.
+
+    It urlencodes the messages and makes sure to deliver them at the highest rate possible
+    without breaking the [rate limits](https://core.telegram.org/bots/faq#my-bot-is-hitting-limits-how-do-i-avoid-this)
+    of the Telegram's Bot APIs.
+    """
 
     # Inizializzo le veriabili che servono per calibrare l'invio dei messaggi in modo che stiano dentro
     # i rate limits di Telegram (https://core.telegram.org/bots/faq#my-bot-is-hitting-limits-how-do-i-avoid-this).
@@ -18,12 +25,33 @@ class Telegram:
     MESSAGES_PER_MINUTE_TO_SAME_CHAT = 20
 
     # Imposta la url di Telegram col token (fa abbastanza schifo come metodo, fa funziona)
-    def __init__(self, token):
+    def __init__(self, token: str):
+        """
+            Initializing method.
+            Arguments:
+                token: Unique authentication token provided by Telegram via [@BotFather](https://t.me/BotFather).
+        """
         self.__logger = logging.getLogger('telegram_bot.telegram')
         self.__logger.info('Class instance for communication with Telegram\'s bot APIs initiated.')
         self.__tl_url = "https://api.telegram.org/bot{}/".format(token)
 
-    def update_command_info(self, commands):
+    def update_command_info(self, commands: [dict]) -> bool:
+        """
+            Update the inline command list suggestions.
+            Arguments:
+                commands: List of commands with their description
+            Returns:
+                Is updated.
+            Example: Example of `commands` structure
+                ```json
+                [
+                    {
+                        'command': 'start',
+                        'description': 'Start the bot and subscribe'
+                    }
+                ]
+                ```
+        """
         actual_command = self.__get_my_commands()["result"]
         if commands != actual_command:
             self.__set_my_commands(commands)
@@ -40,13 +68,25 @@ class Telegram:
         # [{'command': 'start', 'description': 'Start the bot'}, {'command': 'stop', 'description': 'Stop the bot'}]
 
     # TODO: Mettere nel config il timeout in modo che possa esse impostato manualmente dall'utente
-    def get_updates(self, offset=None):
+    def get_updates(self, offset: int = None) -> dict:
+        """
+            Longpolls the Telegram's API for new updates.
+            Arguments:
+                offset: The offset of the window
+            Returns:
+                Updates.
+        """
         url = self.__tl_url + "getUpdates?timeout=60"
         if offset:
             url += "&offset={}".format(offset)
         return self.__get_json_from_url(url)
 
-    def send_message(self, message):
+    def send_message(self, message: dict):
+        """
+            Urlencodes and send messages singurarly.
+            Arguments:
+                message: the message ready to be urlencoded and delivered.
+        """
         url = self.__tl_url
         if message["type"] == "sendMessage":
             if ("chat_id" in message) and ("text" in message):  # if is sendMessage, the dict MUST contain chat_id and text, otherwise is invalid and the mssage will not be sent
@@ -112,6 +152,13 @@ class Telegram:
     # Se fossero un po' più precisi nelle specifiche mi farebbero un gran favore. >:(
     # def send_messages(self, coda, condizione):
     def send_messages(self, coda):
+        """
+            Send messages at the maximum rate without hitting the
+            [rate limits](https://core.telegram.org/bots/faq#my-bot-is-hitting-limits-how-do-i-avoid-this)
+            of the Telegtram's Bot APIs.
+            Arguments:
+                coda (queue): queue of messages (`dict`).
+        """
 
         last_one_second = {}
         last_sixty_seconds = {}

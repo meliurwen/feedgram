@@ -10,13 +10,15 @@
 
 > **_Note:_** It's a private repo, use the `LabProgettazioneDISCo` Gitlab's user in order to access it!
 
-+ **_Project's Link:_** [gitlab.com/meliurwen/feedgram](https://gitlab.com/meliurwen/feedgram)
-+ **_Demo Link:_** [t.me/FeedGram_demo_bot](https://t.me/FeedGram_demo_bot)
++ :fontawesome-brands-gitlab: **_Project's Link:_** [gitlab.com/meliurwen/feedgram](https://gitlab.com/meliurwen/feedgram)
++ :fontawesome-brands-telegram: **_Demo Link:_** [t.me/FeedGram_demo_bot](https://t.me/FeedGram_demo_bot)
 
 ## Group Members
 
-+ Salanti Michele - 793891
-+ Donati Ivan - 781022
+| :fontawesome-solid-user-circle: | Name            |  Matr. |
+|:-------------------------------:|-----------------|:------:|
+|               👩🏻‍💻               | Michele Salanti | 793891 |
+|               👨🏻‍💻               | Ivan Donati     | 781022 |
 
 ## Purpose
 
@@ -28,7 +30,7 @@ In this project we'll use **_Trello_** in combination with the _Gitlab's_ **_git
 
 > **Note:** At the moment it's in pre-alpha state; a sensible part of our available resources has been invested on the study on learning agile practices.
 
-A simple to use, but yet powerful Telegram bot app living in the cloud with bare bones functionalities!  ☁️🗒
+A simple to use, but yet powerful Telegram bot app living in the cloud with advanced functionalities! :cloud::muscle:
 
 This **_multi-user bot_** allows to receive _news_, _RSS feeds_, _social networks and other platforms posts_ into a **_single and curated inbox_**!
 
@@ -48,4 +50,4 @@ The **_internal structure_** of the application is mainly composed by a multitud
 
 ## Contribute
 
-See [here](contributing.md) to know how to report bugs, propose features, merge requests or other forms of contribution! 😎🚀
+See [here](contributing.md) to know how to report bugs, propose features, merge requests or other forms of contribution! :sunglasses::rocket:

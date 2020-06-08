@@ -4,10 +4,10 @@
 
 At the moment platforms officially supported are:
 
-+ Docker
-+ Debian 10
-+ Ubuntu 18.04
-+ Python Wheels
++ :fontawesome-brands-docker: Docker
++ :fontawesome-brands-linux: Debian 10
++ :fontawesome-brands-ubuntu: Ubuntu 18.04
++ :fontawesome-brands-python: Python Wheels
 
 Go to the [releases section](https://gitlab.com/meliurwen/feedgram/-/releases) to download the latest installer:
 

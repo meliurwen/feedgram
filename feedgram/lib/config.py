@@ -15,31 +15,37 @@ def get_random_alphanumeric_string(string_len=16):
 # (sì, lo so che potrei mettere un .lower(), ma anche no >:()
 
 
-DEFAULT_CONFIG = {"BOT": {"databasefilepath": "socialFeedgram.sqlite3", "privilegekey": get_random_alphanumeric_string()},
-                  "API": {"telegramkey": ""}
-                  }
-
-# module_logger = logging.getLogger('telegram_bot.config')
-
-# Structure Config
-# [BOT]
-# databasefilepath
-# [API]
-# telegramkey: ""
-# privilegeKey: ""
+DEFAULT_CONFIG: dict = {
+    "BOT": {
+        "databasefilepath": "socialFeedgram.sqlite3",
+        "privilegekey": get_random_alphanumeric_string()
+    },
+    "API": {
+        "telegramkey": ""
+    }
+}
+"""
+Describes the structure of the config `ini` file with its default values.
+"""
 
 
 class Config:
-    # Private:
-    #   logger
-    #   file_config
-    #   state
-    #   cofigurazione_dict
-    # Public:
-    #   dictionary
-    #   status
+    """
+    This class purpose is to load the parameters stored in the confugration file;
+    if the file is not present a default one is generated.
 
-    def __init__(self, fileConfig):
+    If the file is present, before loading parameters, a structural check is
+    performed; if the configuration file is not well-formed the program terminates.
+
+    The configuration file format is `ini`.
+    """
+
+    def __init__(self, fileConfig: str):
+        """Initialization method.
+
+        Args:
+            fileConfig: Filename of the config file.
+        """
 
         self.__logger = logging.getLogger('telegram_bot.Config')
         self.__logger.info('Class instance for loading the configuration from a file initiated')
@@ -57,11 +63,17 @@ class Config:
             self.__cofigurazione_dict = DEFAULT_CONFIG
             self.__logger.info("Configuration file '%s' created.", fileConfig)
             self.__logger.info("Saving configuration file '%s'...", fileConfig)
-            self.save_config()
+            self.__save_config()
             self.__logger.info("Configuration file '%s' saved.", fileConfig)
             self.load_config()
 
     def load_config(self):
+        """Loads the parameters stored in the configuration file.
+
+        Raises:
+            configparser.DuplicateOptionError: Duplicated parameters in teh config file.
+            configparser.DuplicateSectionError: Duplicated sections in the config file.
+        """
         configurazione = configparser.ConfigParser()
         try:
             configurazione.read(self.__file_config)
@@ -81,7 +93,7 @@ class Config:
             # self._state = -4
             # return -4
 
-    def save_config(self):
+    def __save_config(self):
         self.__write_config(self.__file_config, self.__cofigurazione_dict)
 
     @property

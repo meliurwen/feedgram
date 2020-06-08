@@ -12,6 +12,9 @@
 
 ## Generate the Documentation
 
+!!! Warning
+    Before doing any related developing operation remember to [prepare the development environment](develop.md)!
+
 ### Prerequisites
 
 + `mkdocs-material`

@@ -5,8 +5,19 @@ import time
 
 
 class Processinput:
+    """
+    This class purpose is to process the input received from the Telegram's APIs.
+    In particular the messages and commands sent by the users.
+    """
 
-    def __init__(self, database, social_list, privilege_key):
+    def __init__(self, database, social_list: list, privilege_key: str):
+        """
+            Initializing method.
+            Arguments:
+                database (obj): Database object
+                social_list: List of objects, eah one is an abilited social network.
+                privilege_key: Secret aplhanumeric string to use to gain the maximum privileges.
+        """
         self.__logger = logging.getLogger('telegram_bot.process_input')
         self.__db = database
         self.__re_compiler()
@@ -72,7 +83,17 @@ class Processinput:
     __ilk_list = {"text": "📋", "callback_data": "list_mode"}
     __ilk_category = {"text": "🏷", "callback_data": "category_mode"}
 
-    def process(self, updates):
+    def process(self, updates: dict) -> list:
+        """
+            This is the main (and only at the moment) entrypoint of all the updates
+            received from the Telegram's APIs. It processes all the interactions
+            of the users on the application.
+
+            Arguments:
+                updates: The JSON received from Telegram (see [here](https://core.telegram.org/bots/api#making-requests)).
+            Return:
+                The chronologically ordered list of messages (`dict`) to deliver.
+        """
         messages = []
         for update in updates["result"]:
             mss_type = None
@@ -296,7 +317,7 @@ class Processinput:
                                         match = re.search(r"^\s+(@[a-zA-Z0-9]{5,32}|\d{5,16})\s+(\d{1,3})$", text[10:])
                                         if match:
                                             str_opuser, is_username = (match[1][1:], True) if match[1][:1] == "@" else (match[1], False)
-                                            msg = "<b>✅ Successful action</b>\n\nUser {} now can follow up to <b>{}</b> profiles!".format(match[1], match[2]) if self.__db.set_follow_limit_auth(user_id, str_opuser, match[2], is_username) else self.__msm_wrnng
+                                            msg = "<b>✅ Successful action</b>\n\nUser {} now can follow up to <b>{}</b> profiles!".format(match[1], match[2]) if self.__db.set_follow_limit_auth(user_id, str_opuser, int(match[2]), is_username) else self.__msm_wrnng
                                         else:
                                             msg = "<b>⚠️ Warning</b>\n<code>/setsublim</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/setsublim &lt;@username&gt; &lt;sub_lim_number&gt;</code>\n<i>OR:</i>\n<code>/setsublim &lt;userId&gt; &lt;sub_lim_number&gt;</code>"
                                         messages.append(self.__ms_maker(chat_id, msg, "HTML"))
@@ -1141,7 +1162,7 @@ class Processinput:
             state = 0
         # If subscribed then unsubscribe, otherwise return error
         if is_subscribed:
-            if self.__db.set_state_of_social_account(user_id, sub["social"], sub["internal_id"], state, exp_time):
+            if self.__db.set_state_of_social_account(user_id, sub["social"], sub["internal_id"], state, int(exp_time)):
                 response = {"ok": True, "description": "changedState"}
             else:
                 response = {"ok": False, "description": "userNotSubscribed"}  # It happens only if between the check and the deleted the subscription is deleted by an nother istance/thread (it basically never happens)

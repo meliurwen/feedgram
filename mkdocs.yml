@@ -11,6 +11,7 @@ nav:
   - Develop: develop.md
   - Testing & Linting: testing_and_linting.md
   - Docstring: docstring.md
+  - Multithreaded Arch.: multithreaded_arch.md
   - Reference:
     - lib:
       - utils.py: reference/lib/utils.md
@@ -20,7 +21,6 @@ nav:
       - process_input.py: reference/lib/process_input.md
     - social:
       - instagram.py: reference/social/instagram.md
-    - app_handler.py: reference/app_handler.md
   - Contributing: contributing.md
   - Changelog: changelog.md
   - License: license.md
@@ -43,7 +43,9 @@ markdown_extensions:
       guess_lang: false
   - pymdownx.superfences
   - pymdownx.tasklist
-  - pymdownx.emoji
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
   - toc:
       permalink: "¤"
 

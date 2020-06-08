@@ -17,6 +17,11 @@ class RateLimitError(Error):
 
 
 class Instagram:
+    """
+        The purpose of this class is to act as a layer between the app and the social
+        network. It manages all the comunication back and forth, and all the functions
+        related to this social network.
+    """
 
     def __init__(self):
         self.__logger = logging.getLogger('telegram_bot.instagram')
@@ -57,7 +62,15 @@ class Instagram:
             time.sleep(wait_time)
             self.__logger.warning("Trying to retreive again the content from the url...")
 
-    def extract_data(self, sn_account):
+    def extract_data(self, sn_account: dict) -> dict:
+        """
+            Given pieces of informations enough to univocally identify an user,
+            etract data of such user querying the remote source.
+            Arguments:
+                sn_account: Dictionary with enough informations to univocally identify the user.
+            Returns:
+                Definitive informations gathered.
+        """
         if sn_account["username"]:
             response = self.__get_json_from_url("https://www.instagram.com/" + sn_account["username"] + "/")
             sn_payload = response["content"]
@@ -91,8 +104,14 @@ class Instagram:
             sn_account["status"] = "unknown"
         return sn_account
 
-    def get_feed(self, social_accounts):
-
+    def get_feed(self, social_accounts: list) -> dict:
+        """
+            Gather the new posts of every single social account.
+            Arguments:
+                social_accounts: List of social accounts
+            Returns:
+                The messages to deliver and the queries to perform.
+        """
         # print(social_accounts)
         messages = []
         queries = {}

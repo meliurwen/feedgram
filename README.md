@@ -32,7 +32,7 @@ In this project we'll use **_Trello_** in combination with the _Gitlab's_ **_git
 
 > **Note:** At the moment it's in pre-alpha state; a sensible part of our available resources has been invested on the study on learning agile practices.
 
-A simple to use, but yet powerful Telegram bot app living in the cloud with bare bones functionalities!  ☁️🗒
+A simple to use, but yet powerful Telegram bot app living in the cloud with advanced functionalities! ☁️💪
 
 This **_multi-user bot_** allows to receive _news_, _RSS feeds_, _social networks and other platforms posts_ into a **_single and curated inbox_**!
 
