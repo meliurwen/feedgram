@@ -44,6 +44,8 @@ class Instagram:
                 if before_json_exception:
                     before_json_exception = False
                     self.__logger.warning("This time the the content retrived contains json! :D")
+                if content["status_code"] == 404:
+                    content["content"] = {"entry_data": {}}
                 return content
             except json.JSONDecodeError:
                 if content["status_code"] == 404:
@@ -72,6 +74,8 @@ class Instagram:
                 Definitive informations gathered.
         """
         if sn_account["username"]:
+            if sn_account["username"][:1] == "@":
+                sn_account["username"] = sn_account["username"][1:]
             response = self.__get_json_from_url("https://www.instagram.com/" + sn_account["username"] + "/")
             sn_payload = response["content"]
 
