@@ -57,7 +57,7 @@ mkdocstring:
     - ./setup.py develop
     - pip install -r docs-requirements.txt
   script:
-    - mkdocs build -d public
+    - mkdocs build -s -d public
 
 pages:
   image: alpine:latest

@@ -10,7 +10,7 @@ nav:
   - Install: install.md
   - Develop: develop.md
   - Testing & Linting: testing_and_linting.md
-  - Docstring: docstring.md
+  - Docstrings: docstrings.md
   - Multithreaded Arch.: multithreaded_arch.md
   - Reference:
     - lib:

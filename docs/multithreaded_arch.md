@@ -11,4 +11,4 @@ It mainly consists in:
 |  2  | **shared _queues_**                                             |
 |  1  | **shared _list_**                                               |
 
-![Architecture](/img/watchdog_arch.svg)
+![Architecture](img/watchdog_arch.svg)

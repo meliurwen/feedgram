@@ -1,3 +1,38 @@
+## Version 0.7
+
+### Additions
+
++ Added category functionality
++ Added `/category` command to set a category to a social account
++ Added `/rename` command to rename a category
++ Added `/remove` command to remove a category
++ Added `/cmute` command to mute a category
++ Added `/chalt` command to stop a category
++ Added `/cpause` command to mute a category
++ Added ability to set and update bot commands shortcuts
++ Added the concept of roles and privileges
++ Added `/privkey` command (abbr. "Privilege Key") to give to the issuer the role with highest access privileges
++ Added `/listop` command to list the bot operators and their role
++ Added the concept of roles and privileges
++ Added `/setrole` command to set a roles to a user
++ Added `/remrole` command to remove the role to a user
++ Added `/kick` command to kick (forced unsubscribe) an user from the bot
++ Added `/setsublim` command to set a limit on the number of SN profiles to follow for an user
++ Added `/ban` command to ban an user for using the bot
++ Added `/unban` command to lift the ban from an user
++ Added docstrings to almost all modules
++ Added `mkdocstrings` for the generation of documentation
++ Automated deploy of documentation in GitLab Pages trough the pipeline
+
+### Changes
+
++ Updated the menu interface for the category functionality
++ A lot of code cleaning with small sparse fixes and tweaks
+
+### Fixes
+
++ Added buttons to the greeter message
+
 ## Version 0.6
 
 ### Additions
