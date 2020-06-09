@@ -28,10 +28,12 @@
 
 + Updated the menu interface for the category functionality
 + A lot of code cleaning with small sparse fixes and tweaks
++ Now the Instagram usernames with `@` notation are recognized
 
 ### Fixes
 
 + Added buttons to the greeter message
++ Fixed crash when subscribing to an nonexistent Instagram account
 
 ## Version 0.6
 
