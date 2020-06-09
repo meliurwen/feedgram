@@ -5,6 +5,38 @@ import copy
 
 # Module: test.test_database
 
+HELP_MESSAGE = ("<b>📖 Help</b>"
+                "\n\n"
+                "You can follow up to <i>10 social accounts</i>.\n"
+                "Socials currently abilited:\n"
+                " • <i>Instagram</i>\n"
+                "You can follow only <b>public</b> accounts.\n"
+                "\n"
+                "<b>Receive Feeds:</b>\n"
+                " • /sub <i>social</i> <i>username</i>\n"
+                " • /sub <i>link</i>\n"
+                " • /unsub <i>social</i> <i>username</i>\n"
+                " • /mute <i>social</i> <i>username</i> <i>time</i>\n"
+                " • /halt <i>social</i> <i>username</i> <i>time</i>\n"
+                " • /pause <i>social</i> <i>username</i> <i>time</i>\n"
+                "<b>Categories:</b>\n"
+                " • /category <i>social</i> <i>username</i> <i>catName</i>\n"
+                " • /rename <i>oldCatName</i> <i>newCatName</i>\n"
+                " • /remove <i>catName</i>\n"
+                " • /cmute <i>catName</i> <i>time</i>\n"
+                " • /chalt <i>catName</i> <i>time</i>\n"
+                " • /cpause <i>catName</i> <i>time</i>\n"
+                "<b>Bot:</b>\n"
+                " • /stop to stop and unsubscribe from the bot."
+                "\n\n"
+                "<b>About some above parameters</b>\n"
+                "Below are described which values some parameters accept:\n"
+                " • <b>social:</b>\n"
+                "   ◦ <i>instagram</i>, <i>ig</i>\n"
+                " • <b>time:</b> <i>XXh</i>, <i>XXd</i>\n"
+                "   ◦ <i>Where <b>XX</b> is a number between <b>0</b> and <b>99</b></i>.\n"
+                "   ◦ <i><b>h</b> and <b>d</b> represents respectively <b>hours</b> and <b>days</b></i>.\n")
+
 SUB_BY_POST_LINK = {"social": "instagram",
                     "username": "il_post",
                     "internal_id": None,
@@ -328,42 +360,100 @@ SOCIAL_QUERY_PUBLIC_NOW_PRIVATE["result"]["queries"] = {
 }
 
 GENERAL_COMMAND = {
-    "ok": True,
-    "result": [
-        {
-            "update_id": 731419464,
-            "message": {
-                "message_id": 1256,
-                "from": {
-                    "id": 123456789,
-                    "is_bot": False,
-                    "first_name": "John",
-                    "last_name": "Doe",
-                    "username": "TestUsername",
-                    "language_code": "en",
+    "query": {
+        "ok": True,
+        "result": [
+            {
+                "update_id": 731419464,
+                "message": {
+                    "message_id": 1256,
+                    "from": {
+                        "id": 123456789,
+                        "is_bot": False,
+                        "first_name": "John",
+                        "last_name": "Doe",
+                        "username": "TestUsername",
+                        "language_code": "en",
+                    },
+                    "chat": {
+                        "id": 123456789,
+                        "first_name": "John",
+                        "last_name": "Doe",
+                        "username": "TestUsername",
+                        "type": "private",
+                    },
+                    "dte": 1587049598,
+                    "text": "/comand",
+                    "entities": [{"offset": 0, "length": 7, "type": "bot_command"}],
                 },
-                "chat": {
-                    "id": 123456789,
-                    "first_name": "John",
-                    "last_name": "Doe",
-                    "username": "TestUsername",
-                    "type": "private",
-                },
-                "dte": 1587049598,
-                "text": "/comand",
-                "entities": [{"offset": 0, "length": 7, "type": "bot_command"}],
-            },
-        }
-    ],
+            }
+        ],
+    },
+    "response": {},
+    "result": []
 }
 
-COMMAND_START = copy.deepcopy(GENERAL_COMMAND)
-COMMAND_START['result'][0]['message']['text'] = "/start"
-COMMAND_START['result'][0]['message']['entities'] = [{"offset": 0, "length": 6, "type": "bot_command"}]
+MSG_CMD_START_USR1 = copy.deepcopy(GENERAL_COMMAND)
+MSG_CMD_START_USR1["query"]['result'][0]['message']['text'] = "/start"
+MSG_CMD_START_USR1["query"]['result'][0]['message']['entities'][0]["length"] = 6
+MSG_CMD_START_USR1["result"] = [
+    {
+        'chat_id': 123456789,
+        'text': "Congratulations, you're now registered!\nType /help to learn the commands available!",
+        'type': 'sendMessage'
+    },
+    {
+        'chat_id': 123456789,
+        'markdown': 'HTML',
+        'text': HELP_MESSAGE,
+        'type': 'sendMessage',
+        'reply_markup': {
+            'inline_keyboard': [
+                [
+                    {'text': "📋", 'callback_data': "list_mode"},
+                    {'text': "🏷", 'callback_data': "category_mode"}
+                ]
+            ]
+        }
+    }
+]
 
-COMMAND_STOP = copy.deepcopy(GENERAL_COMMAND)
+MSG_CMD_START_USR2 = copy.deepcopy(MSG_CMD_START_USR1)
+MSG_CMD_START_USR2["query"]['result'][0]['message']['from']['id'] = 451843278
+MSG_CMD_START_USR2["query"]['result'][0]['message']['from']['username'] = "TestUsername2"
+MSG_CMD_START_USR2["query"]['result'][0]['message']['chat']['id'] = 451843278
+MSG_CMD_START_USR2["query"]['result'][0]['message']['chat']['username'] = "TestUsername2"
+MSG_CMD_START_USR2["result"][0]["chat_id"] = 451843278
+MSG_CMD_START_USR2["result"][1]["chat_id"] = 451843278
+
+MSG_CMD_START_USR3 = copy.deepcopy(MSG_CMD_START_USR1)
+MSG_CMD_START_USR3["query"]['result'][0]['message']['from']['id'] = 546848189
+MSG_CMD_START_USR3["query"]['result'][0]['message']['from']['username'] = "TestUsername3"
+MSG_CMD_START_USR3["query"]['result'][0]['message']['chat']['id'] = 546848189
+MSG_CMD_START_USR3["query"]['result'][0]['message']['chat']['username'] = "TestUsername3"
+MSG_CMD_START_USR3["result"][0]["chat_id"] = 546848189
+MSG_CMD_START_USR3["result"][1]["chat_id"] = 546848189
+
+MSG_CMD_START_USR4 = copy.deepcopy(MSG_CMD_START_USR1)
+MSG_CMD_START_USR4["query"]['result'][0]['message']['from']['id'] = 465654982
+MSG_CMD_START_USR4["query"]['result'][0]['message']['from']['username'] = "TestUsername4"
+MSG_CMD_START_USR4["query"]['result'][0]['message']['chat']['id'] = 465654982
+MSG_CMD_START_USR4["query"]['result'][0]['message']['chat']['username'] = "TestUsername4"
+MSG_CMD_START_USR4["result"][0]["chat_id"] = 465654982
+MSG_CMD_START_USR4["result"][1]["chat_id"] = 465654982
+
+MSG_CMD_START_USR5 = copy.deepcopy(MSG_CMD_START_USR1)
+MSG_CMD_START_USR5["query"]['result'][0]['message']['from']['id'] = 974565456
+MSG_CMD_START_USR5["query"]['result'][0]['message']['from']['username'] = "TestUsername5"
+MSG_CMD_START_USR5["query"]['result'][0]['message']['chat']['id'] = 974565456
+MSG_CMD_START_USR5["query"]['result'][0]['message']['chat']['username'] = "TestUsername5"
+MSG_CMD_START_USR5["result"][0]["chat_id"] = 974565456
+MSG_CMD_START_USR5["result"][1]["chat_id"] = 974565456
+
+
+COMMAND_STOP = copy.deepcopy(GENERAL_COMMAND["query"])
 COMMAND_STOP['result'][0]['message']['text'] = "/stop"
-COMMAND_STOP['result'][0]['message']['entities'] = [{"offset": 0, "length": 5, "type": "bot_command"}]
+COMMAND_STOP['result'][0]['message']['entities'][0]["length"] = 5
 
 
 NOT_COMMAND = {
@@ -443,7 +533,7 @@ CLBK_MODE_HELP = {
                             "type": "private"
                         },
                         "date": 1588349911,
-                        "text": "📖 Help\n\nYou can follow up to <i>10 social accounts</i>.\nSocials currently supported:\n • <i>Instagram</i>\nYou can follow only <b>public</b> accounts.\n\n<b>Receive Feeds:</b>\n • /sub <i>social</i> <i>username</i>\n • /sub <i>link</i>\n • /unsub <i>social</i> <i>username</i>\n • /mute <i>social</i> <i>username</i> <i>time</i>\n • /halt <i>social</i> <i>username</i> <i>time</i>\n • /pause <i>social</i> <i>username</i> <i>time</i>\n<b>Bot:</b>\n • /stop to stop and unsubscribe from the bot.",
+                        "text": HELP_MESSAGE,
                         "reply_markup": {
                             "inline_keyboard": [
                                 [
@@ -462,11 +552,11 @@ CLBK_MODE_HELP = {
     "result": []
 }
 
-WRONG_COMMAND = copy.deepcopy(GENERAL_COMMAND)
+WRONG_COMMAND = copy.deepcopy(GENERAL_COMMAND["query"])
 WRONG_COMMAND['result'][0]['message']['text'] = "/stops"
 WRONG_COMMAND['result'][0]['message']['entities'] = [{"offset": 0, "length": 6, "type": "bot_command"}]
 
-COMMAND_HELP = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_HELP = copy.deepcopy(GENERAL_COMMAND["query"])
 COMMAND_HELP['result'][0]['message']['text'] = "/help"
 COMMAND_HELP['result'][0]['message']['entities'] = [{"offset": 0, "length": 5, "type": "bot_command"}]
 
@@ -787,7 +877,7 @@ NON_EXISTENT_TYPE = {
     "markdown": "HTML",
 }
 
-COMMAND_LIST = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_LIST = copy.deepcopy(GENERAL_COMMAND["query"])
 COMMAND_LIST['result'][0]['message']['text'] = "/list"
 COMMAND_LIST['result'][0]['message']['entities'] = [{"offset": 0, "length": 5, "type": "bot_command"}]
 
@@ -851,19 +941,19 @@ MSG_CMD_SUB_IG_TEST4["response"]["username"] = "testProfile4"
 MSG_CMD_SUB_IG_TEST4["response"]["internal_id"] = 456765579
 MSG_CMD_SUB_IG_TEST4["response"]["title"] = "testProfile4"
 
-COMMAND_MUTE = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_MUTE = copy.deepcopy(GENERAL_COMMAND["query"])
 COMMAND_MUTE['result'][0]['message']['text'] = "/mute"
 
-COMMAND_MUTE_WORKING_HOURS = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_MUTE_WORKING_HOURS = copy.deepcopy(GENERAL_COMMAND["query"])
 COMMAND_MUTE_WORKING_HOURS['result'][0]['message']['text'] = "/mute ig testProfile3 12h"
 
-COMMAND_MUTE_WORKING_DAY = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_MUTE_WORKING_DAY = copy.deepcopy(GENERAL_COMMAND["query"])
 COMMAND_MUTE_WORKING_DAY['result'][0]['message']['text'] = "/mute ig testProfile3 1d"
 
-COMMAND_MUTE_MISS_SOCIAL = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_MUTE_MISS_SOCIAL = copy.deepcopy(GENERAL_COMMAND["query"])
 COMMAND_MUTE_MISS_SOCIAL['result'][0]['message']['text'] = "/mute youtube testProfile3 1h"
 
-COMMAND_MUTE_MISS_SUBSCRIPTION = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_MUTE_MISS_SUBSCRIPTION = copy.deepcopy(GENERAL_COMMAND["query"])
 COMMAND_MUTE_MISS_SUBSCRIPTION['result'][0]['message']['text'] = "/mute ig testProfile9 1h"
 
 CALLBACK_MUTE = copy.deepcopy(CLBK_MODE_HELP["query"])
@@ -956,14 +1046,17 @@ CLBK_UNSUB_MODE["query"]["result"][0]["callback_query"]["message"]["text"] = "Ba
 CLBK_UNSUB_MODE["query"]["result"][0]["callback_query"]["message"]["reply_markup"]["inline_keyboard"] = []
 CLBK_UNSUB_MODE["result"] = [
     {
-        "type": "answerCallbackQuery", "chat_id": 123456789, "callback_query_id": "268511788082888011",
-        "text": "Be careful, you'll not receive confirmation alert upon removing!", "show_alert": True
+        "type": "answerCallbackQuery",
+        "chat_id": 123456789,
+        "callback_query_id": "268511788082888011",
+        "text": "Be careful, you'll not receive confirmation alert upon removing!",
+        "show_alert": True
     },
     {
         "type": "editMessageText",
         "chat_id": 123456789,
         "message_id": 2120,
-        "text": "♻️Remove\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfilePrivate\n  ② testProfileStrangeStatus\n  ③ testIgProfileLinkHome\n  ④ testProfile2\n  ⑤ ⏯️ testProfile3\n  ⑥ testProfile4\n\nPage 1 of 1",
+        "text": "♻️Remove\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfilePrivate\n  ② testProfileStrangeStatus\n  ③ testIgProfileLinkHome\n  ④ testProfile2\n  ⑤ testProfile3\n  ⑥ testProfile4\n\nPage 1 of 1",
         "markdown": "HTML",
         "reply_markup": {
             "inline_keyboard": [
@@ -995,28 +1088,28 @@ CLBK_UNSUB_MODE_EXST_WRNG_PAGE = copy.deepcopy(CLBK_UNSUB_MODE)
 CLBK_UNSUB_MODE_EXST_WRNG_PAGE["query"]["result"][0]["callback_query"]["data"] = "remove 66 instagram 456765579"
 CLBK_UNSUB_MODE_EXST_WRNG_PAGE["result"][0]["text"] = "Unfollowed"
 del CLBK_UNSUB_MODE_EXST_WRNG_PAGE["result"][0]["show_alert"]
-CLBK_UNSUB_MODE_EXST_WRNG_PAGE["result"][1]["text"] = "♻️Remove\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfilePrivate\n  ② testProfileStrangeStatus\n  ③ testIgProfileLinkHome\n  ④ testProfile2\n  ⑤ ⏯️ testProfile3\n\nPage 1 of 1"
+CLBK_UNSUB_MODE_EXST_WRNG_PAGE["result"][1]["text"] = "♻️Remove\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfilePrivate\n  ② testProfileStrangeStatus\n  ③ testIgProfileLinkHome\n  ④ testProfile2\n  ⑤ testProfile3\n\nPage 1 of 1"
 del CLBK_UNSUB_MODE_EXST_WRNG_PAGE["result"][1]["reply_markup"]["inline_keyboard"][1][2]
 
 CLBK_UNSUB_MODE_EXST_WRNG_PAGE_AND_SOCL = copy.deepcopy(CLBK_UNSUB_MODE_EXST_WRNG_PAGE)
 CLBK_UNSUB_MODE_EXST_WRNG_PAGE_AND_SOCL["query"]["result"][0]["callback_query"]["data"] = "remove 66 banana 1546448"
 CLBK_UNSUB_MODE_EXST_WRNG_PAGE_AND_SOCL["result"][0]["text"] = "Error: socialNotAbilitedOrMisstyped"
 CLBK_UNSUB_MODE_EXST_WRNG_PAGE_AND_SOCL["result"][0]["show_alert"] = True
-CLBK_UNSUB_MODE_EXST_WRNG_PAGE_AND_SOCL["result"][1]["text"] = "♻️Remove\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfilePrivate\n  ② testProfileStrangeStatus\n  ③ testIgProfileLinkHome\n  ④ testProfile2\n  ⑤ ⏯️ testProfile3\n\nPage 1 of 1"
+CLBK_UNSUB_MODE_EXST_WRNG_PAGE_AND_SOCL["result"][1]["text"] = "♻️Remove\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfilePrivate\n  ② testProfileStrangeStatus\n  ③ testIgProfileLinkHome\n  ④ testProfile2\n  ⑤ testProfile3\n\nPage 1 of 1"
 
-COMMAND_PAUSE = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_PAUSE = copy.deepcopy(GENERAL_COMMAND["query"])
 COMMAND_PAUSE['result'][0]['message']['text'] = "/pause"
 
-COMMAND_PAUSE_WORKING_HOURS = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_PAUSE_WORKING_HOURS = copy.deepcopy(GENERAL_COMMAND["query"])
 COMMAND_PAUSE_WORKING_HOURS['result'][0]['message']['text'] = "/pause ig testProfile3 12h"
 
-COMMAND_PAUSE_WORKING_DAY = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_PAUSE_WORKING_DAY = copy.deepcopy(GENERAL_COMMAND["query"])
 COMMAND_PAUSE_WORKING_DAY['result'][0]['message']['text'] = "/pause ig testProfile3 1d"
 
-COMMAND_PAUSE_MISS_SOCIAL = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_PAUSE_MISS_SOCIAL = copy.deepcopy(GENERAL_COMMAND["query"])
 COMMAND_PAUSE_MISS_SOCIAL['result'][0]['message']['text'] = "/pause youtube testProfile3 1h"
 
-COMMAND_PAUSE_MISS_SUBSCRIPTION = copy.deepcopy(GENERAL_COMMAND)
+COMMAND_PAUSE_MISS_SUBSCRIPTION = copy.deepcopy(GENERAL_COMMAND["query"])
 COMMAND_PAUSE_MISS_SUBSCRIPTION['result'][0]['message']['text'] = "/pause ig testProfile9 1h"
 
 CALLBACK_PAUSE = copy.deepcopy(CLBK_MODE_HELP["query"])
@@ -1091,3 +1184,492 @@ ARCHIVE_MESSAGE = {'type': 'sendMessage',
                    'disable_notification': False,
                    'markdown': 'HTML',
                    }
+
+COMMAND_CMUTE = copy.deepcopy(GENERAL_COMMAND["query"])
+COMMAND_CMUTE['result'][0]['message']['text'] = "/cmute"
+
+COMMAND_CMUTE_WORKING_HOURS = copy.deepcopy(GENERAL_COMMAND["query"])
+COMMAND_CMUTE_WORKING_HOURS['result'][0]['message']['text'] = "/cmute default 12h"
+
+COMMAND_CMUTE_WORKING_DAY = copy.deepcopy(GENERAL_COMMAND["query"])
+COMMAND_CMUTE_WORKING_DAY['result'][0]['message']['text'] = "/cmute default 1d"
+
+COMMAND_CMUTE_MISS_SOCIAL = copy.deepcopy(GENERAL_COMMAND["query"])
+COMMAND_CMUTE_MISS_SOCIAL['result'][0]['message']['text'] = "/cmute inesiste 1h"
+
+COMMAND_CHALT = copy.deepcopy(GENERAL_COMMAND["query"])
+COMMAND_CHALT['result'][0]['message']['text'] = "/chalt"
+
+COMMAND_CHALT_WORKING_HOURS = copy.deepcopy(GENERAL_COMMAND["query"])
+COMMAND_CHALT_WORKING_HOURS['result'][0]['message']['text'] = "/chalt default 12h"
+
+COMMAND_CHALT_WORKING_DAY = copy.deepcopy(GENERAL_COMMAND["query"])
+COMMAND_CHALT_WORKING_DAY['result'][0]['message']['text'] = "/chalt default 1d"
+
+COMMAND_CHALT_MISS_SOCIAL = copy.deepcopy(GENERAL_COMMAND["query"])
+COMMAND_CHALT_MISS_SOCIAL['result'][0]['message']['text'] = "/chalt inesiste 1h"
+
+COMMAND_CPAUSE = copy.deepcopy(GENERAL_COMMAND["query"])
+COMMAND_CPAUSE['result'][0]['message']['text'] = "/cpause"
+
+COMMAND_CPAUSE_WORKING_HOURS = copy.deepcopy(GENERAL_COMMAND["query"])
+COMMAND_CPAUSE_WORKING_HOURS['result'][0]['message']['text'] = "/cpause default 12h"
+
+COMMAND_CPAUSE_WORKING_DAY = copy.deepcopy(GENERAL_COMMAND["query"])
+COMMAND_CPAUSE_WORKING_DAY['result'][0]['message']['text'] = "/cpause default 1d"
+
+COMMAND_CPAUSE_MISS_SOCIAL = copy.deepcopy(GENERAL_COMMAND["query"])
+COMMAND_CPAUSE_MISS_SOCIAL['result'][0]['message']['text'] = "/cpause inesiste 1h"
+
+COMMAND_CATEGORY = copy.deepcopy(GENERAL_COMMAND["query"])
+COMMAND_CATEGORY['result'][0]['message']['text'] = "/category"
+
+COMMAND_CATEGORY_WORKING = copy.deepcopy(GENERAL_COMMAND["query"])
+COMMAND_CATEGORY_WORKING['result'][0]['message']['text'] = "/category ig testProfile3 test"
+
+COMMAND_CATEGORY_MISS_SOCIAL = copy.deepcopy(GENERAL_COMMAND["query"])
+COMMAND_CATEGORY_MISS_SOCIAL['result'][0]['message']['text'] = "/category youtube testProfile3 test"
+
+COMMAND_CATEGORY_MISS_SUBSCRIPTION = copy.deepcopy(GENERAL_COMMAND["query"])
+COMMAND_CATEGORY_MISS_SUBSCRIPTION['result'][0]['message']['text'] = "/category ig testProfile9 test"
+
+COMMAND_RENAME = copy.deepcopy(GENERAL_COMMAND["query"])
+COMMAND_RENAME['result'][0]['message']['text'] = "/rename"
+
+COMMAND_RENAME_MISS_CATEGORY = copy.deepcopy(GENERAL_COMMAND["query"])
+COMMAND_RENAME_MISS_CATEGORY['result'][0]['message']['text'] = "/rename missingcategory newcategory"
+
+COMMAND_RENAME_WORKING = copy.deepcopy(GENERAL_COMMAND["query"])
+COMMAND_RENAME_WORKING['result'][0]['message']['text'] = "/rename test newcategory"
+
+COMMAND_REMOVE = copy.deepcopy(GENERAL_COMMAND["query"])
+COMMAND_REMOVE['result'][0]['message']['text'] = "/remove"
+
+COMMAND_REMOVE_MISS_CATEGORY = copy.deepcopy(GENERAL_COMMAND["query"])
+COMMAND_REMOVE_MISS_CATEGORY['result'][0]['message']['text'] = "/remove missingcategory"
+
+COMMAND_REMOVE_WORKING = copy.deepcopy(GENERAL_COMMAND["query"])
+COMMAND_REMOVE_WORKING['result'][0]['message']['text'] = "/remove newcategory"
+
+CALLBACK_CATEGORY_MODE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_MODE["result"][0]["callback_query"]["message"]["text"] = '👥Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • ⏯️ testProfile\n    • ⏯️ testProfilePrivate\n    • ⏯️ testProfileStrangeStatus\n    • ⏯️ testIgProfileLinkHome\n    • ⏯️ testProfile2\n    • ⏯️ testProfile3\n\nPage 1 of 2'
+CALLBACK_CATEGORY_MODE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'category_mode 6', 'text': '»'}],
+        [{'callback_data': 'cat_pause', 'text': '⏯️'}, {'callback_data': 'cat_mute', 'text': '🔕'}, {'callback_data': 'cat_halt', 'text': '⏹'}, {'callback_data': 'cat_remove', 'text': '🗑'}],
+        [{'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_MODE["result"][0]["callback_query"]["data"] = "category_mode"
+
+CALLBACK_CATEGORY_MODE_PAGE2 = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_MODE_PAGE2["result"][0]["callback_query"]["message"]["text"] = '👥Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • ⏯️ testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_MODE_PAGE2["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'category_mode 0', 'text': '«'}],
+        [{'callback_data': 'cat_pause', 'text': '⏯️'}, {'callback_data': 'cat_mute', 'text': '🔕'}, {'callback_data': 'cat_halt', 'text': '⏹'}, {'callback_data': 'cat_remove', 'text': '🗑'}],
+        [{'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_MODE_PAGE2["result"][0]["callback_query"]["data"] = "category_mode 6"
+
+CALLBACK_CATEGORY_REMVOE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_REMVOE["result"][0]["callback_query"]["message"]["text"] = '🗑Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • ⏯️ testProfile\n    • ⏯️ testProfilePrivate\n    • ⏯️ testProfileStrangeStatus\n    • ⏯️ testIgProfileLinkHome\n    • ⏯️ testProfile2\n    • ⏯️ testProfile3\n\nPage 1 of 2'
+CALLBACK_CATEGORY_REMVOE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_remove 0 default', 'text': '1'}],
+        [{'callback_data': 'cat_remove 6', 'text': '»'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_REMVOE["result"][0]["callback_query"]["data"] = "cat_remove"
+
+CALLBACK_CATEGORY_REMVOE_PAGE2 = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_REMVOE_PAGE2["result"][0]["callback_query"]["message"]["text"] = '🗑Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • ⏯️ testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_REMVOE_PAGE2["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_remove 6 default', 'text': '1'}],
+        [{'callback_data': 'cat_remove 0', 'text': '«'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_REMVOE_PAGE2["result"][0]["callback_query"]["data"] = "cat_remove 6"
+
+CALLBACK_CATEGORY_REMVOE_USE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_REMVOE_USE["result"][0]["callback_query"]["message"]["text"] = '🗑Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • ⏯️ testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_REMVOE_USE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_remove 6 default', 'text': '1'}],
+        [{'callback_data': 'cat_remove 0', 'text': '«'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_REMVOE_USE["result"][0]["callback_query"]["data"] = "cat_remove 6 default"
+
+CALLBACK_CATEGORY_MUTE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_MUTE["result"][0]["callback_query"]["message"]["text"] = '🔕Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • ⏯️ testProfile\n    • ⏯️ testProfilePrivate\n    • ⏯️ testProfileStrangeStatus\n    • ⏯️ testIgProfileLinkHome\n    • ⏯️ testProfile2\n    • ⏯️ testProfile3\n\nPage 1 of 2'
+CALLBACK_CATEGORY_MUTE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_mute 0 3 default', 'text': '1'}],
+        [{'callback_data': 'cat_mute 6 3', 'text': '»'}],
+        [{'callback_data': 'cat_mute 0 1', 'text': '1 Day'}, {'callback_data': 'cat_mute 0 3', 'text': '✔ 3 Days'}],
+        [{'callback_data': 'cat_mute 0 7', 'text': '7 Days'}, {'callback_data': 'cat_mute 0 0', 'text': 'Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_MUTE["result"][0]["callback_query"]["data"] = "cat_mute"
+
+CALLBACK_CATEGORY_MUTE_PAGE2 = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_MUTE_PAGE2["result"][0]["callback_query"]["message"]["text"] = '🔕Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • ⏯️ testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_MUTE_PAGE2["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_mute 6 3 default', 'text': '1'}],
+        [{'callback_data': 'cat_mute 0 3', 'text': '«'}],
+        [{'callback_data': 'cat_mute 6 1', 'text': '1 Day'}, {'callback_data': 'cat_mute 6 3', 'text': '✔ 3 Days'}],
+        [{'callback_data': 'cat_mute 6 7', 'text': '7 Days'}, {'callback_data': 'cat_mute 6 0', 'text': 'Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_MUTE_PAGE2["result"][0]["callback_query"]["data"] = "cat_mute 6 3"
+
+CALLBACK_CATEGORY_MUTE_PAGE2_DATE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_MUTE_PAGE2_DATE["result"][0]["callback_query"]["message"]["text"] = '🔕Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • ⏯️ testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_MUTE_PAGE2_DATE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_mute 6 7 default', 'text': '1'}],
+        [{'callback_data': 'cat_mute 0 7', 'text': '«'}],
+        [{'callback_data': 'cat_mute 6 1', 'text': '1 Day'}, {'callback_data': 'cat_mute 6 3', 'text': '3 Days'}],
+        [{'callback_data': 'cat_mute 6 7', 'text': '✔ 7 Days'}, {'callback_data': 'cat_mute 6 0', 'text': 'Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_MUTE_PAGE2_DATE["result"][0]["callback_query"]["data"] = "cat_mute 6 7"
+
+CALLBACK_CATEGORY_MUTE_USE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_MUTE_USE["result"][0]["callback_query"]["message"]["text"] = '🔕Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • 🔕 testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_MUTE_USE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_mute 6 3 default', 'text': '1'}],
+        [{'callback_data': 'cat_mute 0 3', 'text': '«'}],
+        [{'callback_data': 'cat_mute 6 1', 'text': '1 Day'}, {'callback_data': 'cat_mute 6 3', 'text': '✔ 3 Days'}],
+        [{'callback_data': 'cat_mute 6 7', 'text': '7 Days'}, {'callback_data': 'cat_mute 6 0', 'text': 'Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_MUTE_USE["result"][0]["callback_query"]["data"] = "cat_mute 6 3 default"
+
+CALLBACK_CATEGORY_MUTE_UNMUTE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_MUTE_UNMUTE["result"][0]["callback_query"]["message"]["text"] = '🔕Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_MUTE_UNMUTE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_mute 6 0 default', 'text': '1'}],
+        [{'callback_data': 'cat_mute 0 0', 'text': '«'}],
+        [{'callback_data': 'cat_mute 6 1', 'text': '1 Day'}, {'callback_data': 'cat_mute 6 3', 'text': '3 Days'}],
+        [{'callback_data': 'cat_mute 6 7', 'text': '7 Days'}, {'callback_data': 'cat_mute 6 0', 'text': '✔ Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_MUTE_UNMUTE["result"][0]["callback_query"]["data"] = "cat_mute 6 0 default"
+
+CALLBACK_CATEGORY_HALT = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_HALT["result"][0]["callback_query"]["message"]["text"] = '⏹Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • testProfile\n    • testProfilePrivate\n    • testProfileStrangeStatus\n    • testIgProfileLinkHome\n    • testProfile2\n    • testProfile3\n\nPage 1 of 2'
+CALLBACK_CATEGORY_HALT["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_halt 0 3 default', 'text': '1'}],
+        [{'callback_data': 'cat_halt 6 3', 'text': '»'}],
+        [{'callback_data': 'cat_halt 0 1', 'text': '1 Day'}, {'callback_data': 'cat_halt 0 3', 'text': '✔ 3 Days'}],
+        [{'callback_data': 'cat_halt 0 7', 'text': '7 Days'}, {'callback_data': 'cat_halt 0 0', 'text': 'Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_HALT["result"][0]["callback_query"]["data"] = "cat_halt"
+
+CALLBACK_CATEGORY_HALT_PAGE2 = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_HALT_PAGE2["result"][0]["callback_query"]["message"]["text"] = '⏹Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_HALT_PAGE2["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_halt 6 3 default', 'text': '1'}],
+        [{'callback_data': 'cat_halt 0 3', 'text': '«'}],
+        [{'callback_data': 'cat_halt 6 1', 'text': '1 Day'}, {'callback_data': 'cat_halt 6 3', 'text': '✔ 3 Days'}],
+        [{'callback_data': 'cat_halt 6 7', 'text': '7 Days'}, {'callback_data': 'cat_halt 6 0', 'text': 'Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_HALT_PAGE2["result"][0]["callback_query"]["data"] = "cat_halt 6 3"
+
+CALLBACK_CATEGORY_HALT_PAGE2_DATE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_HALT_PAGE2_DATE["result"][0]["callback_query"]["message"]["text"] = '⏹Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_HALT_PAGE2_DATE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_halt 6 7 default', 'text': '1'}],
+        [{'callback_data': 'cat_halt 0 7', 'text': '«'}],
+        [{'callback_data': 'cat_halt 6 1', 'text': '1 Day'}, {'callback_data': 'cat_halt 6 3', 'text': '3 Days'}],
+        [{'callback_data': 'cat_halt 6 7', 'text': '✔ 7 Days'}, {'callback_data': 'cat_halt 6 0', 'text': 'Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_HALT_PAGE2_DATE["result"][0]["callback_query"]["data"] = "cat_halt 6 7"
+
+CALLBACK_CATEGORY_HALT_USE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_HALT_USE["result"][0]["callback_query"]["message"]["text"] = '⏹Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • ⏹ testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_HALT_USE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_halt 6 3 default', 'text': '1'}],
+        [{'callback_data': 'cat_halt 0 3', 'text': '«'}],
+        [{'callback_data': 'cat_halt 6 1', 'text': '1 Day'}, {'callback_data': 'cat_halt 6 3', 'text': '✔ 3 Days'}],
+        [{'callback_data': 'cat_halt 6 7', 'text': '7 Days'}, {'callback_data': 'cat_halt 6 0', 'text': 'Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_HALT_USE["result"][0]["callback_query"]["data"] = "cat_halt 6 3 default"
+
+CALLBACK_CATEGORY_HALT_UNMUTE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_HALT_UNMUTE["result"][0]["callback_query"]["message"]["text"] = '⏹Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_HALT_UNMUTE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_halt 6 0 default', 'text': '1'}],
+        [{'callback_data': 'cat_halt 0 0', 'text': '«'}],
+        [{'callback_data': 'cat_halt 6 1', 'text': '1 Day'}, {'callback_data': 'cat_halt 6 3', 'text': '3 Days'}],
+        [{'callback_data': 'cat_halt 6 7', 'text': '7 Days'}, {'callback_data': 'cat_halt 6 0', 'text': '✔ Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_HALT_UNMUTE["result"][0]["callback_query"]["data"] = "cat_halt 6 0 default"
+
+CALLBACK_CATEGORY_PAUSE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_PAUSE["result"][0]["callback_query"]["message"]["text"] = '⏯️Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • testProfile\n    • testProfilePrivate\n    • testProfileStrangeStatus\n    • testIgProfileLinkHome\n    • testProfile2\n    • testProfile3\n\nPage 1 of 2'
+CALLBACK_CATEGORY_PAUSE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_pause 0 3 default', 'text': '1'}],
+        [{'callback_data': 'cat_pause 6 3', 'text': '»'}],
+        [{'callback_data': 'cat_pause 0 1', 'text': '1 Day'}, {'callback_data': 'cat_pause 0 3', 'text': '✔ 3 Days'}],
+        [{'callback_data': 'cat_pause 0 7', 'text': '7 Days'}, {'callback_data': 'cat_pause 0 0', 'text': 'Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_PAUSE["result"][0]["callback_query"]["data"] = "cat_pause"
+
+CALLBACK_CATEGORY_PAUSE_PAGE2 = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_PAUSE_PAGE2["result"][0]["callback_query"]["message"]["text"] = '⏯️Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_PAUSE_PAGE2["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_pause 6 3 default', 'text': '1'}],
+        [{'callback_data': 'cat_pause 0 3', 'text': '«'}],
+        [{'callback_data': 'cat_pause 6 1', 'text': '1 Day'}, {'callback_data': 'cat_pause 6 3', 'text': '✔ 3 Days'}],
+        [{'callback_data': 'cat_pause 6 7', 'text': '7 Days'}, {'callback_data': 'cat_pause 6 0', 'text': 'Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_PAUSE_PAGE2["result"][0]["callback_query"]["data"] = "cat_pause 6 3"
+
+CALLBACK_CATEGORY_PAUSE_PAGE2_DATE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_PAUSE_PAGE2_DATE["result"][0]["callback_query"]["message"]["text"] = '⏯️Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_PAUSE_PAGE2_DATE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_pause 6 7 default', 'text': '1'}],
+        [{'callback_data': 'cat_pause 0 7', 'text': '«'}],
+        [{'callback_data': 'cat_pause 6 1', 'text': '1 Day'}, {'callback_data': 'cat_pause 6 3', 'text': '3 Days'}],
+        [{'callback_data': 'cat_pause 6 7', 'text': '✔ 7 Days'}, {'callback_data': 'cat_pause 6 0', 'text': 'Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_PAUSE_PAGE2_DATE["result"][0]["callback_query"]["data"] = "cat_pause 6 7"
+
+CALLBACK_CATEGORY_PAUSE_USE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_PAUSE_USE["result"][0]["callback_query"]["message"]["text"] = '⏯️Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • ⏯️ testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_PAUSE_USE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_pause 6 3 default', 'text': '1'}],
+        [{'callback_data': 'cat_pause 0 3', 'text': '«'}],
+        [{'callback_data': 'cat_pause 6 1', 'text': '1 Day'}, {'callback_data': 'cat_pause 6 3', 'text': '✔ 3 Days'}],
+        [{'callback_data': 'cat_pause 6 7', 'text': '7 Days'}, {'callback_data': 'cat_pause 6 0', 'text': 'Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_PAUSE_USE["result"][0]["callback_query"]["data"] = "cat_pause 6 3 default"
+
+CALLBACK_CATEGORY_PAUSE_UNPAUSE = copy.deepcopy(CLBK_MODE_HELP["query"])
+CALLBACK_CATEGORY_PAUSE_UNPAUSE["result"][0]["callback_query"]["message"]["text"] = '⏯️Category List\n                                                  \nYou are following: \n<b>① default</b>\n<b>  • instagram</b>\n    • testProfile4\n\nPage 2 of 2'
+CALLBACK_CATEGORY_PAUSE_UNPAUSE["result"][0]["callback_query"]["message"]["reply_markup"] = {
+    "inline_keyboard": [
+        [{'callback_data': 'cat_pause 6 0 default', 'text': '1'}],
+        [{'callback_data': 'cat_pause 0 0', 'text': '«'}],
+        [{'callback_data': 'cat_pause 6 1', 'text': '1 Day'}, {'callback_data': 'cat_pause 6 3', 'text': '3 Days'}],
+        [{'callback_data': 'cat_pause 6 7', 'text': '7 Days'}, {'callback_data': 'cat_pause 6 0', 'text': '✔ Reset state'}],
+        [{'callback_data': 'category_mode', 'text': '🏷'}, {'callback_data': 'help_mode', 'text': '📖'}]
+    ]
+}
+CALLBACK_CATEGORY_PAUSE_UNPAUSE["result"][0]["callback_query"]["data"] = "cat_pause 6 0 default"
+
+
+MSG_CMD_HALT_USR1 = copy.deepcopy(GENERAL_COMMAND)
+MSG_CMD_HALT_USR1["query"]['result'][0]['message']['text'] = "/halt instagram testProfile 1h"
+MSG_CMD_HALT_USR1["query"]['result'][0]['message']['entities'][0]["length"] = 5
+MSG_CMD_HALT_USR1["result"] = [
+    {
+        'chat_id': 123456789,
+        'text': '<b>✅⏹ Stopped successfully!</b>\n\nSocial: <i>instagram</i>\nUser: <i>testProfile</i>!',
+        'type': 'sendMessage',
+        'markdown': 'HTML'
+    }
+]
+
+MSG_CMD_HALT_USR1_NO_EXST_SCL = copy.deepcopy(MSG_CMD_HALT_USR1)
+MSG_CMD_HALT_USR1_NO_EXST_SCL["query"]['result'][0]['message']['text'] = "/halt potato testProfile 1h"
+MSG_CMD_HALT_USR1_NO_EXST_SCL["result"][0]["text"] = "<b>⚠️Warning</b>\nError: <code>socialNotAbilitedOrMisstyped</code>"
+
+MSG_CMD_HALT_USR1_WRNG = copy.deepcopy(MSG_CMD_HALT_USR1_NO_EXST_SCL)
+MSG_CMD_HALT_USR1_WRNG["query"]['result'][0]['message']['text'] = "/halt potato"
+MSG_CMD_HALT_USR1_WRNG["result"][0]["text"] = "<b>⚠️Warning</b>\n<code>/halt</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/halt &lt;social&gt; &lt;username&gt; &lt;XXXd&gt;</code>\n<i>OR:</i>\n<code>/halt &lt;social&gt; &lt;username&gt; &lt;XXXh&gt;</code>"
+
+CLBK_HALT_MODE = copy.deepcopy(CLBK_MODE_HELP)
+CLBK_HALT_MODE["query"]["result"][0]["callback_query"]["data"] = "halt"
+CLBK_HALT_MODE["query"]["result"][0]["callback_query"]["message"]["text"] = "Banana"
+CLBK_HALT_MODE["query"]["result"][0]["callback_query"]["message"]["reply_markup"]["inline_keyboard"] = []
+CLBK_HALT_MODE["result"] = [
+    {
+        'callback_query_id': '268511788082888011',
+        'chat_id': 123456789,
+        'text': 'Stop list',
+        'type': 'answerCallbackQuery'
+    },
+    {
+        'chat_id': 123456789,
+        'markdown': 'HTML',
+        'message_id': 2120,
+        'reply_markup': {
+            'inline_keyboard': [
+                [{'callback_data': 'halt 0 3 instagram 546545337', 'text': '1'}, {'callback_data': 'halt 0 3 instagram 741852963', 'text': '2'}, {'callback_data': 'halt 0 3 instagram 963852741', 'text': '3'}],
+                [{'callback_data': 'halt 0 3 instagram 897546782', 'text': '4'}, {'callback_data': 'halt 0 3 instagram 4345345', 'text': '5'}, {'callback_data': 'halt 0 3 instagram 782782767', 'text': '6'}],
+                [{'callback_data': 'halt 6 3', 'text': '»'}],
+                [{'callback_data': 'halt 0 1', 'text': '1 Day'}, {'callback_data': 'halt 0 3', 'text': '✔ 3 Days'}],
+                [{'callback_data': 'halt 0 7', 'text': '7 Days'}, {'callback_data': 'halt 0 0', 'text': 'Reset state'}],
+                [{'callback_data': 'list_mode', 'text': '📋'}, {'callback_data': 'help_mode', 'text': '📖'}]
+            ]
+        },
+        'text': '👥Stop List\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① ⏹ testProfile\n  ② testProfilePrivate\n  ③ testProfileStrangeStatus\n  ④ testIgProfileLinkHome\n  ⑤ testProfile2\n  ⑥ ⏯️ testProfile3\n\nPage 1 of 2',
+        'type': 'editMessageText'
+    }
+]
+
+CLBK_HALT_MODE_PAGE_DAY = copy.deepcopy(CLBK_HALT_MODE)
+CLBK_HALT_MODE_PAGE_DAY["query"]["result"][0]["callback_query"]["data"] = "halt 0 3"
+del CLBK_HALT_MODE_PAGE_DAY["result"][0]
+
+CLBK_HALT_MODE_EXST = copy.deepcopy(CLBK_HALT_MODE)
+CLBK_HALT_MODE_EXST["query"]["result"][0]["callback_query"]["data"] = "halt 0 3 instagram 546545337"
+CLBK_HALT_MODE_EXST["result"][0]["text"] = "Stopped"
+
+CLBK_HALT_MODE_RST = copy.deepcopy(CLBK_HALT_MODE)
+CLBK_HALT_MODE_RST["query"]["result"][0]["callback_query"]["data"] = "halt 0 0 instagram 546545337"
+CLBK_HALT_MODE_RST["result"][0]["text"] = "Resetted"
+CLBK_HALT_MODE_RST["result"][1]["text"] = "👥Stop List\n                                                  \nYou are following: \n<b>• instagram</b>\n  ① testProfile\n  ② testProfilePrivate\n  ③ testProfileStrangeStatus\n  ④ testIgProfileLinkHome\n  ⑤ testProfile2\n  ⑥ ⏯️ testProfile3\n\nPage 1 of 2"
+CLBK_HALT_MODE_RST["result"][1]["reply_markup"]["inline_keyboard"] = [
+    [{'callback_data': 'halt 0 0 instagram 546545337', 'text': '1'}, {'callback_data': 'halt 0 0 instagram 741852963', 'text': '2'}, {'callback_data': 'halt 0 0 instagram 963852741', 'text': '3'}],
+    [{'callback_data': 'halt 0 0 instagram 897546782', 'text': '4'}, {'callback_data': 'halt 0 0 instagram 4345345', 'text': '5'}, {'callback_data': 'halt 0 0 instagram 782782767', 'text': '6'}],
+    [{'callback_data': 'halt 6 0', 'text': '»'}],
+    [{'callback_data': 'halt 0 1', 'text': '1 Day'}, {'callback_data': 'halt 0 3', 'text': '3 Days'}],
+    [{'callback_data': 'halt 0 7', 'text': '7 Days'}, {'callback_data': 'halt 0 0', 'text': '✔ Reset state'}],
+    [{'callback_data': 'list_mode', 'text': '📋'}, {'callback_data': 'help_mode', 'text': '📖'}]
+]
+
+CLBK_HALT_MODE_RST_WRNG_SCL = copy.deepcopy(CLBK_HALT_MODE_RST)
+CLBK_HALT_MODE_RST_WRNG_SCL["query"]["result"][0]["callback_query"]["data"] = "halt 0 0 potato 546545337"
+CLBK_HALT_MODE_RST_WRNG_SCL["result"][0]["text"] = "Error: socialNotAbilitedOrMisstyped"
+CLBK_HALT_MODE_RST_WRNG_SCL["result"][0]["show_alert"] = True
+
+
+MSG_CMD_PRIVKEY_USR2 = copy.deepcopy(MSG_CMD_START_USR2)
+MSG_CMD_PRIVKEY_USR2["query"]['result'][0]['message']['text'] = "/privkey vKcg86E3AoR3SRg2"
+MSG_CMD_PRIVKEY_USR2["query"]['result'][0]['message']['entities'][0]["length"] = 8
+MSG_CMD_PRIVKEY_USR2["result"] = [
+    {
+        'chat_id': 451843278,
+        'text': "You have now creator privileges!",
+        'type': 'sendMessage'
+    }
+]
+
+MSG_CMD_PRIVKEY_USR2_AGAIN = copy.deepcopy(MSG_CMD_PRIVKEY_USR2)
+MSG_CMD_PRIVKEY_USR2_AGAIN["result"][0]["text"] = "You already have the role of creator"
+
+MSG_CMD_LISTOP_USR2 = copy.deepcopy(MSG_CMD_PRIVKEY_USR2)
+MSG_CMD_LISTOP_USR2["query"]['result'][0]['message']['text'] = "/listop"
+MSG_CMD_LISTOP_USR2["query"]['result'][0]['message']['entities'][0]["length"] = 7
+MSG_CMD_LISTOP_USR2["result"][0]["markdown"] = "HTML"
+MSG_CMD_LISTOP_USR2["result"][0]["text"] = "<b>⚖️ Operators list</b>\n\n<b>Creators</b>\n  • <a href='tg://user?id=451843278'>TestUsername2</a>\n"
+
+
+MSG_CMD_SETROLE_USR2_USR3_MOD = copy.deepcopy(MSG_CMD_PRIVKEY_USR2)
+MSG_CMD_SETROLE_USR2_USR3_MOD["query"]['result'][0]['message']['text'] = "/setrole @TestUsername3 mod"
+MSG_CMD_SETROLE_USR2_USR3_MOD["query"]['result'][0]['message']['entities'][0]["length"] = 8
+MSG_CMD_SETROLE_USR2_USR3_MOD["result"][0]["markdown"] = "HTML"
+MSG_CMD_SETROLE_USR2_USR3_MOD["result"][0]["text"] = "<b>✅ Successful action</b>\n\nUser @TestUsername3 is now <b>Moderator</b>!"
+
+MSG_CMD_SETROLE_USR2_BAD = copy.deepcopy(MSG_CMD_SETROLE_USR2_USR3_MOD)
+MSG_CMD_SETROLE_USR2_BAD["query"]['result'][0]['message']['text'] = "/setrole"
+MSG_CMD_SETROLE_USR2_BAD["result"][0]["text"] = "<b>⚠️ Warning</b>\n<code>/setrole</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/setrole &lt;@username&gt; &lt;rolenumber&gt;</code>\n<i>OR:</i>\n<code>/setrole &lt;userId&gt; &lt;rolenumber&gt;</code>"
+
+
+MSG_CMD_SETSUBLIM_USR2_USR3_42 = copy.deepcopy(MSG_CMD_PRIVKEY_USR2)
+MSG_CMD_SETSUBLIM_USR2_USR3_42["query"]['result'][0]['message']['text'] = "/setsublim @TestUsername3 42"
+MSG_CMD_SETSUBLIM_USR2_USR3_42["query"]['result'][0]['message']['entities'][0]["length"] = 10
+MSG_CMD_SETSUBLIM_USR2_USR3_42["result"][0]["markdown"] = "HTML"
+MSG_CMD_SETSUBLIM_USR2_USR3_42["result"][0]["text"] = "<b>✅ Successful action</b>\n\nUser @TestUsername3 now can follow up to <b>42</b> profiles!"
+
+MSG_CMD_SETSUBLIM_USR2_BAD = copy.deepcopy(MSG_CMD_SETSUBLIM_USR2_USR3_42)
+MSG_CMD_SETSUBLIM_USR2_BAD["query"]['result'][0]['message']['text'] = "/setsublim"
+MSG_CMD_SETSUBLIM_USR2_BAD["result"][0]["text"] = "<b>⚠️ Warning</b>\n<code>/setsublim</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/setsublim &lt;@username&gt; &lt;sub_lim_number&gt;</code>\n<i>OR:</i>\n<code>/setsublim &lt;userId&gt; &lt;sub_lim_number&gt;</code>"
+
+
+MSG_CMD_REMROLE_USR2_USR3 = copy.deepcopy(MSG_CMD_PRIVKEY_USR2)
+MSG_CMD_REMROLE_USR2_USR3["query"]['result'][0]['message']['text'] = "/remrole @TestUsername3"
+MSG_CMD_REMROLE_USR2_USR3["query"]['result'][0]['message']['entities'][0]["length"] = 10
+MSG_CMD_REMROLE_USR2_USR3["result"][0]["markdown"] = "HTML"
+MSG_CMD_REMROLE_USR2_USR3["result"][0]["text"] = "<b>✅ Successful action</b>\n\nUser @TestUsername3 now has <b>no role</b>!"
+
+MSG_CMD_REMROLE_USR2_USR3_BAD = copy.deepcopy(MSG_CMD_REMROLE_USR2_USR3)
+MSG_CMD_REMROLE_USR2_USR3_BAD["query"]['result'][0]['message']['text'] = "/remrole"
+MSG_CMD_REMROLE_USR2_USR3_BAD["result"][0]["text"] = "<b>⚠️ Warning</b>\n<code>/remrole</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/remrole &lt;@username&gt;</code>\n<i>OR:</i>\n<code>/remrole &lt;userId&gt;</code>"
+
+
+MSG_CMD_KICK_USR2_USR4 = copy.deepcopy(MSG_CMD_PRIVKEY_USR2)
+MSG_CMD_KICK_USR2_USR4["query"]['result'][0]['message']['text'] = "/kick @TestUsername4"
+MSG_CMD_KICK_USR2_USR4["query"]['result'][0]['message']['entities'][0]["length"] = 5
+MSG_CMD_KICK_USR2_USR4["result"][0]["markdown"] = "HTML"
+MSG_CMD_KICK_USR2_USR4["result"][0]["text"] = "<b>✅ Successful action</b>\n\nUser @TestUsername4 is <b>kicked</b>!"
+
+MSG_CMD_KICK_USR2_USR4_BAD = copy.deepcopy(MSG_CMD_KICK_USR2_USR4)
+MSG_CMD_KICK_USR2_USR4_BAD["query"]['result'][0]['message']['text'] = "/kick"
+MSG_CMD_KICK_USR2_USR4_BAD["result"][0]["text"] = "<b>⚠️ Warning</b>\n<code>/kick</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/kick &lt;@username&gt;</code>\n<i>OR:</i>\n<code>/kick &lt;userId&gt;</code>"
+
+
+MSG_CMD_BAN_USR2_USR5 = copy.deepcopy(MSG_CMD_PRIVKEY_USR2)
+MSG_CMD_BAN_USR2_USR5["query"]['result'][0]['message']['text'] = "/ban @TestUsername5"
+MSG_CMD_BAN_USR2_USR5["query"]['result'][0]['message']['entities'][0]["length"] = 4
+MSG_CMD_BAN_USR2_USR5["result"][0]["markdown"] = "HTML"
+MSG_CMD_BAN_USR2_USR5["result"][0]["text"] = "<b>✅ Successful action</b>\n\nUser @TestUsername5 now is <b>banned</b>!"
+
+MSG_CMD_BAN_USR2_USR5_BAD = copy.deepcopy(MSG_CMD_BAN_USR2_USR5)
+MSG_CMD_BAN_USR2_USR5_BAD["query"]['result'][0]['message']['text'] = "/ban"
+MSG_CMD_BAN_USR2_USR5_BAD["result"][0]["text"] = "<b>⚠️ Warning</b>\n<code>/ban</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/ban &lt;@username&gt;</code>\n<i>OR:</i>\n<code>/ban &lt;userId&gt;</code>"
+
+
+MSG_CMD_UNBAN_USR2_USR5 = copy.deepcopy(MSG_CMD_PRIVKEY_USR2)
+MSG_CMD_UNBAN_USR2_USR5["query"]['result'][0]['message']['text'] = "/unban 974565456"
+MSG_CMD_UNBAN_USR2_USR5["query"]['result'][0]['message']['entities'][0]["length"] = 6
+MSG_CMD_UNBAN_USR2_USR5["result"][0]["markdown"] = "HTML"
+MSG_CMD_UNBAN_USR2_USR5["result"][0]["text"] = "<b>✅ Successful action</b>\n\nUser 974565456 now is <b>unbanned</b>!"
+
+MSG_CMD_UNBAN_USR2_USR5_BAD = copy.deepcopy(MSG_CMD_UNBAN_USR2_USR5)
+MSG_CMD_UNBAN_USR2_USR5_BAD["query"]['result'][0]['message']['text'] = "/unban"
+MSG_CMD_UNBAN_USR2_USR5_BAD["result"][0]["text"] = "<b>⚠️ Warning</b>\n<code>/unban</code> command badly compiled!\n\n<b>ℹ️ Tip</b>\nHow to use this command:\n<code>/unban &lt;@username&gt;</code>\n<i>OR:</i>\n<code>/unban &lt;userId&gt;</code>"
+
+TG_API_UPDATE_CMD = {
+    "query": [{'command': 'test', 'description': 'This is a test'}],
+    "response": [
+        {"ok": True, "result": []},
+        {"ok": True, "result": True}
+    ],
+    "result": True
+}

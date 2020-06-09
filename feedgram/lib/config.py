@@ -3,36 +3,49 @@
 import os
 import configparser
 import logging
+import string
+import random
 
+
+def get_random_alphanumeric_string(string_len=16):
+    letters_digits = string.ascii_letters + string.digits
+    return ''.join((random.choice(letters_digits) for i in range(string_len)))
 
 # TUTTE le chiavi del dizionario quì sotto DEVONO essere scritte in minuscolo, altrimenti falliscono i controlli più avanti
 # (sì, lo so che potrei mettere un .lower(), ma anche no >:()
-DEFAULT_CONFIG = {"BOT": {"databasefilepath": "socialFeedgram.sqlite3"},
-                  "API": {"telegramkey": "",
-                          "youtubev3key": ""}
-                  }
 
-# module_logger = logging.getLogger('telegram_bot.config')
 
-# Structure Config
-# [BOT]
-# databasefilepath
-# [API]
-# telegramkey": ""
-# "youtubev3key": ""
+DEFAULT_CONFIG: dict = {
+    "BOT": {
+        "databasefilepath": "socialFeedgram.sqlite3",
+        "privilegekey": get_random_alphanumeric_string()
+    },
+    "API": {
+        "telegramkey": ""
+    }
+}
+"""
+Describes the structure of the config `ini` file with its default values.
+"""
 
 
 class Config:
-    # Private:
-    #   logger
-    #   file_config
-    #   state
-    #   cofigurazione_dict
-    # Public:
-    #   dictionary
-    #   status
+    """
+    This class purpose is to load the parameters stored in the confugration file;
+    if the file is not present a default one is generated.
 
-    def __init__(self, fileConfig):
+    If the file is present, before loading parameters, a structural check is
+    performed; if the configuration file is not well-formed the program terminates.
+
+    The configuration file format is `ini`.
+    """
+
+    def __init__(self, fileConfig: str):
+        """Initialization method.
+
+        Args:
+            fileConfig: Filename of the config file.
+        """
 
         self.__logger = logging.getLogger('telegram_bot.Config')
         self.__logger.info('Class instance for loading the configuration from a file initiated')
@@ -50,11 +63,17 @@ class Config:
             self.__cofigurazione_dict = DEFAULT_CONFIG
             self.__logger.info("Configuration file '%s' created.", fileConfig)
             self.__logger.info("Saving configuration file '%s'...", fileConfig)
-            self.save_config()
+            self.__save_config()
             self.__logger.info("Configuration file '%s' saved.", fileConfig)
             self.load_config()
 
     def load_config(self):
+        """Loads the parameters stored in the configuration file.
+
+        Raises:
+            configparser.DuplicateOptionError: Duplicated parameters in teh config file.
+            configparser.DuplicateSectionError: Duplicated sections in the config file.
+        """
         configurazione = configparser.ConfigParser()
         try:
             configurazione.read(self.__file_config)
@@ -74,7 +93,7 @@ class Config:
             # self._state = -4
             # return -4
 
-    def save_config(self):
+    def __save_config(self):
         self.__write_config(self.__file_config, self.__cofigurazione_dict)
 
     @property
@@ -109,30 +128,27 @@ class Config:
             self.__state = -5
             return False
         self.__logger.info("Ci sono tutte le sezioni.")
-
         self.__logger.info("Controllo che in ogni sezione ci siano esattamente tutte le chiavi...")
-
+        is_success = True
         for key, _ in DEFAULT_CONFIG.items():
-            if not set(self.__cofigurazione_dict[key].keys()) == set(DEFAULT_CONFIG[key].keys()):
+            if set(self.__cofigurazione_dict[key].keys()) == set(DEFAULT_CONFIG[key].keys()):
+                for key_section, value_section in self.__cofigurazione_dict[key].items():
+                    if str(value_section):
+                        self.__logger.info("Ci sono tutte le chiavi in ogni sezione.")
+                        self.__logger.info("Controllo che tutte le opzioni abbiano valori accettabli...")
+                        # In realtà bisognerebbe controllare se il path del database sia valido, ma vbb, lo farò un'altra volta
+                        # TODO: Implementare controllo per la validità del path del database
+                        self.__logger.info("Tutte le opzioni hanno valori accettabili.")
+                    else:
+                        self.__logger.warning("Nella sezione %s l'opzione %s è VUOTA!", str(key), str(key_section))
+                        self.__state = -7
+                        is_success = False
+            else:
                 self.__logger.warning("Nella sezione %s NON ci sono ESATTAMENTE tutte le chiavi!", str(key))
                 self.__logger.warning("Miss the key(s): %s ", ''.join(list(set(self.__cofigurazione_dict[key].keys()) - set(DEFAULT_CONFIG[key].keys()))))
                 self.__state = -6
-                return False
-            else:
-                for key_section, value_section in self.__cofigurazione_dict[key].items():
-                    if not str(value_section):
-                        self.__logger.warning("Nella sezione %s l'opzione %s è VUOTA!", str(key), str(key_section))
-                        self.__state = -7
-                        return False
-
-        self.__logger.info("Ci sono tutte le chiavi in ogni sezione.")
-
-        self.__logger.info("Controllo che tutte le opzioni abbiano valori accettabli...")
-        # In realtà bisognerebbe controllare se il path del database sia valido, ma vbb, lo farò un'altra volta
-        # TODO: Implementare controllo per la validità del path del database
-        self.__logger.info("Tutte le opzioni hanno valori accettabili.")
-
-        return True
+                is_success = False
+        return is_success
 
     @classmethod
     def __as_dict(cls, dicts):

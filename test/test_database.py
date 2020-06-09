@@ -116,15 +116,11 @@ def test_user_id_not_exist():
 def test_subscribe():
 
     database = MyDatabase(DATABASE_PATH)
-    database.subscribe_user(6551474276, "username", 75692378, 1, 10)
-    us_exist, _ = myquery(DATABASE_PATH, "SELECT 1 FROM users WHERE user_id = ?;", 6551474276)
-    assert bool(us_exist)
-    database.subscribe_user(1597534565, "foo", 456789132, 1, 10)
-    us_exist, _ = myquery(DATABASE_PATH, "SELECT 1 FROM users WHERE user_id = ?;", 6551474276)
-    assert bool(us_exist)
-    database.subscribe_user(9638527416, "bar", 456789132, 1, 10)
-    us_exist, _ = myquery(DATABASE_PATH, "SELECT 1 FROM users WHERE user_id = ?;", 6551474276)
-    assert bool(us_exist)
+    subs = [[6551474276, "username"], [1597534565, "foo"], [9638527416, "bar"], [4568521973, "fido"], [791358246, "fufi"], [575861093, "jack"]]
+    for user_id in subs:
+        database.subscribe_user(user_id[0], user_id[1], user_id[0], 10)
+        us_exist, _ = myquery(DATABASE_PATH, "SELECT 1 FROM users WHERE user_id = ?;", user_id[0])
+        assert bool(us_exist)
 
 
 def test_user_id_exist():
@@ -282,11 +278,7 @@ def test_user_subscriptions():
 
     res = database.user_subscriptions(6551474276)
 
-    assert res[0][0] == "instagram"
-    assert res[0][1] == "il_post"
-    assert res[0][2] == "1769583068"
-    assert res[0][3] == 0
-    assert res[0][4] == -1
+    assert res[0] == ("instagram", "il_post", "1769583068", 0, -1)
 
 
 def test_set_state_of_social_account():
@@ -369,6 +361,66 @@ def test_remove_messages():
     assert res[0] == 0
 
 
+def test_user_subscriptions_category():
+    '''
+        Verifica le sottoscrizioni dell'utente compresa la categoria
+    '''
+    assert path.exists(DATABASE_PATH)
+    database = MyDatabase(DATABASE_PATH)
+
+    res = database.user_subscriptions(6551474276, True)
+
+    assert res[0] == ("instagram", "il_post", "1769583068", 0, -1, 'default')
+
+
+def test_set_category_of_social_account():
+    '''
+        Testo il setaggio di una categoria ad una registrazione
+    '''
+    assert path.exists(DATABASE_PATH)
+    database = MyDatabase(DATABASE_PATH)
+
+    res = database.set_category_of_social_account(6551474276, 'instagram', 1769583068, 'Test')
+
+    assert res
+
+    res = database.user_subscriptions(6551474276, True)
+
+    assert res[0] == ("instagram", "il_post", "1769583068", 0, -1, 'Test')
+
+
+def test_rename_category():
+    '''
+        Testo il setaggio di una categoria ad una registrazione
+    '''
+    assert path.exists(DATABASE_PATH)
+    database = MyDatabase(DATABASE_PATH)
+
+    res = database.rename_category(6551474276, 'Test', 'New_test')
+
+    assert res
+
+    res = database.user_subscriptions(6551474276, True)
+
+    assert res[0] == ("instagram", "il_post", "1769583068", 0, -1, 'New_test')
+
+
+def test_set_state_of_category():
+    '''
+        Testo il setaggio di una categoria ad una registrazione
+    '''
+    assert path.exists(DATABASE_PATH)
+    database = MyDatabase(DATABASE_PATH)
+
+    res = database.set_state_of_category(6551474276, 'New_test', 1, 17867577819)
+
+    assert res
+
+    res = database.user_subscriptions(6551474276, True)
+
+    assert res[0] == ("instagram", "il_post", "1769583068", 1, 17867577819, 'New_test')
+
+
 def test_process_messages_queries1():
 
     database = MyDatabase(DATABASE_PATH)
@@ -435,3 +487,120 @@ def test_unsubscribe():
     us_exist, _ = myquery(DATABASE_PATH, "SELECT 1 FROM users WHERE user_id = ?;", 6551474276)
 
     assert not bool(us_exist)
+
+
+def test_set_role():
+
+    database = MyDatabase(DATABASE_PATH)
+    assert database.set_role(1597534565, 0)
+    assert not database.set_role(1597534565, 0)
+
+
+def test_list_operators():
+
+    database = MyDatabase(DATABASE_PATH)
+    assert database.list_operators() == [(1597534565, 0, "foo")]
+
+
+def test_has_permissions():
+
+    database = MyDatabase(DATABASE_PATH)
+    assert database.has_permissions(1597534565, 1)
+
+
+def test_set_role_auth():
+
+    database = MyDatabase(DATABASE_PATH)
+    # Random user not in database tries to set a role to a Peasant
+    assert not database.rm_role_auth(864518978, 9638527416, 1)
+    # A Peasant tries to promote itself to Mod
+    assert not database.rm_role_auth(9638527416, 9638527416, 1)
+    # Admin (1597534565) set an user with no roles (9638527416) as moderator (role 1)
+    assert database.set_role_auth(1597534565, 9638527416, 1)
+    # Admin set an another user with no roles as moderator
+    assert database.set_role_auth(1597534565, 4568521973, 1)
+    # Assigning the same role again
+    assert not database.set_role_auth(1597534565, 9638527416, 1)
+    # Mod tries to demote an Admin
+    assert not database.set_role_auth(9638527416, 1597534565, 1)
+    # Admin promotes a Mod to Admin
+    assert database.set_role_auth(1597534565, 9638527416, 0)
+    # Admin demotes an admin to Mod
+    assert database.set_role_auth(1597534565, 9638527416, 1)
+
+
+def test_set_follow_limit_auth():
+
+    database = MyDatabase(DATABASE_PATH)
+    # Random user not in database tries to set the follow limit to a Peasant
+    assert not database.set_follow_limit_auth(864518978, 791358246, 42)
+    # Peasant tries to set the follow limit to itself
+    assert not database.set_follow_limit_auth(791358246, 791358246, 42)
+    # Admin (1597534565) set to a Mod (9638527416) the follow limit to 42
+    assert database.set_follow_limit_auth(1597534565, 9638527416, 42)
+    # Assigning tha same limit again
+    assert not database.set_follow_limit_auth(1597534565, 9638527416, 42)
+    # Mod tries to assign a limit to an Admin
+    assert not database.set_follow_limit_auth(9638527416, 1597534565, 42)
+    # Admin assigns to itself the limit
+    assert database.set_follow_limit_auth(1597534565, 1597534565, 42)
+
+
+def test_rm_role_auth():
+
+    database = MyDatabase(DATABASE_PATH)
+    # Random user not in database tries to remove a role to a Mod
+    assert not database.rm_role_auth(864518978, 9638527416)
+    # Mod (9638527416) tries to remove the role to an Admin (1597534565)
+    assert not database.rm_role_auth(9638527416, 1597534565)
+    # Admin removes the role to a Mod
+    assert database.rm_role_auth(1597534565, 9638527416)
+    # Peasant tries to remove the role to an Admin
+    assert not database.rm_role_auth(9638527416, 1597534565)
+
+
+def test_kick_user_auth():
+
+    database = MyDatabase(DATABASE_PATH)
+    # Random user not in database tries to kick a Peasant
+    assert not database.kick_user_auth(864518978, 791358246)
+    # Peasant tries to kick itself
+    assert not database.kick_user_auth(791358246, 791358246)
+    # Mod (4568521973) tries to kick an Admin (1597534565)
+    assert not database.kick_user_auth(4568521973, 1597534565)
+    # Peasant tries to kick a Mod
+    assert not database.kick_user_auth(9638527416, 4568521973)
+    # Mod kick a Peasant
+    assert database.kick_user_auth(4568521973, 9638527416)
+
+
+def test_set_ban_user_auth():
+
+    database = MyDatabase(DATABASE_PATH)
+    # Random user not in database tries to ban a Peasant
+    assert not database.set_ban_user_auth(864518978, 791358246)
+    # Mod (4568521973) tries to ban an Admin (1597534565)
+    assert not database.set_ban_user_auth(4568521973, 1597534565)
+    # Peasant tries to ban a Mod
+    assert not database.set_ban_user_auth(791358246, 4568521973)
+    # Mod ban a Peasant
+    assert database.set_ban_user_auth(4568521973, 791358246)
+
+
+def test_is_banned():
+
+    database = MyDatabase(DATABASE_PATH)
+    assert database.is_banned(791358246)
+
+
+def test_set_unban_user_auth():
+
+    database = MyDatabase(DATABASE_PATH)
+    # Random user not in database tries to unban a banned user
+    assert not database.set_unban_user_auth(864518978, 791358246)
+    # Peasant tries to uban a banned user
+    assert not database.set_unban_user_auth(575861093, 791358246)
+    # Admin unbans a banned user
+    assert database.set_unban_user_auth(1597534565, 791358246)
+    # Admin tries to unban an user already unbanned
+    assert not database.set_unban_user_auth(1597534565, 791358246)

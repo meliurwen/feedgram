@@ -1,4 +1,4 @@
-image: python:3.6
+image: python:3.6-alpine
 
 # Change pip's cache directory to be inside the project directory since we can
 # only cache local items.
@@ -14,6 +14,7 @@ cache:
   paths:
     - .cache/pip
     - venv/
+    - public/
 
 variables:
   DSETUPTOOLS_DEB_LAYOUT: "OFF"
@@ -45,6 +46,35 @@ Build:
       pip install -r test-requirements.txt
     - python setup.py install
 
+mkdocstring:
+  image: python:3.8-alpine
+  stage: verify
+  except:
+    - tags
+  before_script:
+    - apk add --no-cache build-base git
+    - pip install setuptools
+    - ./setup.py develop
+    - pip install -r docs-requirements.txt
+  script:
+    - mkdocs build -s -d public
+
+pages:
+  image: alpine:latest
+  stage: package
+  except:
+    - tags
+  only:
+    - master
+    - develop
+  before_script:
+    - echo "Preparing to deploy..."
+  script:
+    - echo "Deploying Pages..."
+  artifacts:
+    paths:
+    - public
+
 flake8:
   stage: verify
   except:
@@ -66,7 +96,7 @@ pylint:
     - FEEDGRAM_V=$(cat version)
     - echo "Pylint score is $PYLINT_SCORE"
     - anybadge --label="FeedGram" --file=pylint/app_version.svg --value=v$FEEDGRAM_V --color=#0088cc
-    - anybadge --label="platform" --file=pylint/plaform.svg --value="Debian | Ubuntu | Wheel" --color=#007ec6
+    - anybadge --label="platform" --file=pylint/plaform.svg --value="Docker | Debian | Ubuntu | Wheel" --color=#007ec6
     - anybadge --label="python" --file=pylint/python_ver.svg --value="3.6 | 3.7 | 3.8" --color=#007ec6
     - anybadge --label="wheel" --file=pylint/wheel.svg --value="yes" --color=#4c1
     - anybadge --label="pip install" --file=pylint/pip_install.svg --value="feedgram" --color=#007ec6
@@ -74,7 +104,7 @@ pylint:
     paths:
       - ./pylint/
 
-Test:
+pytest:
   stage: test
   except:
     - tags
@@ -103,7 +133,7 @@ pipwhl:
   artifacts:
     paths:
       - dist/*.whl
-    expire_in: 1 week
+    expire_in: 4 week
 
 Debian_10:
   stage: package
@@ -130,7 +160,7 @@ Debian_10:
   artifacts:
     paths:
       - dist/deb_dist/
-    expire_in: 1 week
+    expire_in: 4 week
     
 Ubuntu_18.04:
   stage: package
@@ -162,9 +192,47 @@ Ubuntu_18.04:
   artifacts:
       paths:
         - dist/ubuntu_dist/
-      expire_in: 1 week
+      expire_in: 4 week
+
+docker-prod:
+  image: docker:latest
+  stage: package
+  services:
+    - docker:dind
+  except:
+    - tags
+  only:
+    - master
+  before_script:
+    - echo $CI_BUILD_TOKEN | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+  script:
+    - "[ -f ./version ] && export VERSION=$(cat ./version)"
+    - docker build --pull -t "$CI_REGISTRY_IMAGE" .
+    - docker tag "$CI_REGISTRY_IMAGE" "$CI_REGISTRY_IMAGE:latest"
+    - docker tag "$CI_REGISTRY_IMAGE" "$CI_REGISTRY_IMAGE:$VERSION"
+    - docker push "$CI_REGISTRY_IMAGE"
+
+docker-dev:
+  image: docker:latest
+  stage: package
+  services:
+    - docker:dind
+  except:
+    - tags
+  only:
+    - develop
+  before_script:
+    - echo $CI_BUILD_TOKEN | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+  script:
+    - "[ -f ./version ] && export VERSION=$(cat ./version)"
+    - export TIMESTAMP=$(date +%s)
+    - docker build --pull -t "$CI_REGISTRY_IMAGE" .
+    - docker tag "$CI_REGISTRY_IMAGE" "$CI_REGISTRY_IMAGE:dev-$VERSION-$TIMESTAMP"
+    - docker push "$CI_REGISTRY_IMAGE:dev-$VERSION-$TIMESTAMP"
+
 
 GitlabRelease:
+  image: python:3.6
   stage: release
   before_script:
     - apt-get update 
@@ -210,6 +278,7 @@ GitlabRelease:
       --arg pip "${URL_WHEEL_PIP}" \
       --arg deb10 "${URL_DEB_DEBIAN_10}" \
       --arg ub1804 "${URL_DEB_UBUNTU_1804}" \
-      '{ name:$name, tag_name:$tag_name, ref:"master", description:$description, assets:{ links:[  { name:"pip Wheel", url:$pip }, { name:"Debian 10", url:$deb10 }, { name:"Ubuntu 18.04", url:$ub1804 } ] } }')
+      --arg dockerUrl "${CI_PROJECT_URL}/container_registry/" \
+      '{ name:$name, tag_name:$tag_name, ref:"master", description:$description, assets:{ links:[  { name:"pip Wheel", url:$pip }, { name:"Debian 10", url:$deb10 }, { name:"Ubuntu 18.04", url:$ub1804 }, { name:"Docker", url:$dockerUrl } ] } }')
     - echo "curl -v --request POST --header 'Content-Type:application/json' --header \"PRIVATE-TOKEN:${PRIVATE_TOKEN}\" --data \"${JSON_DATA}\" ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases"
     - curl -v --request POST --header 'Content-Type:application/json' --header "PRIVATE-TOKEN:${PRIVATE_TOKEN}" --data "${JSON_DATA}" ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases

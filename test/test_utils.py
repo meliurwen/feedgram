@@ -44,10 +44,11 @@ def custom_matcher_no_json(request):
     # print(request.path_url)
     if GLOBAL_COUNTER == 0:
         GLOBAL_COUNTER += 1
-        return requests_mock.create_response(request, status_code=200, text=b'')
+        text = b''
     else:
         GLOBAL_COUNTER = 0
-        return requests_mock.create_response(request, status_code=200, text="hello")
+        text = "hello"
+    return requests_mock.create_response(request, status_code=200, text=text)
 
 
 def test_get_url_type_error():

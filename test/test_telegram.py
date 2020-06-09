@@ -46,10 +46,11 @@ def custom_matcher_no_json(request):
     # print(request.path_url)
     if GLOBAL_COUNTER == 0:
         GLOBAL_COUNTER += 1
-        return requests_mock.create_response(request, status_code=200, text="THIS IS A TEST")
+        text = "THIS IS A TEST"
     else:
         GLOBAL_COUNTER = 0
-        return requests_mock.create_response(request, status_code=200, text=json.dumps(cnst.JSON_GENERIC))
+        text = json.dumps(cnst.JSON_GENERIC)
+    return requests_mock.create_response(request, status_code=200, text=text)
 
 
 def test_get_updates_no_json_error():
@@ -185,13 +186,14 @@ def test_send_messages_max_one_min_same_chat_ids():
     assert_true(delay * 0.95 <= elapsed_time <= delay * 1.05)
 
 
-# 90 unique chat_id sends 20 messages at minute = 1800 messages at minute
+# 90 unique chat_id sends 20 messages per minute = 1800 messages per minute
 def test_send_messages_max_one_sec_max_one_min_same_chat_ids():
     tel_interface = Telegram(TELEGRAM_API_KEY)
     coda = queue.Queue()
 
     # For the sake of the duration of the tests the time windows of one second
-    # and one minute has been reduced at 1/5 (1/10 is too much)
+    # and one minute has been reduced at 1/5 (1/10 is too fast, some low-end
+    # machines may struggle to keep compromising the result of the test)
     tel_interface.ONE_SECOND_TIME = 0.5
     tel_interface.SIXTY_SECONDS_TIME = 30
 
@@ -276,3 +278,30 @@ def test_send_messages_while():
     thread.join()
     elapsed_time = (stop_time - start_time)
     assert_true(2 <= elapsed_time <= 3)
+
+# TODO: The test down here sorta work, but it shoud be tweaked
+
+
+GLOBAL_COUNTER_2 = 0
+
+
+def custom_matcher_mycomm(tg_mock_api):
+    global GLOBAL_COUNTER_2
+    if GLOBAL_COUNTER_2 < len(tg_mock_api):
+        text = json.dumps(tg_mock_api[GLOBAL_COUNTER_2])
+        GLOBAL_COUNTER_2 += 1
+    else:
+        text = json.dumps(tg_mock_api[GLOBAL_COUNTER_2])
+        GLOBAL_COUNTER_2 = 0
+    return text
+
+
+def test_update_command_info():
+    tel_interface = Telegram(TELEGRAM_API_KEY)
+    matcher = re.compile(r"^(?:https:\/\/)?api.telegram\.org\/bot\d{5,16}:[A-Za-z0-9_-]{16,64}\/([A-Za-z]+)\??(\S*)$")
+    api_queries = [cnst.TG_API_UPDATE_CMD]
+    for api in api_queries:
+        with requests_mock.mock() as mock_get:
+            mock_get.get(matcher, text=custom_matcher_mycomm(api["response"]))
+            response = tel_interface.update_command_info([api["query"]])
+        assert_equal(response, api["result"])

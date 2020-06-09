@@ -72,13 +72,14 @@ def custom_matcher_no_json(request):
     # print(request.path_url)
     if GLOBAL_COUNTER == 0:  # Not a json
         GLOBAL_COUNTER += 1
-        return requests_mock.create_response(request, status_code=200, text="THIS IS A TEST")
+        text = "THIS IS A TEST"
     elif GLOBAL_COUNTER == 1:  # A json, but it's the rate limited case, in which a login page is presented
         GLOBAL_COUNTER += 1
-        return requests_mock.create_response(request, status_code=200, text=ig_html_src({"entry_data": {"LoginAndSignupPage": None}}))
+        text = ig_html_src({"entry_data": {"LoginAndSignupPage": None}})
     else:
         GLOBAL_COUNTER = 0  # A json
-        return requests_mock.create_response(request, status_code=200, text=ig_html_src(cnst.IG_API_SCRP_USERNAME_EXIST_PUB["response"]))
+        text = ig_html_src(cnst.IG_API_SCRP_USERNAME_EXIST_PUB["response"])
+    return requests_mock.create_response(request, status_code=200, text=text)
 
 
 # tme.sleep patched so regardless the value issue it is now istant
