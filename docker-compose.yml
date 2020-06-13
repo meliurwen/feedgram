@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+    feedgram:
+        container_name: feedgram
+        build: .
+        restart: unless-stopped
+        volumes:
+            - "./config.ini:/app/config.ini"
+            - "./socialFeedgram.sqlite3:/app/socialFeedgram.sqlite3"
