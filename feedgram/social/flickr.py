@@ -3,8 +3,10 @@ import calendar
 import datetime
 import logging
 import json
+import re
 from random import randrange
 from feedgram.lib.utils import get_url
+
 
 class Error(Exception):
     pass
@@ -12,6 +14,7 @@ class Error(Exception):
 
 class RateLimitError(Error):
     pass
+
 
 class Flickr:
     """
@@ -29,20 +32,20 @@ class Flickr:
         while True:
             content = get_url(url)
             if social == "flickr-username":
-                tmp = content["content"].find("/services/feeds/photos_public.gne?id&#x3D;") #If it finds nothing returns -1, else the index
-                if tmp == -1: #If it finds nothing means that the user doesn't exist
+                tmp = content["content"].find("/services/feeds/photos_public.gne?id&#x3D;")  # If it finds nothing returns -1, else the index
+                if tmp == -1:  # If it finds nothing means that the user doesn't exist
                     return None
-                content["content"] = content["content"][tmp+len("/services/feeds/photos_public.gne?id&#x3D;"):]
+                content["content"] = content["content"][tmp + len("/services/feeds/photos_public.gne?id&#x3D;"):]
                 content["content"] = {"internal_id": content["content"][:content["content"].find("&amp")]}
                 return content["content"]
-            elif social == "flickr-internal_id":
-                content["content"] = content["content"][content["content"].find("jsonFlickrFeed(")+15:-1] #15 is the length of "jsonFlickrFeed("
+            if social == "flickr-internal_id":
+                content["content"] = content["content"][content["content"].find("jsonFlickrFeed(") + 15:-1]  # 15 is the length of "jsonFlickrFeed("
                 try:
-                    return json.loads(content["content"]) #If the internal_id is not valid flickr's responds with a non-json page
-                except:
+                    return json.loads(content["content"])  # If the internal_id is not valid flickr's responds with a non-json page
+                except json.JSONDecodeError:
                     if not before_json_exception:
                         self.__logger.warning("The content of the flickr's url is not json, I assume the account has been deleted...")
-                        self.__logger.warning("\n######START######\n" + content["content"] + "\n######END######") #Added this line only to investigate about an issue about false positive detections of deleted accounts. Remove this when finished.
+                        self.__logger.warning("\n######START######\n%s\n######END######", (content["content"]))  # Added this line only to investigate about an issue about false positive detections of deleted accounts. Remove this when finished.
                         return {"error": True, "reason": "userNotFound"}
                     before_json_exception = True
                     wait_time = randrange(10, 20)
@@ -60,23 +63,21 @@ class Flickr:
             Returns:
                 Definitive informations gathered.
         """
-        print(sn_account)
         if sn_account["internal_id"]:
-            f = self.__get_json_from_url("http://api.flickr.com/services/feeds/photos_public.gne?id="+sn_account["internal_id"]+"&format=json", "flickr-internal_id")
+            account_data = self.__get_json_from_url("http://api.flickr.com/services/feeds/photos_public.gne?id=" + sn_account["internal_id"] + "&format=json", "flickr-internal_id")
             try:
-                tmp = re.search("photos\/([a-zA-Z0-9]{1,32})", f["link"])
+                tmp = re.search(r"photos\/([a-zA-Z0-9]{1,32})", account_data["link"])
                 sn_account["username"] = tmp.group(1)
                 sn_account["title"] = tmp.group(1)
                 sn_account["subStatus"] = "subscribable"
                 sn_account["status"] = "public"
-            except:
+            except json.JSONDecodeError:
                 sn_account["subStatus"] = "NotExists"
                 sn_account["status"] = "unknown"
         elif sn_account["username"]:
-            f = self.__get_json_from_url("https://www.flickr.com/photos/"+sn_account["username"]+"/", "flickr-username")
-            print(f)
+            account_data = self.__get_json_from_url("https://www.flickr.com/photos/" + sn_account["username"] + "/", "flickr-username")
             try:
-                sn_account["internal_id"] = f["internal_id"]
+                sn_account["internal_id"] = account_data["internal_id"]
                 sn_account["title"] = sn_account["username"]
                 sn_account["subStatus"] = "subscribable"
                 sn_account["status"] = "public"
@@ -97,57 +98,52 @@ class Flickr:
 
         for value in social_accounts:
 
-            userId = value["internal_id"]
+            user_id = value["internal_id"]
             user = value["username"]
             title = value["title"]
-            status = value["status"]
+            # status = value["status"]
 
-            self.__logger.info("Getting JSON from Flickr of "+value["username"]+"...")
-            f = self.__get_json_from_url("http://api.flickr.com/services/feeds/photos_public.gne?id="+userId+"&format=json", "flickr-internal_id")
+            self.__logger.info("Getting JSON from Flickr of %s...", (value["username"]))
+            account_data = self.__get_json_from_url("http://api.flickr.com/services/feeds/photos_public.gne?id=" + user_id + "&format=json", "flickr-internal_id")
 
             request_status = True
-            if "error" in f: #Controllo che non ci siano errori come account non esistente (o cancellato) o chiave non valida
-                reason = f["reason"]
+            if "error" in account_data:  # Controllo che non ci siano errori come account non esistente (o cancellato) o chiave non valida
+                reason = account_data["reason"]
                 request_status = False
-            elif "items" in f: #Controllo che il canale non sia vuoto
-                if not f["items"]:
+            elif "items" in account_data:  # Controllo che il canale non sia vuoto
+                if not account_data["items"]:
                     reason = "emptyChannel"
                     request_status = False
 
-            if request_status: #Se l'account esiste e non è vuoto
+            if request_status:  # Se l'account esiste e non è vuoto
 
-                item_lastDate = int(value["retreive_time"])#-17280000
+                item_last_date = int(value["retreive_time"])  # -17280000
 
-                item_lastDate_Temp = item_lastDate
-                for post in f["items"]:
+                item_last_date_temp = item_last_date
+                for post in account_data["items"]:
                     item_title = post["title"]
                     item_description = post["description"]
                     item_url = post["link"]
                     item_date = int(calendar.timegm(datetime.datetime.strptime(post["published"], "%Y-%m-%dT%H:%M:%SZ").timetuple()))
-                    if item_date > item_lastDate:
-                        messages.append({"type": "new_post", "social": "flickr", "internal_id": userId, "username": user, "title": title, "post_title": item_title, "post_description": item_description, "post_url": item_url, "media_source": None, "post_date": item_date})
-                        if item_date > item_lastDate_Temp:
-                            item_lastDate_Temp = item_date
+                    if item_date > item_last_date:
+                        messages.append({"type": "new_post", "social": "flickr", "internal_id": user_id, "username": user, "title": title, "post_title": item_title, "post_description": item_description, "post_url": item_url, "media_source": None, "post_date": item_date})
+                        if item_date > item_last_date_temp:
+                            item_last_date_temp = item_date
 
-                item_lastDate = item_lastDate_Temp
+                item_last_date = item_last_date_temp
 
-                queries["update"].append({'type':'retreive_time', 'social':'flickr', 'internal_id': userId, 'retreive_time': str(item_lastDate)})
+                queries["update"].append({'type': 'retreive_time', 'social': 'flickr', 'internal_id': user_id, 'retreive_time': str(item_last_date)})
 
             else:
                 if reason == "userNotFound":
-                    #Se l'account non esiste più allora lo cancello
-                    self.__logger.info("Il profilo "+user+" non esiste più, ora lo cancello.")
-                    queries["delete"].append({'type':'socialAccount', 'social':'flickr', 'internal_id': userId})
-                    messages.append({"type": "deleted_account" ,"social": "flickr", "internal_id": userId, "username": user, 'title': title, "post_url": "https://www.flickr.com/people/"+user, "post_date": int(time.time())})
+                    # Se l'account non esiste più allora lo cancello
+                    self.__logger.info("Il profilo %s non esiste più, ora lo cancello.", (user))
+                    queries["delete"].append({'type': 'socialAccount', 'social': 'flickr', 'internal_id': user_id})
+                    messages.append({"type": "deleted_account", "social": "flickr", "internal_id": user_id, "username": user, 'title': title, "post_url": "https://www.flickr.com/people/" + user, "post_date": int(time.time())})
                 elif reason == "emptyChannel":
                     pass
                 else:
-                    pass #Oltrepassato il rate limit od errore sconosciuto
-
-
-        #Messaggi ordinati cronologicamente
+                    pass  # Oltrepassato il rate limit od errore sconosciuto
+        # Messaggi ordinati cronologicamente
         messages.reverse()
-        
         return {'messages': messages, 'queries': queries}
-
-

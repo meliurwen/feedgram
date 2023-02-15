@@ -1241,7 +1241,7 @@ class Processinput:
                 sub["link"] = tmp.group(0)
                 sub["username"] = tmp.group(1)
                 return sub
-            #Flickr
+            # Flickr
             tmp = self.__re_link["flickr"]["username"].search(sub["link"])
             if tmp:
                 sub["social"] = "flickr"
