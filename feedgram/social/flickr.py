@@ -40,32 +40,15 @@ class Flickr:
                 try:
                     return json.loads(content["content"]) #If the internal_id is not valid flickr's responds with a non-json page
                 except:
-                    print("The content of the flickr's url is not json, I assume the account has been deleted...")
-                    print("\n######START######\n" + content["content"] + "\n######END######") #Added this line only to investigate about an issue about false positive detections of deleted accounts. Remove this when finished.
-                    return {"error": True, "reason": "userNotFound"}
-            try:
-                content["content"] = json.loads(content["content"])
-                if before_json_exception:
-                    before_json_exception = False
-                    self.__logger.warning("This time the the content retrived contains json! :D")
-                if content["status_code"] == 404:
-                    content["content"] = {"entry_data": {}}
-                return content["content"]
-            except json.JSONDecodeError:
-                if content["status_code"] == 404:
-                    content["content"] = {"entry_data": {}}
-                    return content
-                before_json_exception = True
-                wait_time = randrange(10, 20)
-                self.__logger.warning("The content of the url is not json, now i print the content...")
-                self.__logger.warning(content["content"])
-                self.__logger.warning("Trying again in %s seconds...", wait_time)
-            except RateLimitError:
-                before_json_exception = True
-                wait_time = randrange(60, 240)
-                self.__logger.warning("Rate Limited...")
-                self.__logger.warning("Trying again in %s seconds...", wait_time)
-            time.sleep(wait_time)
+                    if not before_json_exception:
+                        self.__logger.warning("The content of the flickr's url is not json, I assume the account has been deleted...")
+                        self.__logger.warning("\n######START######\n" + content["content"] + "\n######END######") #Added this line only to investigate about an issue about false positive detections of deleted accounts. Remove this when finished.
+                        return {"error": True, "reason": "userNotFound"}
+                    before_json_exception = True
+                    wait_time = randrange(10, 20)
+                    self.__logger.warning("The content of the flickr's url is not json.")
+                    self.__logger.warning("Trying again in %s seconds...", wait_time)
+                    time.sleep(wait_time)
             self.__logger.warning("Trying to retreive again the content from the url...")
 
     def extract_data(self, sn_account: dict) -> dict:
