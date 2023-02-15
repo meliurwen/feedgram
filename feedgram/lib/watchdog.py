@@ -9,6 +9,7 @@ from feedgram.lib.process_input import Processinput
 from feedgram.lib.database import MyDatabase
 from feedgram.lib.telegram import Telegram
 from feedgram.social.instagram import Instagram
+from feedgram.social.flickr import Flickr
 
 CODA = queue.Queue()
 CODA_TEMP = queue.Queue()
@@ -21,6 +22,8 @@ class Watchdog(threading.Thread):
     def news_retreiver_subthread(self, social_type, subscriptions, coda_social):
         if social_type == "instagram":
             datas = self.__instagram_interface.get_feed(subscriptions)
+        elif social_type == "flickr":
+            datas = self.__flickr_interface.get_feed(subscriptions)
         else:
             datas = []
         if datas:
@@ -45,6 +48,7 @@ class Watchdog(threading.Thread):
         # Inizializazione dei social da fare solo ne caso del news_retreiver e del telegram_user_interface
         if self.mode == "telegram_user_interface" or self.mode == "news_retreiver":
             self.__instagram_interface = Instagram()
+            self.__flickr_interface = Flickr()
 
         if self.mode == "telegram_user_interface" or self.mode == "sender":
             self.__tel_interface = Telegram(self.__conf_dict["API"]["telegramkey"])  # <- cambiare config_dict
@@ -67,7 +71,7 @@ class Watchdog(threading.Thread):
             self.__tel_interface.update_command_info(commands)
 
         if self.mode == "telegram_user_interface":
-            self.__process_input = Processinput(self.__db, [self.__instagram_interface], self.__conf_dict["BOT"]["privilegekey"])  # da dare in input i social
+            self.__process_input = Processinput(self.__db, [self.__instagram_interface, self.__flickr_interface], self.__conf_dict["BOT"]["privilegekey"])  # da dare in input i social
 
     def run(self):
         global CODA
@@ -169,7 +173,7 @@ class Watchdog(threading.Thread):
 
                     # In caso nessuno sia iscritto al social aggiungo un array ed un dizionario vuoti
                     num_subs_threads = {"subscriptions": {"total": 0}, "threads": {"total": 0}}
-                    for element in ["instagram"]:  # TODO: Portare fuori questa lista, che indica i servizi che sono abilitati per il retrieving delle informazioni
+                    for element in ["flickr"]:  # TODO: Portare fuori questa lista, che indica i servizi che sono abilitati per il retrieving delle informazioni
                         if element not in SUBSCRIPTIONS_DICT["subscriptions"]:
                             SUBSCRIPTIONS_DICT["subscriptions"][element] = {}
                         if element not in SUBSCRIPTIONS_DICT["social_accounts"]:

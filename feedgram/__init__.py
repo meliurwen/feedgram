@@ -5,6 +5,7 @@ import feedgram.lib.telegram
 import feedgram.lib.utils
 import feedgram.social
 import feedgram.social.instagram
+import feedgram.social.flickr
 import feedgram.lib.database
 import feedgram.lib.process_input
 import feedgram.lib.watchdog

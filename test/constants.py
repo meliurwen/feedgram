@@ -702,7 +702,7 @@ MSG_CMD_SUB_IG_P_NO_EXST_OR_PRIV["response"] = {
         "p": "dD8-su2dF"
     }
 }
-MSG_CMD_SUB_IG_P_NO_EXST_OR_PRIV["result"][0]["text"] = "Social: instagram\nThis account doesn't exists or is private!"
+MSG_CMD_SUB_IG_P_NO_EXST_OR_PRIV["result"][0]["text"] = "Social: instagram\nThis account doesn't exist or is private!"
 
 MSG_CMD_SUB_IG_P_NO_SPEC_MTHD = copy.deepcopy(MSG_CMD_SUB_STANDARD)
 MSG_CMD_SUB_IG_P_NO_SPEC_MTHD["query"]["result"][0]["message"]["text"] = "/sub https://www.instagram.com/p/Yu9Jfi8/"
