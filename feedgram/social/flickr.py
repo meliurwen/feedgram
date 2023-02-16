@@ -137,7 +137,7 @@ class Flickr:
             else:
                 if reason == "userNotFound":
                     # Se l'account non esiste più allora lo cancello
-                    self.__logger.info("Il profilo %s non esiste più, ora lo cancello.", (user))
+                    self.__logger.info("The profile '%s' no longer exists, now I delete it.", (user))
                     queries["delete"].append({'type': 'socialAccount', 'social': 'flickr', 'internal_id': user_id})
                     messages.append({"type": "deleted_account", "social": "flickr", "internal_id": user_id, "username": user, 'title': title, "post_url": "https://www.flickr.com/people/" + user, "post_date": int(time.time())})
                 elif reason == "emptyChannel":
