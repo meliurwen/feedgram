@@ -43,7 +43,7 @@ class Flickr:
                 try:
                     return json.loads(content["content"])  # If the internal_id is not valid flickr's responds with a non-json page
                 except json.JSONDecodeError:
-                    if not before_json_exception:
+                    if before_json_exception:
                         self.__logger.warning("The content of the flickr's url is not json, I assume the account has been deleted...")
                         self.__logger.warning("\n######START######\n%s\n######END######", (content["content"]))  # Added this line only to investigate about an issue about false positive detections of deleted accounts. Remove this when finished.
                         return {"error": True, "reason": "userNotFound"}
