@@ -6,19 +6,17 @@
 
 [![Platform](https://gitlab.com/meliurwen/feedgram/-/jobs/artifacts/master/raw/pylint/plaform.svg?job=pylint)](https://gitlab.com/meliurwen/feedgram/-/jobs/artifacts/master/raw/pylint/plaform.svg?job=pylint) [![Python_ver](https://gitlab.com/meliurwen/feedgram/-/jobs/artifacts/master/raw/pylint/python_ver.svg?job=pylint)](https://gitlab.com/meliurwen/feedgram/-/jobs/artifacts/master/raw/pylint/python_ver.svg?job=pylint) [![Wheel](https://gitlab.com/meliurwen/feedgram/-/jobs/artifacts/master/raw/pylint/wheel.svg?job=pylint)](https://gitlab.com/meliurwen/feedgram/-/jobs/artifacts/master/raw/pylint/wheel.svg?job=pylint) [![pip_install](https://gitlab.com/meliurwen/feedgram/-/jobs/artifacts/master/raw/pylint/pip_install.svg?job=pylint)](https://gitlab.com/meliurwen/feedgram/-/jobs/artifacts/master/raw/pylint/pip_install.svg?job=pylint)
 
-## 2020 Laboratorio di Progettazione
-
-> **_Note:_** It's a private repo, use the `LabProgettazioneDISCo` Gitlab's user in order to access it!
+## Main Resources
 
 + :fontawesome-brands-gitlab: **_Project's Link:_** [gitlab.com/meliurwen/feedgram](https://gitlab.com/meliurwen/feedgram)
 + :fontawesome-brands-telegram: **_Demo Link:_** [t.me/FeedGram_demo_bot](https://t.me/FeedGram_demo_bot)
 
 ## Group Members
 
-| :fontawesome-solid-user-circle: | Name            |  Matr. |
-|:-------------------------------:|-----------------|:------:|
-|               👩🏻‍💻               | Michele Salanti | 793891 |
-|               👨🏻‍💻               | Ivan Donati     | 781022 |
+| :fontawesome-solid-user-circle: | Name        |
+|:-------------------------------:|-------------|
+|               👩🏻‍💻                | Meliurwen   |
+|               👨🏻‍💻                | Ivan Donati |
 
 ## Purpose
 
