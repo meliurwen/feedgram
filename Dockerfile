@@ -1,6 +1,6 @@
 FROM python:3.8-alpine3.11
 
-LABEL maintainer = "Michele Salanti, Ivan Donati"
+LABEL maintainer = "Meliurwen, Ivan Donati"
 
 COPY . /app/
 
