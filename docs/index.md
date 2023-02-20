@@ -11,19 +11,6 @@
 + :fontawesome-brands-gitlab: **_Project's Link:_** [gitlab.com/meliurwen/feedgram](https://gitlab.com/meliurwen/feedgram)
 + :fontawesome-brands-telegram: **_Demo Link:_** [t.me/FeedGram_demo_bot](https://t.me/FeedGram_demo_bot)
 
-## Group Members
-
-| :fontawesome-solid-user-circle: | Name        |
-|:-------------------------------:|-------------|
-|               👩🏻‍💻                | Meliurwen   |
-|               👨🏻‍💻                | Ivan Donati |
-
-## Purpose
-
-Acquire, through experimental activities, the skills necessary to independently develop a system using agile methodologies by practicing the knowledge acquired during the course of studies.
-
-In this project we'll use **_Trello_** in combination with the _Gitlab's_ **_git_** and **_CI/CD_** infrastructure.
-
 ## App
 
 > **Note:** At the moment it's in pre-alpha state; a sensible part of our available resources has been invested on the study on learning agile practices.
@@ -32,7 +19,7 @@ A simple to use, but yet powerful Telegram bot app living in the cloud with adva
 
 This **_multi-user bot_** allows to receive _news_, _RSS feeds_, _social networks and other platforms posts_ into a **_single and curated inbox_**!
 
-The first platforms supported will be the most popular ones: _Instagram_, _Youtube_, _Flickr_, _Twitter_, _Artstation_, etc...
+The first platforms supported will be the most popular ones: ~~_Instagram_~~, _Youtube_, _Flickr_, _Twitter_, _Artstation_, etc...
 
 ## Architecture
 
@@ -47,5 +34,9 @@ The **_interactions with the socials/platforms_** will be done with various meth
 The **_internal structure_** of the application is mainly composed by a multitude of _specialised python modules_, an _SQLite3_ database and a config file in `ini` format, most of them directly orchestrated by a main module.
 
 ## Contribute
+
+> **Main Contributors**: Meliurwen, Ivan Donati
+
+In this project we use _Gitlab's_ **_kanban_**, **_git_**, **_CI/CD_** infrastructure and **_registry_**.
 
 See [here](contributing.md) to know how to report bugs, propose features, merge requests or other forms of contribution! :sunglasses::rocket:
