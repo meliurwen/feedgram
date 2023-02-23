@@ -3,6 +3,9 @@ import logging
 import re
 import time
 
+social_abilited = {"instagram": "instagram", "ig": "instagram", "flickr": "flickr", "fl": "flickr"}
+social_user_search_supported = {"instagram": None, "flickr": None}
+
 
 class Processinput:
     """
@@ -1034,9 +1037,6 @@ class Processinput:
         return txt
 
     def __unsubscription(self, sub, user_id):
-        # Spostare fuori questo dizionario
-        social_abilited = {"flickr": "flickr", "fl": "flickr"}
-
         # Check if there's enough data
         if not ((sub["social"] and sub["username"]) or (sub["social"] and sub["internal_id"])):
             return {"ok": False, "description": "notEnoughData"}
@@ -1065,9 +1065,6 @@ class Processinput:
         return response
 
     def __iscrizione(self, sub, user_id):
-        # Spostare fuori questo dizionario
-        social_abilited = {"flickr": "flickr", "fl": "flickr"}
-
         # Check if there's enough data
         if not ((sub["social"] and sub["username"]) or sub["link"]):
             return None
@@ -1090,7 +1087,6 @@ class Processinput:
 
         # Extract partial data locally on supported socials
         sub["subStatus"] = "social_id_not_present"
-        social_user_search_supported = {"flickr": None}
         if (sub["username"] or sub["internal_id"]) and (sub["social"] in social_user_search_supported):
             sub = self.__db.get_first_social_id_from_internal_user_social_and_if_present_subscribe(user_id, sub, False)
 
@@ -1105,7 +1101,6 @@ class Processinput:
         if not sub["social_id"]:
             # Extract data online
             sub = self.__extract_data_social(sub)
-            print(sub)
             # If exists, check if already in the database
             # If in the database subscribe, else add and subscribe
             if sub["subStatus"] == "subscribable":
@@ -1131,9 +1126,6 @@ class Processinput:
         return text
 
     def __set_sub_state(self, sub, user_id, state, exp_time):
-        # Spostare fuori questo dizionario
-        social_abilited = {"flickr": "flickr", "fl": "flickr"}
-
         # Check if there's enough data
         if not ((sub["social"] and sub["username"]) or (sub["social"] and sub["internal_id"])):
             return {"ok": False, "description": "notEnoughData"}
@@ -1195,9 +1187,6 @@ class Processinput:
         return response
 
     def __set_sub_category(self, sub, user_id, category):
-        # Spostare fuori questo dizionario
-        social_abilited = {"flickr": "flickr", "fl": "flickr"}
-
         # Check if there's enough data
         if not ((sub["social"] and sub["username"]) or (sub["social"] and sub["internal_id"])):
             return {"ok": False, "description": "notEnoughData"}

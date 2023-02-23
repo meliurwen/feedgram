@@ -9,7 +9,8 @@ HELP_MESSAGE = ("<b>📖 Help</b>"
                 "\n\n"
                 "You can follow up to <i>10 social accounts</i>.\n"
                 "Socials currently abilited:\n"
-                " • <i>Instagram</i>\n"
+                " • <i>Flickr</i>\n"
+                " • <i><s>Instagram</s></i>\n"
                 "You can follow only <b>public</b> accounts.\n"
                 "\n"
                 "<b>Receive Feeds:</b>\n"
@@ -32,7 +33,8 @@ HELP_MESSAGE = ("<b>📖 Help</b>"
                 "<b>About some above parameters</b>\n"
                 "Below are described which values some parameters accept:\n"
                 " • <b>social:</b>\n"
-                "   ◦ <i>instagram</i>, <i>ig</i>\n"
+                "   ◦ <i>flickr</i>, <i>fl</i>\n"
+                "   ◦ <s><i>instagram</i>, <i>ig</i></s>\n"
                 " • <b>time:</b> <i>XXh</i>, <i>XXd</i>\n"
                 "   ◦ <i>Where <b>XX</b> is a number between <b>0</b> and <b>99</b></i>.\n"
                 "   ◦ <i><b>h</b> and <b>d</b> represents respectively <b>hours</b> and <b>days</b></i>.\n")
@@ -631,7 +633,7 @@ MSG_CMD_SUB_NO_EXIST["response"] = {
     "data": {
     }
 }
-MSG_CMD_SUB_NO_EXIST["result"][0]["text"] = "Social: instagram\nThis account doesn't exists!"
+MSG_CMD_SUB_NO_EXIST["result"][0]["text"] = "Social: instagram\nThis account doesn't exist!"
 
 MSG_CMD_SUB_UNXPCTD_SUB_STATUS = copy.deepcopy(MSG_CMD_SUB_NO_EXIST)
 MSG_CMD_SUB_UNXPCTD_SUB_STATUS["query"]["result"][0]["message"]["text"] = "/sub instagram testProfileImpossible"

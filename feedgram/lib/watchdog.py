@@ -16,6 +16,8 @@ CODA_TEMP = queue.Queue()
 SUBSCRIPTIONS_DICT = {}
 DATAS_SOCIAL = []
 
+SOCIALS_ABILITED_FOR_RETRIEVING = ["instagram", "flickr"]
+
 
 class Watchdog(threading.Thread):
 
@@ -173,7 +175,7 @@ class Watchdog(threading.Thread):
 
                     # In caso nessuno sia iscritto al social aggiungo un array ed un dizionario vuoti
                     num_subs_threads = {"subscriptions": {"total": 0}, "threads": {"total": 0}}
-                    for element in ["flickr"]:  # TODO: Portare fuori questa lista, che indica i servizi che sono abilitati per il retrieving delle informazioni
+                    for element in SOCIALS_ABILITED_FOR_RETRIEVING:  # TODO: Portare fuori questa lista, che indica i servizi che sono abilitati per il retrieving delle informazioni
                         if element not in SUBSCRIPTIONS_DICT["subscriptions"]:
                             SUBSCRIPTIONS_DICT["subscriptions"][element] = {}
                         if element not in SUBSCRIPTIONS_DICT["social_accounts"]:
