@@ -12,6 +12,7 @@ nav:
   - Testing & Linting: testing_and_linting.md
   - Docstrings: docstrings.md
   - Multithreaded Arch.: multithreaded_arch.md
+  - Pipelines: pipelines.md
   - Reference:
     - lib:
       - utils.py: reference/lib/utils.md
@@ -46,6 +47,7 @@ markdown_extensions:
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
       emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.tabbed
   - toc:
       permalink: "¤"
 

@@ -9,24 +9,11 @@
 
 </div>
 
-# 2020 Laboratorio di Progettazione
-
-> **_Note:_** It's a private repo, use the `LabProgettazioneDISCo` Gitlab's user in order to access it!
+## Main Resources
 
 + **_Project's Repo:_** [gitlab.com/meliurwen/feedgram](https://gitlab.com/meliurwen/feedgram)
 + **_Project's Documentation:_** [meliurwen.gitlab.io/feedgram/](https://meliurwen.gitlab.io/feedgram/)
 + **_Demo Link:_** [t.me/FeedGram_demo_bot](https://t.me/FeedGram_demo_bot)
-
-## Group Members
-
-+ Salanti Michele - 793891
-+ Donati Ivan - 781022
-
-## Purpose
-
-Acquire, through experimental activities, the skills necessary to independently develop a system using agile methodologies by practicing the knowledge acquired during the course of studies.
-
-In this project we'll use **_Trello_** in combination with the _Gitlab's_ **_git_** and **_CI/CD_** infrastructure.
 
 ## App
 
@@ -36,7 +23,7 @@ A simple to use, but yet powerful Telegram bot app living in the cloud with adva
 
 This **_multi-user bot_** allows to receive _news_, _RSS feeds_, _social networks and other platforms posts_ into a **_single and curated inbox_**!
 
-The first platforms supported will be the most popular ones: _Instagram_, _Youtube_, _Flickr_, _Twitter_, _Artstation_, etc...
+The first platforms supported will be the most popular ones: ~~_Instagram_~~, _Youtube_, _Flickr_, _Twitter_, _Artstation_, etc...
 
 ## Architecture
 
@@ -117,6 +104,10 @@ pip3 install --upgrade .
 ```
 
 ## Contribute
+
+> **Main Contributors**: Meliurwen, Ivan Donati
+
+In this project we use _Gitlab's_ **_kanban_**, **_git_**, **_CI/CD_** infrastructure and **_registry_**.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) to know how to report bugs, propose features, merge requests or other forms of contribution! 😎🚀
 

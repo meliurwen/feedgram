@@ -170,7 +170,7 @@ class Instagram:
 
             else:
                 # Se l'account non esiste più allora lo cancello
-                self.__logger.info("Il profilo %s non esiste più, ora lo cancello.", user)
+                self.__logger.info("The profile '%s' no longer exists, now I delete it.", (user))
                 queries["delete"].append({'type': 'socialAccount', 'social': 'instagram', 'internal_id': str(user_id)})
                 messages.append({"type": "deleted_account", "social": "instagram", "internal_id": user_id, "username": user, "title": title, "post_url": "https://www.instagram.com/" + user + "/", "post_date": int(time.time())})
 

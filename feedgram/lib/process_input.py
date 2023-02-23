@@ -3,6 +3,9 @@ import logging
 import re
 import time
 
+social_abilited = {"instagram": "instagram", "ig": "instagram", "flickr": "flickr", "fl": "flickr"}
+social_user_search_supported = {"instagram": None, "flickr": None}
+
 
 class Processinput:
     """
@@ -33,7 +36,8 @@ class Processinput:
                   "\n\n"
                   "You can follow up to <i>10 social accounts</i>.\n"
                   "Socials currently abilited:\n"
-                  " • <i>Instagram</i>\n"
+                  " • <i>Flickr</i>\n"
+                  " • <i><s>Instagram</s></i>\n"
                   "You can follow only <b>public</b> accounts.\n"
                   "\n"
                   "<b>Receive Feeds:</b>\n"
@@ -56,7 +60,8 @@ class Processinput:
                   "<b>About some above parameters</b>\n"
                   "Below are described which values some parameters accept:\n"
                   " • <b>social:</b>\n"
-                  "   ◦ <i>instagram</i>, <i>ig</i>\n"
+                  "   ◦ <i>flickr</i>, <i>fl</i>\n"
+                  "   ◦ <s><i>instagram</i>, <i>ig</i></s>\n"
                   " • <b>time:</b> <i>XXh</i>, <i>XXd</i>\n"
                   "   ◦ <i>Where <b>XX</b> is a number between <b>0</b> and <b>99</b></i>.\n"
                   "   ◦ <i><b>h</b> and <b>d</b> represents respectively <b>hours</b> and <b>days</b></i>.\n")
@@ -1032,9 +1037,6 @@ class Processinput:
         return txt
 
     def __unsubscription(self, sub, user_id):
-        # Spostare fuori questo dizionario
-        social_abilited = {"instagram": "instagram", "ig": "instagram"}
-
         # Check if there's enough data
         if not ((sub["social"] and sub["username"]) or (sub["social"] and sub["internal_id"])):
             return {"ok": False, "description": "notEnoughData"}
@@ -1063,9 +1065,6 @@ class Processinput:
         return response
 
     def __iscrizione(self, sub, user_id):
-        # Spostare fuori questo dizionario
-        social_abilited = {"instagram": "instagram", "ig": "instagram"}
-
         # Check if there's enough data
         if not ((sub["social"] and sub["username"]) or sub["link"]):
             return None
@@ -1088,7 +1087,6 @@ class Processinput:
 
         # Extract partial data locally on supported socials
         sub["subStatus"] = "social_id_not_present"
-        social_user_search_supported = {"instagram": None}
         if (sub["username"] or sub["internal_id"]) and (sub["social"] in social_user_search_supported):
             sub = self.__db.get_first_social_id_from_internal_user_social_and_if_present_subscribe(user_id, sub, False)
 
@@ -1118,9 +1116,9 @@ class Processinput:
         elif sub["subStatus"] == "AlreadySubscribed":
             text = "Social: " + sub["social"] + "\nUser: " + sub["title"] + "\nYou're already subscribed to this account!"
         elif sub["subStatus"] == "NotExists":
-            text = "Social: " + sub["social"] + "\nThis account doesn't exists!"
+            text = "Social: " + sub["social"] + "\nThis account doesn't exist!"
         elif sub["subStatus"] == "NotExistsOrPrivate":
-            text = "Social: " + sub["social"] + "\nThis account doesn't exists or is private!"
+            text = "Social: " + sub["social"] + "\nThis account doesn't exist or is private!"
         elif sub["subStatus"] == "noSpecificMethodToExtractData" or sub["subStatus"] == "noMethodToExtractData":
             text = "Social: " + str(sub["social"]) + "\nMmmh, this shouldn't happen, no method (or specific method) to extract data."
         else:
@@ -1128,9 +1126,6 @@ class Processinput:
         return text
 
     def __set_sub_state(self, sub, user_id, state, exp_time):
-        # Spostare fuori questo dizionario
-        social_abilited = {"instagram": "instagram", "ig": "instagram"}
-
         # Check if there's enough data
         if not ((sub["social"] and sub["username"]) or (sub["social"] and sub["internal_id"])):
             return {"ok": False, "description": "notEnoughData"}
@@ -1192,9 +1187,6 @@ class Processinput:
         return response
 
     def __set_sub_category(self, sub, user_id, category):
-        # Spostare fuori questo dizionario
-        social_abilited = {"instagram": "instagram", "ig": "instagram"}
-
         # Check if there's enough data
         if not ((sub["social"] and sub["username"]) or (sub["social"] and sub["internal_id"])):
             return {"ok": False, "description": "notEnoughData"}
@@ -1238,11 +1230,20 @@ class Processinput:
                 sub["link"] = tmp.group(0)
                 sub["username"] = tmp.group(1)
                 return sub
+            # Flickr
+            tmp = self.__re_link["flickr"]["username"].search(sub["link"])
+            if tmp:
+                sub["social"] = "flickr"
+                sub["link"] = tmp.group(0)
+                sub["username"] = tmp.group(1)
+                return sub
         return sub
 
     def __extract_data_social(self, sub):
         if sub["social"] == "instagram":
             sub = self.__socials[0].extract_data(sub)
+        elif sub["social"] == "flickr":
+            sub = self.__socials[1].extract_data(sub)
         return sub
 
     def __re_compiler(self):
@@ -1252,3 +1253,5 @@ class Processinput:
         self.__re_link["instagram"] = {}
         self.__re_link["instagram"]["p"] = re.compile(r"(?:https:\/\/www\.|www\.)?instagram\.com\/p\/([A-Za-z0-9-_]{1,30})")
         self.__re_link["instagram"]["username"] = re.compile(r"(?:https:\/\/www\.|www\.)?instagram\.com\/([A-Za-z0-9_](?:(?:[A-Za-z0-9_]|(?:\.(?!\.))){0,28}(?:[A-Za-z0-9_]))?)")
+        self.__re_link["flickr"] = {}
+        self.__re_link["flickr"]["username"] = re.compile(r"(?:http[s]?:\/\/)?(?:www\.|m\.)?flickr\.com\/(?:photos\/|people\/)?([@A-Za-z0-9-_]{1,48})")

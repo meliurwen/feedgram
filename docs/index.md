@@ -6,25 +6,10 @@
 
 [![Platform](https://gitlab.com/meliurwen/feedgram/-/jobs/artifacts/master/raw/pylint/plaform.svg?job=pylint)](https://gitlab.com/meliurwen/feedgram/-/jobs/artifacts/master/raw/pylint/plaform.svg?job=pylint) [![Python_ver](https://gitlab.com/meliurwen/feedgram/-/jobs/artifacts/master/raw/pylint/python_ver.svg?job=pylint)](https://gitlab.com/meliurwen/feedgram/-/jobs/artifacts/master/raw/pylint/python_ver.svg?job=pylint) [![Wheel](https://gitlab.com/meliurwen/feedgram/-/jobs/artifacts/master/raw/pylint/wheel.svg?job=pylint)](https://gitlab.com/meliurwen/feedgram/-/jobs/artifacts/master/raw/pylint/wheel.svg?job=pylint) [![pip_install](https://gitlab.com/meliurwen/feedgram/-/jobs/artifacts/master/raw/pylint/pip_install.svg?job=pylint)](https://gitlab.com/meliurwen/feedgram/-/jobs/artifacts/master/raw/pylint/pip_install.svg?job=pylint)
 
-## 2020 Laboratorio di Progettazione
-
-> **_Note:_** It's a private repo, use the `LabProgettazioneDISCo` Gitlab's user in order to access it!
+## Main Resources
 
 + :fontawesome-brands-gitlab: **_Project's Link:_** [gitlab.com/meliurwen/feedgram](https://gitlab.com/meliurwen/feedgram)
 + :fontawesome-brands-telegram: **_Demo Link:_** [t.me/FeedGram_demo_bot](https://t.me/FeedGram_demo_bot)
-
-## Group Members
-
-| :fontawesome-solid-user-circle: | Name            |  Matr. |
-|:-------------------------------:|-----------------|:------:|
-|               👩🏻‍💻               | Michele Salanti | 793891 |
-|               👨🏻‍💻               | Ivan Donati     | 781022 |
-
-## Purpose
-
-Acquire, through experimental activities, the skills necessary to independently develop a system using agile methodologies by practicing the knowledge acquired during the course of studies.
-
-In this project we'll use **_Trello_** in combination with the _Gitlab's_ **_git_** and **_CI/CD_** infrastructure.
 
 ## App
 
@@ -49,5 +34,9 @@ The **_interactions with the socials/platforms_** will be done with various meth
 The **_internal structure_** of the application is mainly composed by a multitude of _specialised python modules_, an _SQLite3_ database and a config file in `ini` format, most of them directly orchestrated by a main module.
 
 ## Contribute
+
+> **Main Contributors**: Meliurwen, Ivan Donati
+
+In this project we use _Gitlab's_ **_kanban_**, **_git_**, **_CI/CD_** infrastructure and **_registry_**.
 
 See [here](contributing.md) to know how to report bugs, propose features, merge requests or other forms of contribution! :sunglasses::rocket:
