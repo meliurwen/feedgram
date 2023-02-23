@@ -1,3 +1,18 @@
+## Version 0.7.1
+
+### Additions
+
++ Added Flickr support
+
+### Changes
+
++ Minor docs and bot text cleaning and spellchecking
+
+### Fixes
+
++ Fixed dependencies
++ Fixed CI/CD
+
 ## Version 0.7
 
 ### Additions

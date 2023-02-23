@@ -19,7 +19,7 @@ A simple to use, but yet powerful Telegram bot app living in the cloud with adva
 
 This **_multi-user bot_** allows to receive _news_, _RSS feeds_, _social networks and other platforms posts_ into a **_single and curated inbox_**!
 
-The first platforms supported will be the most popular ones: ~~_Instagram_~~, _Youtube_, _Flickr_, _Twitter_, _Artstation_, etc...
+The first platforms supported will be the most popular ones: _Instagram_, _Youtube_, _Flickr_, _Twitter_, _Artstation_, etc...
 
 ## Architecture
 
